@@ -1,0 +1,192 @@
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap');
+
+*{
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Montserrat', sans-serif;
+}
+
+.main_container{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width:100vw;
+    height:100vh;
+    background: #00B4DB;  /* fallback for old browsers */
+    background: -webkit-linear-gradient(to top, #0083B0, #00B4DB);  /* Chrome 10-25, Safari 5.1-6 */
+    background: linear-gradient(to top, #0083B0, #00B4DB); /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
+}
+
+.container_file_image{
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    width: 80%;
+}
+    .container_file_image .image_container img {
+        filter: drop-shadow(0px 1px 10px rgba(0, 0, 0, 0.2));
+    }
+
+.drop-zone {
+        width: 500px;
+        height: 400px;
+        border-radius: 20px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-direction: column;
+        font-size: 16px;
+        color: #cccccc;
+        cursor: pointer;
+        background-color:rgb(255, 255, 255); ;
+        box-shadow: 0 0 80px rgba(75, 75, 75, 0.3);
+        transform: scale(100%);
+
+    }
+    .drop-zone.dragover {
+        border-color: #0000ff;
+        background-color: #f0f8ff;
+        transform: scale(110%);
+    }
+
+    #preview-img {
+        display: none;
+        width: auto;
+        height: 200px;
+        padding-bottom: 10px;
+    }
+
+    .drop-zone button{
+        height: 40px;
+        width: 150px;
+        border-radius: 20px;
+        border: none;
+        background: rgb(37, 152, 38);
+        color: white;
+        font-weight: 500;
+        margin-top: 15px;
+    }
+
+    .drop-zone button:hover{
+        font-weight: 700;
+        cursor: pointer;
+    }
+
+
+    /*ANIMACION DE ONDA*/
+
+    section .wave{
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        width: 100%;
+        height: 100px;
+        background: url("assets/wave.png");
+        background-size: 1000px 100px;
+    }
+
+    section .wave1{
+        animation: wave 30s linear infinite;
+        z-index: 1000;
+        opacity: 1;
+        animation-delay: 0s;
+        bottom: 0;
+    }
+
+    section .wave2{
+        animation: wave2 15s linear infinite;
+        z-index: 999;
+        opacity: 0.5;
+        animation-delay: -5s;
+        bottom: 10px;
+    }
+
+    section .wave3{
+        animation: wave2 15s linear infinite;
+        z-index: 998;
+        opacity: 0.2;
+        animation-delay: -2s;
+        bottom: 15px;
+    }
+
+    @keyframes wave {
+        0%{background-position-x:0;}
+        100%{background-position-x:1000px;}
+    }
+
+    @keyframes wave2 {
+        0%{background-position-x:0;}
+        100%{background-position-x:1000px;}
+    }
+
+    .modal-content{
+        width: 80vw;
+        height: 90vh;
+    }
+
+    .modal-header button{
+        width: 30px;
+        height: 30px;
+        border: none;
+        background-color: red;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        box-shadow: 0 0 3px rgba(0,0,0,0.4);
+    }
+    .modal-header button span{
+        color: #ffffff;
+    }
+
+    .modal-body{
+        position:relative;
+        width: 100%;
+        height: auto;
+        overflow: auto;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .content_body{
+        position: relative;
+        display: flex;
+        flex-direction: column;
+        width: auto;
+        height: auto;
+    }
+
+    .point {
+        width: 7px;
+        height: 7px;
+        background-color: rgb(164, 17, 191);
+        border-radius: 50%;
+        cursor: grab;
+    }
+
+    .point:active {
+        cursor: grabbing;
+    }
+
+    .resize_content{
+        width: 100%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        flex-direction: column;
+    }
+
+    .resize_content label{
+        text-align: center;
+        font-size: 0.8rem;
+    }
+
+    .select-option{
+        height: 40px;
+        width: 120px;
+        padding: 7px 2px;
+        border: 1px solid rgba(0,0,0,0.2);
+        border-radius: 5px;
+    }
