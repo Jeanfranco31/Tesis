@@ -4,12 +4,14 @@ const fileInput = document.getElementById('file-input');
 const uploadForm = document.getElementById('upload-form');
 const previewImg = document.getElementById('preview-img');
 const button = document.getElementById('button');
+const modalImgPreview = document.getElementById('modal-imgPreview');
 const modalImg = document.getElementById('modal-img');
+
 const option = document.getElementById('select-option');
 
 // Almacena los puntos
 let points = [];
-const filePathName = '';
+const fileModalImageName = '';
 
     // Permite arrastrar el archivo sobre la zona de drop
     dropZone.addEventListener('dragover', (e) => {
@@ -70,42 +72,45 @@ const filePathName = '';
         const formData = new FormData();
         formData.append('image', file);
 
-        try {
-            const response = await fetch('/upload', {
+        try{
+            const response = await fetch('/resize_image', {
                 method: 'POST',
                 body: formData
             });
-            const data = await response.json();
-            this.response = data;
-            this.filePathName = this.response.path;
+
+            if (!response.ok) {
+                throw new Error(`Error ${response.status}: ${response.statusText}`);
+            }
+
+            const contentType = response.headers.get('Content-Type');
+            if (contentType && contentType.includes('application/json')) {
+                const data = await response.json();
+                this.response = data;
+                this.filePathName = data.path;
+            } else {
+                throw new Error('Respuesta no es JSON válido');
+            }
         } catch (error) {
             console.error('Error al enviar la imagen:', error);
         }
-        console.log(this.response)
+
         // Mostrar imagen procesada en el modal
-        modalImg.src = 'static/uploads/points_' + file.name;
+        modalImgPreview.src = 'static/uploads/resized_' + file.name;
+        this.fileModalImageName = 'resized_'+file.name;
 
         // Dibujar puntos sobre la imagen
         points = this.response.position;
 
         // Esperar a que la imagen se cargue para obtener sus dimensiones
-        modalImg.onload = () => {
-
-            //GET WIDTH AND HEIGHT FROM IMAGE UPLOAD
-            const imgW = modalImg.width;
-            const imgH = modalImg.height;
-
-            console.log(modalImg.width, modalImg.height);
-
-            drawPoints(this.response.position, imgW, imgH);
-            $('#imageModal').modal('show'); // Mostrar el modal
+        modalImgPreview.onload = () => {
+            $('#previewImageModal').modal('show'); // Mostrar el modal
         };
     });
 
 
 
     // Dibujar puntos sobre la imagen usando las dimensiones correctas
-    function drawPoints(points, imgW, imgH) {
+    function drawPoints(points, imgW=300, imgH=445) {
         const pointContainer = document.getElementById('point-container');
         pointContainer.innerHTML = ''; // Limpiar puntos anteriores
 
@@ -208,8 +213,48 @@ const filePathName = '';
 
     }
 
-     function resizeImage(width, height){
-     }
+    async function generatePose(){
+        closeModal();
 
+        const fileName = this.fileModalImageName;
+        console.log('Filename enviado:', fileName);
+
+        try {
+            const response = await fetch('/upload', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ fileName })
+            });
+
+            if (!response.ok) {
+                const errorText = await response.text(); // Leer el texto del error para depurar
+                console.error('Error en la respuesta del servidor:', errorText);
+                throw new Error('Error en la respuesta del servidor');
+            }
+
+            const data = await response.json();
+            this.response = data;
+            //this.filePathName = this.response.path;
+            modalImg.src = this.response.path;
+
+            drawPoints(this.response.position);
+
+        } catch (error) {
+            console.error('Error al enviar la imagen:', error);
+        }
+
+        // Esperar a que la imagen se cargue para obtener sus dimensiones
+        modalImg.onload = () => {
+            $('#imageModal').modal('show'); // Mostrar el modal
+        };
+
+    }
+
+
+    function closeModal(){
+        $('#previewImageModal').modal('hide');
+    }
 
 

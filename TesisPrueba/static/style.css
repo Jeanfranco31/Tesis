@@ -190,3 +190,22 @@
         border: 1px solid rgba(0,0,0,0.2);
         border-radius: 5px;
     }
+
+    /*MODAL*/
+    .cancelButton{
+        height: 40px;
+        width: 100px;
+        border: none;
+        border-radius: 2px;
+        background-color: red;
+        color: white;
+    }
+    .generateButton{
+        height: 40px;
+        width: 130px;
+        border: none;
+        border-radius: 2px;
+        background-color: green;
+        color: white;
+    }
+    /*FIN MODAL*/

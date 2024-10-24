@@ -21,40 +21,76 @@ def index():
 
 @app.route('/upload', methods=['POST'])
 def upload_image():
-    # Verificar si se ha enviado un archivo
-    if 'image' not in request.files:
-        return jsonify({'message': 'No se encontró ninguna imagen.'}), 400
 
-    image = request.files['image']
+    try:
+        # Verificar si se recibió el nombre del archivo
+        data = request.get_json()
+        print(f'Datos recibidos: {data}')  # Verificar qué llega
 
-    # Verificar si se seleccionó un archivo válido
-    if image.filename == '':
-        return jsonify({'message': 'No se seleccionó ninguna imagen.'}), 400
 
-    # Guardar la imagen en la carpeta 'static/uploads'
-    filepath = os.path.join(UPLOAD_FOLDER, image.filename)
-    image.save(filepath)
+        if not data or 'fileName' not in data:
+            return jsonify({'message': 'No se proporcionó un nombre de archivo válido.'}), 400
 
-    # Cargar la imagen y aplicarle los puntos corporales
-    img = cv.imread(filepath)
-    img_with_pose = detector.findPose(img)  # Aplicar detección de pose
+        filename = data['fileName']
+        filepath = os.path.join(UPLOAD_FOLDER, filename)
 
-    # Guardar la nueva imagen con los puntos en 'uploads/'
-    output_path = os.path.join(UPLOAD_FOLDER, 'points_' + image.filename)
-    cv.imwrite(output_path, img_with_pose)
+        # Verificar si el archivo existe
+        if not os.path.isfile(filepath):
+            return jsonify({'message': 'El archivo no existe.'}), 404
 
-    #Coordenadas de los puntos
-    position = detector.findPosition(img)
+        # Procesar la imagen y detectar la pose
+        img = cv.imread(filepath)
+        img_with_pose = detector.findPose(img)
 
-    # Enviar una respuesta al cliente
-    return jsonify({'message': 'Imagen subida exitosamente.', 'path': filepath, 'position':position}), 200
+        # Guardar la imagen con los puntos detectados
+        output_path = os.path.join(UPLOAD_FOLDER, 'points_' + filename)
+        cv.imwrite(output_path, img_with_pose)
 
-def resizeImage(image_path, width=300, height=445):
-    with Image.open(image_path) as img:
-        resized_img = img.resize((width, height))
-        resized_img.save(UPLOAD_FOLDER, format='JPEG', quality=90)
-        output_path_file = UPLOAD_FOLDER+image_path
-    return output_path_file
+        # Coordenadas de los puntos
+        position = detector.findPosition(img)
+
+        return jsonify({
+            'message': 'Imagen procesada exitosamente.',
+            'path': output_path,
+            'position': position
+        }), 200
+
+    except Exception as e:
+        return jsonify({'message': f'Error interno del servidor: {str(e)}'}), 500
+
+
+@app.route('/resize_image', methods=['POST'])
+def resizeImage():
+    try:
+        # Verificar si el archivo está en la solicitud
+        if 'image' not in request.files:
+            return jsonify({'error': 'No se encontró ninguna imagen'}), 400
+
+        image = request.files['image']
+        if image.filename == '':
+            return jsonify({'error': 'Nombre de archivo vacío'}), 400
+
+        # Guardar el archivo temporalmente
+        filepath = os.path.join(UPLOAD_FOLDER, image.filename)
+        image.save(filepath)
+        print("Ruta del archivo guardado:", filepath)
+
+        # Leer la imagen con PIL
+        with Image.open(filepath) as img:
+            resized_img = img.resize((300, 445))
+            resized_image_name = 'resized_' + image.filename
+            output_path_file = os.path.join(UPLOAD_FOLDER, resized_image_name)
+
+            # Guardar la imagen redimensionada
+            resized_img.save(output_path_file, format='JPEG', quality=90)
+            print("Imagen redimensionada guardada en:", output_path_file)
+
+        return jsonify({'Imagen_Redimensionada': output_path_file}), 200
+
+    except Exception as e:
+        print(f"Error: {e}")
+        return jsonify({'error': str(e)}), 500
+
 
 if __name__ == '__main__':
     app.run(debug=True)

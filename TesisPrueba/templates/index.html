@@ -18,7 +18,7 @@
                     <img id="preview-img" alt="Vista previa">
                     <p>Arrastra y suelta tu archivo aquí o haz clic para elegirlo.</p>
                     <input type="file" id="file-input" accept="image/*" style="display: none;">
-                    <button type="button" id="button" style="display: none;">Generar Pose</button>
+                    <button type="button" id="button" style="display: none;">Cargar</button>
                 </div>
             </div>
             <section>
@@ -30,17 +30,37 @@
         </div>
 
         <!-- Modal -->
+        <div class="modal fade" id="previewImageModal" tabindex="-1" role="dialog" aria-labelledby="modalLabel" aria-hidden="true">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h6 class="modal-title" id="modalLabel">¿Deseas generar los puntos en esta imagen?</h6>
+                    </div>
+                    <div class="modal-body">
+                        <div class="content_body" id="content_body">
+                            <img id="modal-imgPreview" src="" alt="Imagen Procesada">
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="cancelButton" onclick="closeModal()">Cancelar</button>
+                        <button type="button" class="generateButton" onclick="generatePose()">Generar POSE</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Modal-->
         <div class="modal fade" id="imageModal" tabindex="-1" role="dialog" aria-labelledby="modalLabel" aria-hidden="true">
             <div class="modal-dialog" role="document">
                 <div class="modal-content">
                     <div class="modal-header">
-                        <h5 class="modal-title" id="modalLabel">Imagen Procesada</h5>
+                        <h5 class="modal-title">Imagen Procesada</h5>
                         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                             <span aria-hidden="true">&times;</span>
                         </button>
                     </div>
                     <div class="modal-body">
-                        <div class="content_body" id="content_body">
+                        <div class="content_body">
                             <img id="modal-img" src="" alt="Imagen Procesada">
                             <div id="point-container"></div>
                         </div>
@@ -61,6 +81,7 @@
                 </div>
             </div>
         </div>
+
     </body>
 
     <script src="../static/scripts/file.js"></script>
