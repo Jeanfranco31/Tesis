@@ -6,12 +6,16 @@ const previewImg = document.getElementById('preview-img');
 const button = document.getElementById('button');
 const modalImgPreview = document.getElementById('modal-imgPreview');
 const modalImg = document.getElementById('modal-img');
-
 const option = document.getElementById('select-option');
+const h = document.getElementById('h');
+const w = document.getElementById('w');
+
 
 // Almacena los puntos
 let points = [];
 const fileModalImageName = '';
+const width_resize = 0;
+const height_resize = 0;
 
     // Permite arrastrar el archivo sobre la zona de drop
     dropZone.addEventListener('dragover', (e) => {
@@ -39,13 +43,14 @@ const fileModalImageName = '';
 
     // Permitir hacer clic en la zona de drop
     dropZone.addEventListener('click', () => {
+        e.stopPropagation();
         fileInput.click();
     });
 
     // Cuando seleccionas un archivo mediante clic
     fileInput.addEventListener('change', () => {
         if (fileInput.files.length > 0) {
-            uploadForm.submit();
+            showPreview(fileInput.files[0]); // Muestra vista previa de la imagen
         }
     });
 
@@ -64,10 +69,6 @@ const fileModalImageName = '';
     button.addEventListener('click', async () => {
         let response = {};
         const file = fileInput.files[0];
-        if (!file) {
-            alert('Selecciona una imagen primero.');
-            return;
-        }
 
         const formData = new FormData();
         formData.append('image', file);
@@ -87,6 +88,8 @@ const fileModalImageName = '';
                 const data = await response.json();
                 this.response = data;
                 this.filePathName = data.path;
+                this.width_resize = data.ancho
+                this.height_resize = data.alto
             } else {
                 throw new Error('Respuesta no es JSON válido');
             }
@@ -105,30 +108,32 @@ const fileModalImageName = '';
         modalImgPreview.onload = () => {
             $('#previewImageModal').modal('show'); // Mostrar el modal
         };
+        fileInput.value = '';
     });
 
 
-
     // Dibujar puntos sobre la imagen usando las dimensiones correctas
-    function drawPoints(points, imgW=300, imgH=445) {
+    function drawPoints(points, imgW, imgH) {
         const pointContainer = document.getElementById('point-container');
-        pointContainer.innerHTML = ''; // Limpiar puntos anteriores
+        pointContainer.innerHTML = '';
+
+        pointContainer.style.position = 'absolute';
+        pointContainer.style.width = `${imgW}px`;
+        pointContainer.style.height = `${imgH}px`;
 
         points.forEach((point) => {
             const [index, x, y] = point;
-
             const pointDiv = document.createElement('div');
-            pointContainer.style.position = 'absolute';
-            pointContainer.style.top = '0';
-            pointContainer.style.left = '0';
-            pointContainer.style.backgroundColor = 'red';
 
             pointDiv.classList.add('point');
             pointDiv.style.position = 'absolute';
 
-            pointDiv.style.left = `${(x / imgW) * 295}px`;
-            pointDiv.style.top = `${(y / imgH) * 440}px`;
-
+            pointDiv.style.left = `${(x / imgW) * imgW}px`;
+            pointDiv.style.top = `${(y / imgH) * imgH}px`;
+            pointDiv.style.backgroundColor = 'red';
+            pointDiv.style.borderRadius = '100%';
+            pointDiv.style.width = '7px';
+            pointDiv.style.height = '7px';
 
             makePointDraggable(pointDiv, index);
 
@@ -148,8 +153,8 @@ const fileModalImageName = '';
             let newX = pageX - shiftX - containerRect.left;
             let newY = pageY - shiftY - containerRect.top;
 
-            newX = Math.max(0, Math.min(newX, container.clientWidth - pointDiv.offsetWidth));
-            newY = Math.max(0, Math.min(newY, container.clientHeight - pointDiv.offsetHeight));
+            newX = Math.max(0, Math.min(newX, pointDiv.parentElement.clientWidth - pointDiv.offsetWidth));
+            newY = Math.max(0, Math.min(newY, pointDiv.parentElement.clientHeight - pointDiv.offsetHeight));
 
             pointDiv.style.left = `${newX}px`;
             pointDiv.style.top = `${newY}px`;
@@ -173,51 +178,32 @@ const fileModalImageName = '';
     }
 
     function savePoints(){
-        let optionSelected;
-        let sizeImage = { width: 0, height: 0};
-        option.addEventListener("change", (event) => {
-            optionSelected = event.target.value;
 
-            if(optionSelected === 'option1'){
-                sizeImage = {
-                    width : 175,
-                    height : 260
-                }
-            }
-            else if(optionSelected === 'option2'){
-                sizeImage = {
-                    width : 225,
-                    height : 334
-                }
-            }
-            else{
-                sizeImage = {
-                    width : 300,
-                    height : 445
-                }
-            }
-        resizeImage(sizeImage.width, sizeImage.height);
-        });
-
-
-
-        modalImg.onload = () => {
-            modalImg.style.width = `${sizeImage.width}px`;
-            modalImg.style.height = `${sizeImage.height}px`;
-
-            drawPoints(this.response.position, imgW, imgH);
-            $('#imageModal').modal('show'); // Mostrar el modal
+        console.log(this.points)
+        console.log(this.fileModalImageName)
+        const data = {
+            points_position : this.points,
+            file : this.fileModalImageName
         };
 
-        return sizeImage;
-
+        try{
+            const response = fetch('/save', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ data })
+            });
+        } catch (error) {
+            console.error('Error al enviar la imagen:', error);
+        }
+        closeModalImageEditor()
     }
 
     async function generatePose(){
         closeModal();
 
         const fileName = this.fileModalImageName;
-        console.log('Filename enviado:', fileName);
 
         try {
             const response = await fetch('/upload', {
@@ -236,10 +222,13 @@ const fileModalImageName = '';
 
             const data = await response.json();
             this.response = data;
+            this.points = data.position
+
+            console.log(this.response)
             //this.filePathName = this.response.path;
             modalImg.src = this.response.path;
 
-            drawPoints(this.response.position);
+            drawPoints(this.response.position, 300, 445);
 
         } catch (error) {
             console.error('Error al enviar la imagen:', error);
@@ -248,13 +237,200 @@ const fileModalImageName = '';
         // Esperar a que la imagen se cargue para obtener sus dimensiones
         modalImg.onload = () => {
             $('#imageModal').modal('show'); // Mostrar el modal
+            w.textContent = '300px'
+            h.textContent = '445px'
         };
 
     }
 
-
     function closeModal(){
         $('#previewImageModal').modal('hide');
     }
+
+    function closeModalImageEditor(){
+        modalImg.src = '';
+        $('#imageModal').modal('hide');
+    }
+
+    function openModalImageEditor(){
+        $('#imageModal').modal('show');
+    }
+
+    //CAMBIO DE OPCIONES EN EL SELECT
+    option.addEventListener('change', (event) => {
+        this.option = event.target.value;
+    });
+
+    /*
+    async function resizeNewDimension(){
+        let data;
+        if(this.option == 'option1'){
+            this.height_resize = 260
+            this.width_resize = 175
+
+            const formData = new FormData();
+            formData.append('image', this.fileModalImageName);
+            formData.append('width', this.width_resize);
+            formData.append('height', this.height_resize)
+
+            try{
+                const response = await fetch('/resize_image_params', {
+                    method: 'POST',
+                    body: formData
+                });
+                data = await response.json();
+                this.points = data.position
+                console.log(data)
+
+            } catch (error) {
+                console.error('Error al enviar la imagen:', error);
+            }
+            drawPoints(this.points,this.width_resize, this.height_resize);
+
+            closeModalImageEditor()
+
+            setTimeout(() => {
+                openModalImageEditor();
+                w.textContent = '175px';
+                h.textContent = '260px';
+                modalImg.src = data.path
+            }, 2000);
+
+        }
+        if(this.option == 'option2'){
+            this.height_resize = 334
+            this.width_resize = 225
+
+            const formData = new FormData();
+            formData.append('image', this.fileModalImageName);
+            formData.append('width', this.width_resize);
+            formData.append('height', this.height_resize)
+
+            try{
+                const response = await fetch('/resize_image_params', {
+                    method: 'POST',
+                    body: formData
+                });
+                data = await response.json();
+                this.points = data.position
+                console.log(data)
+            } catch (error) {
+                console.error('Error al enviar la imagen:', error);
+            }
+            drawPoints(this.points,this.width_resize, this.height_resize);
+
+            closeModalImageEditor()
+
+            setTimeout(() => {
+                openModalImageEditor()
+                w.textContent = '225px'
+                h.textContent = '334px'
+                modalImg.src = data.path
+            }, 2000);
+        }
+        if(this.option == 'option3'){
+            this.height_resize = 445
+            this.width_resize = 300
+
+            const formData = new FormData();
+            formData.append('image', this.fileModalImageName);
+            formData.append('width', this.width_resize);
+            formData.append('height', this.height_resize)
+
+            try{
+                const response = await fetch('/resize_image_params', {
+                    method: 'POST',
+                    body: formData
+                });
+                data = await response.json();
+                this.points = data.position
+                console.log(data)
+
+            } catch (error) {
+                console.error('Error al enviar la imagen:', error);
+            }
+            drawPoints(this.points,this.width_resize, this.height_resize);
+
+            closeModalImageEditor()
+
+            setTimeout(() => {
+                openModalImageEditor()
+                w.textContent = '300px'
+                h.textContent = '445px'
+                modalImg.src = data.path
+            }, 2000);
+        }
+    }
+    */
+
+    async function resizeNewDimension() {
+        let data;
+        let new_image;
+        let width, height;
+
+        if (this.option === 'option1') {
+            width = 175;
+            height = 260;
+        } else if (this.option === 'option2') {
+            width = 225;
+            height = 334;
+        } else if (this.option === 'option3') {
+            width = 300;
+            height = 445;
+        } else {
+            console.error('Opción no válida');
+            return;
+        }
+        this.new_image = '';
+        this.width_resize = width;
+        this.height_resize = height;
+
+        const formData = new FormData();
+        formData.append('image', this.fileModalImageName);
+        formData.append('width', this.width_resize);
+        formData.append('height', this.height_resize);
+
+        try {
+            const response = await fetch('/resize_image_params', {
+                method: 'POST',
+                body: formData
+            });
+
+            // Espera a que la respuesta se convierta en JSON
+            data = await response.json();
+
+            // Verifica que 'data' contenga el path de la imagen
+            if (data.path != null) {
+                // Actualiza 'modalImg.src' con la nueva imagen redimensionada
+                this.new_image = `${data.path}?timestamp=${new Date().getTime()}`;
+
+                // Dibuja los puntos si están disponibles
+                if (data.position != null) {
+                    drawPoints(data.position, this.width_resize, this.height_resize);
+                    this.points = data.position;
+                }
+            } else {
+                console.error('La respuesta no contiene el path de la imagen');
+            }
+
+        } catch (error) {
+            console.error('Error al enviar la imagen:', error);
+        }
+
+        // Cierra el modal y actualiza el contenido visual
+        closeModalImageEditor();
+
+        setTimeout(() => {
+            openModalImageEditor();
+            w.textContent = `${width}px`;
+            h.textContent = `${height}px`;
+            modalImg.src = this.new_image;
+        }, 2000);
+
+        console.log("OPT:", this.option);
+    }
+
+
+
 
 

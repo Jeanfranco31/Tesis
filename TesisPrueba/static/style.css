@@ -121,10 +121,18 @@
         100%{background-position-x:1000px;}
     }
 
-    .modal-content{
-        width: 80vw;
-        height: 90vh;
+    .modal.show .modal-dialog{
+        width:100vw !important;
+        height:100vh !important;
+        margin:0px;
     }
+
+    .modal-content{
+        width: 90vw !important;
+        height: 95vh !important;
+        margin: 0 auto;
+    }
+
 
     .modal-header button{
         width: 30px;
@@ -158,14 +166,15 @@
         height: auto;
     }
 
+/*
     .point {
         width: 7px;
         height: 7px;
-        background-color: rgb(164, 17, 191);
+        background-color: rgb(191, 25, 25);
         border-radius: 50%;
         cursor: grab;
     }
-
+*/
     .point:active {
         cursor: grabbing;
     }
