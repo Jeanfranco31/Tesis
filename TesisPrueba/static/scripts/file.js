@@ -7,6 +7,7 @@ const button = document.getElementById('button');
 const modalImgPreview = document.getElementById('modal-imgPreview');
 const modalImg = document.getElementById('modal-img');
 const option = document.getElementById('select-option');
+const optionHorizontalImage = document.getElementById('select-option-horizontal');
 const h = document.getElementById('h');
 const w = document.getElementById('w');
 
@@ -202,7 +203,7 @@ const height_resize = 0;
 
     async function generatePose(){
         closeModal();
-
+        let position_image;
         const fileName = this.fileModalImageName;
 
         try {
@@ -222,10 +223,9 @@ const height_resize = 0;
 
             const data = await response.json();
             this.response = data;
-            this.points = data.position
+            this.points = data.position;
+            this.position_image = data.image_pos;
 
-            console.log(this.response)
-            //this.filePathName = this.response.path;
             modalImg.src = this.response.path;
 
             drawPoints(this.response.position, 300, 445);
@@ -237,10 +237,18 @@ const height_resize = 0;
         // Esperar a que la imagen se cargue para obtener sus dimensiones
         modalImg.onload = () => {
             $('#imageModal').modal('show'); // Mostrar el modal
-            w.textContent = '300px'
-            h.textContent = '445px'
-        };
 
+
+            if(this.position_image === "vertical"){
+                $('#select-option-horizontal').hide();
+                w.textContent = '300px'
+                h.textContent = '445px'
+            }else{
+                $('#select-option').hide();
+                w.textContent = '350px'
+                h.textContent = '233px'
+            }
+        };
     }
 
     function closeModal(){
@@ -261,126 +269,48 @@ const height_resize = 0;
         this.option = event.target.value;
     });
 
-    /*
-    async function resizeNewDimension(){
-        let data;
-        if(this.option == 'option1'){
-            this.height_resize = 260
-            this.width_resize = 175
+    optionHorizontalImage.addEventListener('change', (event) => {
+        this.optionHorizontalImage = event.target.value;
+    });
 
-            const formData = new FormData();
-            formData.append('image', this.fileModalImageName);
-            formData.append('width', this.width_resize);
-            formData.append('height', this.height_resize)
-
-            try{
-                const response = await fetch('/resize_image_params', {
-                    method: 'POST',
-                    body: formData
-                });
-                data = await response.json();
-                this.points = data.position
-                console.log(data)
-
-            } catch (error) {
-                console.error('Error al enviar la imagen:', error);
-            }
-            drawPoints(this.points,this.width_resize, this.height_resize);
-
-            closeModalImageEditor()
-
-            setTimeout(() => {
-                openModalImageEditor();
-                w.textContent = '175px';
-                h.textContent = '260px';
-                modalImg.src = data.path
-            }, 2000);
-
-        }
-        if(this.option == 'option2'){
-            this.height_resize = 334
-            this.width_resize = 225
-
-            const formData = new FormData();
-            formData.append('image', this.fileModalImageName);
-            formData.append('width', this.width_resize);
-            formData.append('height', this.height_resize)
-
-            try{
-                const response = await fetch('/resize_image_params', {
-                    method: 'POST',
-                    body: formData
-                });
-                data = await response.json();
-                this.points = data.position
-                console.log(data)
-            } catch (error) {
-                console.error('Error al enviar la imagen:', error);
-            }
-            drawPoints(this.points,this.width_resize, this.height_resize);
-
-            closeModalImageEditor()
-
-            setTimeout(() => {
-                openModalImageEditor()
-                w.textContent = '225px'
-                h.textContent = '334px'
-                modalImg.src = data.path
-            }, 2000);
-        }
-        if(this.option == 'option3'){
-            this.height_resize = 445
-            this.width_resize = 300
-
-            const formData = new FormData();
-            formData.append('image', this.fileModalImageName);
-            formData.append('width', this.width_resize);
-            formData.append('height', this.height_resize)
-
-            try{
-                const response = await fetch('/resize_image_params', {
-                    method: 'POST',
-                    body: formData
-                });
-                data = await response.json();
-                this.points = data.position
-                console.log(data)
-
-            } catch (error) {
-                console.error('Error al enviar la imagen:', error);
-            }
-            drawPoints(this.points,this.width_resize, this.height_resize);
-
-            closeModalImageEditor()
-
-            setTimeout(() => {
-                openModalImageEditor()
-                w.textContent = '300px'
-                h.textContent = '445px'
-                modalImg.src = data.path
-            }, 2000);
-        }
-    }
-    */
 
     async function resizeNewDimension() {
         let data;
         let new_image;
         let width, height;
 
-        if (this.option === 'option1') {
-            width = 175;
-            height = 260;
-        } else if (this.option === 'option2') {
-            width = 225;
-            height = 334;
-        } else if (this.option === 'option3') {
-            width = 300;
-            height = 445;
-        } else {
-            console.error('Opción no válida');
-            return;
+        if(this.option != null){
+            if (this.option === 'option1') {
+                width = 175;
+                height = 260;
+            } else if (this.option === 'option2') {
+                width = 225;
+                height = 334;
+            } else if (this.option === 'option3') {
+                width = 300;
+                height = 445;
+            } else {
+                console.error('Opción no válida');
+                return;
+            }
         }
+
+        if(this.optionHorizontalImage != null){
+            if (this.optionHorizontalImage === 'option1') {
+                width = 250;
+                height = 167;
+            } else if (this.optionHorizontalImage === 'option2') {
+                width = 300;
+                height = 200;
+            } else if (this.optionHorizontalImage === 'option3') {
+                width = 350;
+                height = 233;
+            } else {
+                console.error('Opción no válida');
+                return;
+            }
+        }
+
         this.new_image = '';
         this.width_resize = width;
         this.height_resize = height;

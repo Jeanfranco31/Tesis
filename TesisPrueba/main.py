@@ -24,7 +24,6 @@ def index():
 
 @app.route('/upload', methods=['POST'])
 def upload_image():
-
     try:
         # Verificar si se recibió el nombre del archivo
         data = request.get_json()
@@ -39,8 +38,16 @@ def upload_image():
         if not os.path.isfile(filepath):
             return jsonify({'message': 'El archivo no existe.'}), 404
 
+        with Image.open(filepath) as image:
+            original_width, original_height = image.size
+            if original_width > original_height:
+                image_position = 'horizontal'
+            else:
+                image_position = 'vertical'
+
         # Procesar la imagen y detectar la pose
         img = cv.imread(filepath)
+
         img_with_pose = detector.findPose(img)
 
         # Guardar la imagen con los puntos detectados
@@ -53,6 +60,7 @@ def upload_image():
         return jsonify({
             'message': 'Imagen procesada exitosamente.',
             'path': output_path,
+            'image_pos':image_position,
             'position': position
         }), 200
 
@@ -82,9 +90,9 @@ def resizeImage():
             if original_width > original_height:
                 #Si la Imagen es horizontal
                 with Image.open(filepath) as img:
-                    resized_img = img.resize((400, 267))
-                    resized_img_w = 400
-                    resized_img_h = 267
+                    resized_img = img.resize((350, 233))
+                    resized_img_w = 350
+                    resized_img_h = 233
                     resized_image_name = 'resized_' + image.filename
                     output_path_file = os.path.join(UPLOAD_FOLDER, resized_image_name)
 
@@ -135,9 +143,19 @@ def resize_image_params():
 
                     # Guardar la imagen redimensionada
                     resized_img.save(output_path_file, format='JPEG', quality=90)
-                    print(f"Imagen guardada en {output_path_file}")
-            else:
+                    img = cv.imread(output_path_file)
+                    img_with_pose = detector.findPose(img)
 
+                    # Coordenadas de los puntos
+                    position = detector.findPosition(img_with_pose)
+
+                    return jsonify({
+                        'message': 'Imagen procesada exitosamente.',
+                        'path': output_path_file,
+                        'position': position
+                    }), 200
+
+            else:
                 # Si la Imagen es vertical
                 with Image.open(filepath) as img:
                     resized_img = img.resize((int(width), int(height)))
