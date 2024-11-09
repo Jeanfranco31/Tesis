@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Crear Cuenta</title>
+    <link href="../static/styles/create-account.css" rel="stylesheet" type="text/css">
+
+</head>
+<body>
+    <div class="main_container">
+        <div class="left_container"></div>
+        <div class="right_container">
+        <div class="form-box">
+            <form class="form">
+                <span class="title">Crear cuenta</span>
+                <div class="form-container">
+                    <input type="text" id="inputName" class="input" placeholder="Nombre Completo" required>
+                    <input type="email" id="inputMail" class="input" placeholder="Correo Electronico" required>
+                    <input type="password" id="inputPass" class="input" placeholder="Contraseña" required>
+                </div>
+                <button type="button" onclick="createAccount()">Registrese</button>
+            </form>
+            <div class="form-section">
+              <p>Ya tienes cuenta? <a href="{{ url_for('login') }}">Inicia Sesion</a> </p>
+            </div>
+        </div>
+        </div>
+    </div>
+
+
+    <script src="../static/scripts/create-account.js"></script>
+</body>
+</html>

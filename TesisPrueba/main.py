@@ -18,9 +18,9 @@ path_save_json = 'C:/Users/Dell/Desktop/archivo_generado/';
 detector = poseDetector()
 
 # Ruta para el index
-@app.route('/')
-def index():
-    return render_template('index.html')
+#@app.route('/')
+#def index():
+#    return render_template('index.html')
 
 @app.route('/upload', methods=['POST'])
 def upload_image():
@@ -207,5 +207,5 @@ def delete_temp_image(carpeta):
         if os.path.isfile(file):
             os.remove(file)
 
-if __name__ == '__main__':
-    app.run(debug=True)
+#if __name__ == '__main__':
+#    app.run(debug=True)

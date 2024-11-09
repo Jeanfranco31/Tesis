@@ -1,0 +1,10 @@
+You need install next libraries:
+
+pip install flask
+pip install mediapipe
+pip install opencv
+pip install Pillow
+
+For database:
+
+pip install pyodbc
