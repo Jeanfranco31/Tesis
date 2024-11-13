@@ -1,13 +1,17 @@
-from flask import Flask, render_template, request, jsonify, json
+from flask import Flask, render_template, request, jsonify, json, redirect, url_for
+import pyodbc
 import os
 import cv2 as cv
 import glob
 from shutil import copyfile
 from PIL import Image
 from model.PoseModule import poseDetector
+from Resources.Conexion import get_connection
+
 
 # Inicializar la app Flask
 app = Flask(__name__)
+conn = get_connection()
 
 # Crear una carpeta para guardar las imágenes subidas
 UPLOAD_FOLDER = 'static/uploads/'
@@ -17,11 +21,23 @@ path_save_json = 'C:/Users/Dell/Desktop/archivo_generado/';
 # Crear el detector de poses
 detector = poseDetector()
 
-# Ruta para el index
-#@app.route('/')
-#def index():
-#    return render_template('index.html')
 
+#ROUTES
+@app.route('/upload-image')
+def index():
+    return render_template('index.html')
+
+@app.route('/login')
+def login():
+    return render_template('login.html')
+
+@app.route('/create-account')
+def create_account():
+    return render_template('create-account.html')
+
+
+
+#ENDPOINTS
 @app.route('/upload', methods=['POST'])
 def upload_image():
     try:
@@ -207,5 +223,33 @@ def delete_temp_image(carpeta):
         if os.path.isfile(file):
             os.remove(file)
 
-#if __name__ == '__main__':
-#    app.run(debug=True)
+
+#user controllers
+@app.route('/validateLogin', methods=['POST'])
+def validate_login():
+    try:
+        username = request.form.get('username')
+        passw = request.form.get('pass')
+
+        with get_connection() as conn:
+            cursor = conn.cursor()
+            query = "SELECT pass FROM UserData WHERE username = ?"
+            cursor.execute(query, (username,))
+
+            # Recorre los resultados
+            result = cursor.fetchone()
+
+            if result and result[0] == passw:
+                # Usuario autenticado
+                return jsonify({'authenticated': True, 'redirect_url': url_for('index')}), 200
+            else:
+                # Usuario no autenticado
+                return jsonify({'authenticated': False, 'message': 'Usuario o contraseña incorrecta'}), 401
+
+    except pyodbc.Error as e:
+        print("Error al ejecutar la consulta:", e)
+        return jsonify({'authenticated': False, 'message': 'Error interno del servidor'}), 500
+
+
+if __name__ == '__main__':
+    app.run(debug=True)

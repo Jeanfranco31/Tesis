@@ -137,3 +137,11 @@
   color: rgba(156, 163, 175, 1);
   padding : 15px 0;
 }
+
+.message-content{
+    position:absolute;
+    bottom: 5%;
+    right:10%;
+    width:250px;
+    height:50px;
+}
