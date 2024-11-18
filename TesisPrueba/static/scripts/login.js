@@ -1,9 +1,9 @@
-const inputUsername = document.getElementById('username');
+const inputMail = document.getElementById('mail');
 const inputPassword = document.getElementById('password');
 
 async function getLogin() {
     const form = new FormData();
-    form.append('username', inputUsername.value);
+    form.append('mail', inputMail.value);
     form.append('pass', inputPassword.value);
     try {
         const response = await fetch('/validateLogin', {
@@ -13,6 +13,7 @@ async function getLogin() {
         const data = await response.json();
         console.log(data)
         if (data.authenticated) {
+            localStorage.setItem('token',data.token)
             window.location.href = data.redirect_url;
         } else {
             document.getElementById('message_content').innerHTML =
@@ -29,3 +30,4 @@ async function getLogin() {
         console.error('Error:', error);
     }
 }
+

@@ -1,13 +1,19 @@
+import datetime
 from flask import Flask, render_template, request, jsonify, json, redirect, url_for
 import pyodbc
 import os
 import cv2 as cv
 import glob
+import jwt
 from shutil import copyfile
 from PIL import Image
+
+
+from Resources.Middleware import token_required
+from Resources.Middleware import get_key
 from model.PoseModule import poseDetector
 from Resources.Conexion import get_connection
-
+from Resources.Encrypt import  encrypt_password
 
 # Inicializar la app Flask
 app = Flask(__name__)
@@ -23,19 +29,26 @@ detector = poseDetector()
 
 
 #ROUTES
-@app.route('/upload-image')
+@app.route('/')
 def index():
+    return redirect(url_for('login'))
+
+@app.route('/upload-image')
+def upload():
     return render_template('index.html')
 
 @app.route('/login')
 def login():
     return render_template('login.html')
 
-@app.route('/create-account')
-def create_account():
+@app.route('/create_account')
+def create_accountView():
     return render_template('create-account.html')
 
-
+@app.route('/dashboard')
+#@token_required
+def view_dashboard():
+    return render_template('dashboard.html')
 
 #ENDPOINTS
 @app.route('/upload', methods=['POST'])
@@ -228,20 +241,23 @@ def delete_temp_image(carpeta):
 @app.route('/validateLogin', methods=['POST'])
 def validate_login():
     try:
-        username = request.form.get('username')
-        passw = request.form.get('pass')
+        mail = request.form.get('mail')
+        passw = encrypt_password(request.form.get('pass'))
 
         with get_connection() as conn:
             cursor = conn.cursor()
-            query = "SELECT pass FROM UserData WHERE username = ?"
-            cursor.execute(query, (username,))
+            query = "SELECT id, pass FROM Users WHERE mail = ?"
+            cursor.execute(query, (mail,))
 
             # Recorre los resultados
             result = cursor.fetchone()
 
-            if result and result[0] == passw:
+            if result and result[1] == passw:
                 # Usuario autenticado
-                return jsonify({'authenticated': True, 'redirect_url': url_for('index')}), 200
+                token = jwt.encode({
+                    "user_id": result[0]
+                }, get_key(), algorithm="HS256")
+                return jsonify({'authenticated': True, 'redirect_url': url_for('view_dashboard'), 'token': token}), 200
             else:
                 # Usuario no autenticado
                 return jsonify({'authenticated': False, 'message': 'Usuario o contraseña incorrecta'}), 401
@@ -250,6 +266,30 @@ def validate_login():
         print("Error al ejecutar la consulta:", e)
         return jsonify({'authenticated': False, 'message': 'Error interno del servidor'}), 500
 
+@app.route('/createAccount', methods=['POST'])
+def createAccount():
+    try:
+        username = request.form.get('username')
+        email = request.form.get('email')
+        password = request.form.get('pass')
+        passw = encrypt_password(password)
+        print(username,passw,email)
+        with get_connection() as conn:
+            cursor = conn.cursor()
+            query = "INSERT INTO Users(username,pass,mail,stateUser) VALUES(?,?,?,1)"
+            params = (username,passw,email)
+            result = cursor.execute(query, params)
+
+            if result:
+                # Usuario creado
+                return jsonify({'created': True, 'redirect_url': url_for('login')}), 200
+            else:
+                # Usuario no creado
+                return jsonify({'created': False, 'message': 'Usuario no registrado'}), 401
+
+    except pyodbc.Error as e:
+        print("Error al ejecutar la consulta:", e)
+        return jsonify({'authenticated': False, 'message': 'Error interno del servidor'}), 500
 
 if __name__ == '__main__':
     app.run(debug=True)

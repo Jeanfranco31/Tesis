@@ -11,20 +11,17 @@
       <p class="title">Inicia Sesion</p>
       <form class="form">
           <div class="input-group">
-              <label for="username">Usuario</label>
-              <input type="text" name="username" id="username" placeholder="">
+              <label>Correo</label>
+              <input type="text" name="mail" id="mail">
           </div>
           <div class="input-group">
               <label for="password">Contraseña</label>
-              <input type="password" name="password" id="password" placeholder="">
-              <div class="forgot">
-                  <a rel="noopener noreferrer" href="#">Olvidaste la contraseña ?</a>
-              </div>
+              <input type="password" name="password" id="password">
           </div>
           <button type="button" class="sign" onclick="getLogin()">Ingresar</button>
       </form>
       <p class="signup">No tienes cuenta?
-          <a rel="noopener noreferrer" href="{{ url_for('create_account') }}" class="">Registrate</a>
+          <a rel="noopener noreferrer" href="{{ url_for('create_accountView') }}" class="">Registrate</a>
       </p>
     </div>
       <div id="message_content" class="message-content"></div>
