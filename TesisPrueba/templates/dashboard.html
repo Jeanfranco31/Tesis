@@ -9,7 +9,7 @@
     <header>
         <div class="content_logo">
             <img src="../static/assets/logotipo.png">
-            <p>Bienvenido, <span>Jean</span> </p>
+            <p id="name">Bienvenido, <span id="name-user"></span> </p>
         </div>
     </header>
 
@@ -17,7 +17,7 @@
         <ul>
             <li><a>Gestion de Usuarios</a></li>
             <li><a>Configuracion de archivos</a></li>
-            <li><a>Cargas de imagenes</a></li>
+            <li><a href="{{ url_for('upload') }}">Cargas de imagenes</a></li>
             <li><a>Cargas de videos</a></li>
         </ul>
         <div class="toggle_button" id="toggle_button">

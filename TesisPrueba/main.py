@@ -246,18 +246,18 @@ def validate_login():
 
         with get_connection() as conn:
             cursor = conn.cursor()
-            query = "SELECT id, pass FROM Users WHERE mail = ?"
+            query = "SELECT id, pass, username FROM Users WHERE mail = ?"
             cursor.execute(query, (mail,))
 
             # Recorre los resultados
             result = cursor.fetchone()
 
             if result and result[1] == passw:
-                # Usuario autenticado
+                # Usuario autenticaded
                 token = jwt.encode({
                     "user_id": result[0]
                 }, get_key(), algorithm="HS256")
-                return jsonify({'authenticated': True, 'redirect_url': url_for('view_dashboard'), 'token': token}), 200
+                return jsonify({'authenticated': True, 'redirect_url': url_for('view_dashboard'), 'user':result[2], 'token': token}), 200
             else:
                 # Usuario no autenticado
                 return jsonify({'authenticated': False, 'message': 'Usuario o contraseña incorrecta'}), 401
