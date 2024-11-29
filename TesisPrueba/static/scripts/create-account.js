@@ -1,10 +1,15 @@
 const inputName = document.getElementById('inputName');
+const inputApellido = document.getElementById('inputApellido');
+const inputCedula = document.getElementById('inputIdentification');
 const inputMail = document.getElementById('inputMail');
 const inputPass = document.getElementById('inputPass');
 
+
 async function createAccount() {
     const form = new FormData();
-    form.append('username', inputName.value);
+    form.append('name', inputName.value);
+    form.append('lastName', inputApellido.value);
+    form.append('identification', inputCedula.value);
     form.append('email'   , inputMail.value);
     form.append('pass'    , inputPass.value);
 

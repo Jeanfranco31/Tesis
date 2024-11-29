@@ -15,9 +15,9 @@
 
     <nav id="nav">
         <ul>
-            <li><a>Gestion de Usuarios</a></li>
+            <li><a onclick="viewUsers()">Gestion de Usuarios</a></li>
             <li><a>Configuracion de archivos</a></li>
-            <li><a href="{{ url_for('upload') }}">Cargas de imagenes</a></li>
+            <li><a onclick="viewImages()">Cargas de imagenes</a></li>
             <li><a>Cargas de videos</a></li>
         </ul>
         <div class="toggle_button" id="toggle_button">
@@ -25,6 +25,68 @@
         </div>
     </nav>
 
- <script src="../static/scripts/dashboard.js"></script>
+    <div class="main_container" id="main_container"></div>
+
+    <section class="main_section_container" id="main_section_container">
+        <div class="content_first_section">
+            <div class="section_first_left">
+                <h1>¿Que es BoiPose?</h1>
+                <h3>Estimacion de poses humanas</h3>
+
+                <p>BoiPose utiliza como base MediaPipe para estimar las diferentes poses del cuerpo humano y generar 14 keypoints como puntos claves al realizar la estimacion.</p>
+            </div>
+            <div class="section_first_rigth">
+                <img src="https://aihub.qualcomm.com/_next/image?url=https%3A%2F%2Fqaihub-public-assets.s3.us-west-2.amazonaws.com%2Fqai-hub-models%2Fmodels%2Fopenpose%2Fweb-assets%2Fmodel_demo.png&w=1920&q=75">
+            </div>
+        </div>
+        <div class="content_second_section">
+            <div class="cards_container">
+                <h2>Lo que puedes lograr</h2>
+                <div class="cards">
+                    <div class="card">
+                        <div class="content_info_card" id="img">
+                            <h4>Detección en Imagenes</h4>
+                        </div>
+                    </div>
+                    <div class="card">
+                        <div class="content_info_card" id="folder">
+                            <h4>Configuracion Personalizada</h4>
+                        </div>
+                    </div>
+                    <div class="card">
+                        <div class="content_info_card" id="video">
+                            <h4>Deteccion en videos</h4>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="content_third_section">
+            <div class="content_title">
+                <h2 class="title_third_section">Tiempos de respuesta más rápidos con MediaPipe </h2>
+            </div>
+                <div class="container_graphic_compare">
+                <div class="openpose_card">
+                    <img src="../static/assets/Openpose.png">
+                    <h2>OpenPose</h2>
+                </div>
+                <div class="mediapipe_card">
+                    <img src="../static/assets/mediapipe.png">
+                    <h2>MediaPipe</h2>
+                </div>
+                <div class="yolo_card">
+                    <img src="../static/assets/yolo.png">
+                    <h2>Yolo</h2>
+                </div>
+            </div>
+        </div>
+    </section>
+
+
+    <script src="../static/scripts/dashboard.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
 </body>
 </html>

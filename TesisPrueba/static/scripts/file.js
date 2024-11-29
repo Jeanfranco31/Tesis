@@ -17,7 +17,7 @@ let points = [];
 const fileModalImageName = '';
 const width_resize = 0;
 const height_resize = 0;
-
+console.log('SE CARGO EL SCRIPT FILE.JS')
     // Permite arrastrar el archivo sobre la zona de drop
     dropZone.addEventListener('dragover', (e) => {
         e.preventDefault();
@@ -43,11 +43,12 @@ const height_resize = 0;
     });
 
     // Permitir hacer clic en la zona de drop
+    /*
     dropZone.addEventListener('click', () => {
         e.stopPropagation();
         fileInput.click();
     });
-
+    */
     // Cuando seleccionas un archivo mediante clic
     fileInput.addEventListener('change', () => {
         if (fileInput.files.length > 0) {
@@ -179,12 +180,11 @@ const height_resize = 0;
     }
 
     function savePoints(){
-
-        console.log(this.points)
-        console.log(this.fileModalImageName)
         const data = {
             points_position : this.points,
-            file : this.fileModalImageName
+            file : this.fileModalImageName,
+            width : this.width_resize,
+            height : this.height_resize
         };
 
         try{

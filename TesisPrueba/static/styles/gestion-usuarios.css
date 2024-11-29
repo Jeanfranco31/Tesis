@@ -1,0 +1,65 @@
+
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+}
+
+.container_main{
+    width:100vw;
+    height:100vh;
+}
+
+.content_title{
+    height:auto;
+    width:90%;
+    margin:0 auto;
+}
+.content_title h1{
+    padding-top:100px;
+    color:#000000;
+    font-size:2rem;
+    border-bottom:5px solid blue;
+}
+table{
+    width:90%;
+    margin:30px auto 0 auto;
+    border-collapse: collapse;
+    text-align: left;
+}
+
+thead{
+    height:40px;
+}
+
+thead tr{
+    border-top-left-radius:10px;
+    border-top-right-radius:10px;
+}
+
+thead tr th{
+    text-align:center;
+    background-color:blue;
+    color:#ffffff;
+}
+
+tbody tr td{
+    text-align:center;
+    padding:5px 0;
+}
+
+button{
+    width:30px;
+    height:30px;
+    border:none;
+}
+
+button .edit{
+    background-color:green;
+    color:#ffffff;
+}
+
+button .delete{
+    background-color:red;
+    color:#ffffff;
+}

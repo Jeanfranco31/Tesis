@@ -8,15 +8,23 @@
 </head>
 <body>
     <div class="main_container">
-        <div class="left_container"></div>
+        <div class="left_container">
+            <div class="content_images">
+                 <img id="logo" src="../static/assets/logotipo.png">
+                 <img id="bg-image" src="../static/assets/bg_logo.png">
+            </div>
+        </div>
         <div class="right_container">
         <div class="form-box">
             <form class="form">
                 <span class="title">Crear cuenta</span>
                 <div class="form-container">
-                    <input type="text" id="inputName" class="input" placeholder="Nombre Completo" required>
+                    <input type="text" id="inputName" class="input" placeholder="Nombres" required>
+                    <input type="text" id="inputApellido" class="input" placeholder="Apellidos" required>
+                    <input type="text" id="inputIdentification" class="input" placeholder="Numero de Cedula" required>
                     <input type="email" id="inputMail" class="input" placeholder="Correo Electronico" required>
                     <input type="password" id="inputPass" class="input" placeholder="Contraseña" required>
+                    <input type="password" id="inputVerifyPass" class="input" placeholder="Confirmar contraseña" required>
                 </div>
                 <button type="button" onclick="createAccount()">Registrese</button>
             </form>

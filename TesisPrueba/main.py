@@ -1,4 +1,5 @@
 import datetime
+
 from flask import Flask, render_template, request, jsonify, json, redirect, url_for
 import pyodbc
 import os
@@ -22,7 +23,9 @@ conn = get_connection()
 # Crear una carpeta para guardar las imágenes subidas
 UPLOAD_FOLDER = 'static/uploads/'
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
-path_save_json = 'C:/Users/Dell/Desktop/archivo_generado/';
+path_save_json = 'C:/Users/Dell/Desktop/archivo_generado/'
+path_save_images = 'C:/Users/Dell/Desktop/archivo_generado/Imagen/'
+
 
 # Crear el detector de poses
 detector = poseDetector()
@@ -49,6 +52,12 @@ def create_accountView():
 #@token_required
 def view_dashboard():
     return render_template('dashboard.html')
+
+@app.route('/gestion-usuarios')
+def manage_users():
+    return render_template('gestion-usuarios.html')
+
+
 
 #ENDPOINTS
 @app.route('/upload', methods=['POST'])
@@ -215,17 +224,42 @@ def saveImageData():
     data = request.get_json()
     file_name = data['data']['file']
     points_position = data['data']['points_position']
+    width_file = data['data']['width']
+    heigth_file = data['data']['height']
+    center_x = width_file/2
+    center_y = heigth_file/2
+
+    #obtener archivos totales
+    total = get_total_files() + 1
+
+    #nuevo formato de nombre  000001
+    name, ext = os.path.splitext(file_name)
+    name_to_save = f"{total}{ext}"
 
     # Guardar el JSON con los puntos
-    json_file_name = f"{file_name}.json"
+    json_file_name = "Points_Json.json"
     path_json = os.path.join(path_save_json, json_file_name)
     with open(path_json, "w") as json_file:
-        json.dump({"points_position": points_position}, json_file)
+        json.dump(
+            {
+                    "path":name_to_save,
+                    "content":{
+                        "points_position": points_position
+                    },
+                    "size":{
+                        "width": width_file,
+                        "heigth" : heigth_file
+                    },
+                    "center": {
+                        "x": center_x,
+                        "y": center_y
+                    }
+                }, json_file)
 
+    image_file_path = os.path.join(path_save_images,name_to_save)
     path_base_image = os.path.join(UPLOAD_FOLDER,f"points_{file_name}")
 
     # Crear o copiar la imagen con el nombre indicado
-    image_file_path = os.path.join(path_save_json,file_name)
     copyfile(path_base_image, image_file_path)  # Copia una imagen base con el nuevo nombre
 
     delete_temp_image(UPLOAD_FOLDER)
@@ -236,6 +270,10 @@ def delete_temp_image(carpeta):
         if os.path.isfile(file):
             os.remove(file)
 
+def get_total_files():
+    file_count = sum(1 for file in os.listdir(path_save_images)
+                     if os.path.isfile(os.path.join(path_save_images, file)))
+    return file_count
 
 #user controllers
 @app.route('/validateLogin', methods=['POST'])
@@ -246,7 +284,7 @@ def validate_login():
 
         with get_connection() as conn:
             cursor = conn.cursor()
-            query = "SELECT id, pass, username FROM Users WHERE mail = ?"
+            query = "SELECT id, pass, nombre FROM Users WHERE mail = ?"
             cursor.execute(query, (mail,))
 
             # Recorre los resultados
@@ -269,15 +307,17 @@ def validate_login():
 @app.route('/createAccount', methods=['POST'])
 def createAccount():
     try:
-        username = request.form.get('username')
+        name = request.form.get('name')
+        lastName = request.form.get('lastName')
+        identification = request.form.get('identification')
         email = request.form.get('email')
         password = request.form.get('pass')
         passw = encrypt_password(password)
-        print(username,passw,email)
+
         with get_connection() as conn:
             cursor = conn.cursor()
-            query = "INSERT INTO Users(username,pass,mail,stateUser) VALUES(?,?,?,1)"
-            params = (username,passw,email)
+            query = "INSERT INTO Users(nombre,apellido,cedula,pass,mail,stateUser) VALUES(?,?,?,?,?,1)"
+            params = (name,lastName,identification,passw,email)
             result = cursor.execute(query, params)
 
             if result:
@@ -290,6 +330,34 @@ def createAccount():
     except pyodbc.Error as e:
         print("Error al ejecutar la consulta:", e)
         return jsonify({'authenticated': False, 'message': 'Error interno del servidor'}), 500
+
+@app.route('/users-all', methods=['GET'])
+def getUsers():
+    try:
+        with get_connection() as conn:
+            cursor = conn.cursor()
+            query = "SELECT * FROM Users"
+            cursor.execute(query)
+            rows = cursor.fetchall()
+
+            # Convertir el resultado en una lista de diccionarios
+            usuarios = []
+            for row in rows:
+                usuarios.append({
+                    "id": row[0],
+                    "nombre": row[1],
+                    "apellido": row[2],
+                    "cedula": row[3],
+                    "mail": row[5],
+                    "stateUser": row[6],
+                })
+
+            return jsonify(usuarios), 200
+
+    except pyodbc.Error as e:
+        print("Error al ejecutar la consulta:", e)
+        return jsonify({'authenticated': False, 'message': 'Error interno del servidor'}), 500
+
 
 if __name__ == '__main__':
     app.run(debug=True)
