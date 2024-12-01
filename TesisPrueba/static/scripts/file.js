@@ -43,12 +43,10 @@ console.log('SE CARGO EL SCRIPT FILE.JS')
     });
 
     // Permitir hacer clic en la zona de drop
-    /*
     dropZone.addEventListener('click', () => {
         e.stopPropagation();
         fileInput.click();
     });
-    */
     // Cuando seleccionas un archivo mediante clic
     fileInput.addEventListener('change', () => {
         if (fileInput.files.length > 0) {
@@ -69,7 +67,7 @@ console.log('SE CARGO EL SCRIPT FILE.JS')
 
     // Enviar la imagen al servidor
     button.addEventListener('click', async () => {
-        let response = {};
+        //let response = {};
         const file = fileInput.files[0];
 
         const formData = new FormData();
@@ -120,8 +118,8 @@ console.log('SE CARGO EL SCRIPT FILE.JS')
         pointContainer.innerHTML = '';
 
         pointContainer.style.position = 'absolute';
-        pointContainer.style.width = `${imgW}px`;
-        pointContainer.style.height = `${imgH}px`;
+        pointContainer.style.width = ${imgW}px;
+        pointContainer.style.height = ${imgH}px;
 
         points.forEach((point) => {
             const [index, x, y] = point;
@@ -130,8 +128,8 @@ console.log('SE CARGO EL SCRIPT FILE.JS')
             pointDiv.classList.add('point');
             pointDiv.style.position = 'absolute';
 
-            pointDiv.style.left = `${(x / imgW) * imgW}px`;
-            pointDiv.style.top = `${(y / imgH) * imgH}px`;
+            pointDiv.style.left = ${(x / imgW) * imgW}px;
+            pointDiv.style.top = ${(y / imgH) * imgH}px;
             pointDiv.style.backgroundColor = 'red';
             pointDiv.style.borderRadius = '100%';
             pointDiv.style.width = '7px';
@@ -158,8 +156,8 @@ console.log('SE CARGO EL SCRIPT FILE.JS')
             newX = Math.max(0, Math.min(newX, pointDiv.parentElement.clientWidth - pointDiv.offsetWidth));
             newY = Math.max(0, Math.min(newY, pointDiv.parentElement.clientHeight - pointDiv.offsetHeight));
 
-            pointDiv.style.left = `${newX}px`;
-            pointDiv.style.top = `${newY}px`;
+            pointDiv.style.left = ${newX}px;
+            pointDiv.style.top = ${newY}px;
         }
 
         const onMouseMove = (event) => {

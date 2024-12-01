@@ -2,41 +2,55 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Crear Cuenta</title>
     <link href="../static/styles/create-account.css" rel="stylesheet" type="text/css">
-
 </head>
 <body>
     <div class="main_container">
         <div class="left_container">
-            <div class="content_images">
-                 <img id="logo" src="../static/assets/logotipo.png">
-                 <img id="bg-image" src="../static/assets/bg_logo.png">
+            <div class="content-images">
+                 <img id="logo" src="../static/assets/logotipo.png" alt="Logo">
             </div>
         </div>
         <div class="right_container">
-        <div class="form-box">
-            <form class="form">
-                <span class="title">Crear cuenta</span>
-                <div class="form-container">
-                    <input type="text" id="inputName" class="input" placeholder="Nombres" required>
-                    <input type="text" id="inputApellido" class="input" placeholder="Apellidos" required>
-                    <input type="text" id="inputIdentification" class="input" placeholder="Numero de Cedula" required>
-                    <input type="email" id="inputMail" class="input" placeholder="Correo Electronico" required>
-                    <input type="password" id="inputPass" class="input" placeholder="Contraseña" required>
-                    <input type="password" id="inputVerifyPass" class="input" placeholder="Confirmar contraseña" required>
+            <div class="form-box">
+                <div class="title">
+                    <p >Crear cuenta</p>
                 </div>
-                <button type="button" onclick="createAccount()">Registrese</button>
-            </form>
-            <div class="form-section">
-              <p>Ya tienes cuenta? <a href="{{ url_for('login') }}">Inicia Sesion</a> </p>
+                <form class="form">
+                    <div class="form-container">
+                        <div class="input-group">
+                            <input type="text" id="inputName" class="input" placeholder="Nombres" required>
+                        </div>
+                        <div class="input-group">
+                            <input type="text" id="inputApellido" class="input" placeholder="Apellidos" required>
+                        </div>
+                        <div class="input-group">
+                            <input type="text" id="inputIdentification" class="input" placeholder="Número de Cédula" required>
+                            <p id="cedulaMessage" class="error-message"></p>
+                        </div>
+                        <div class="input-group">
+                            <input type="email" id="inputMail" class="input" placeholder="Correo Electrónico" required>
+                            <p id="emailMessage" class="error-message"></p>
+                        </div>
+                        <div class="input-group">
+                            <input type="password" id="inputPass" class="input" placeholder="Contraseña" required>
+                            <p id="passMessage" class="error-message"></p>
+                        </div>
+                        <div class="input-group">
+                            <input type="password" id="inputVerifyPass" class="input" placeholder="Confirmar contraseña" required>
+                            <p id="passMessageVerify" class="error-message"></p>
+                        </div>
+                    </div>
+                    <button type="button" onclick="createAccount()">Regístrese</button>
+                </form>
+                <div class="form-section">
+                <p class="signup">¿Ya tienes cuenta? <a href="{{ url_for('login') }}">Inicia Sesión</a></p>
+                </div>
             </div>
         </div>
-        </div>
     </div>
-
-
 </body>
-    <script src="../static/scripts/create-account.js"></script>
-
+<script src="../static/scripts/create-account.js"></script>
 </html>
