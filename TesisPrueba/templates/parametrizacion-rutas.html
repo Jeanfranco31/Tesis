@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="../static/styles/parametrizacion-rutas.css">
+    <script src="https://cdn.jsdelivr.net/npm/jwt-decode/build/jwt-decode.min.js"></script>
+    <title>BoiPose | Parametrizacion</title>
+</head>
+<body>
+    <div class="main_container_routes" id="main_container_routes">
+        <div class="container_routes_title">
+            <h1>Configuracion de Archivos</h1>
+        </div>
+        <section class="parametrizar_ruta">
+            <h2>Parametrizacion de Rutas</h2>
+            <div class="main_route">
+                <div class="add_route_button">
+                    <button onclick="openModalCreatePath()">Agregar Nueva Ruta</button>
+                </div>
+                <div class="content_configuration">
+                    <div class="content_configuration_elements">
+                        <label>Ruta Principal:</label>
+                        <input type="text" id="folderInput" placeholder="Pega aqui la ruta que tendra tu proyecto completo">
+                        <label for="folderInput">
+                            <img id="logo" src="../static/assets/folder_icon.png" alt="Logo">
+                        </label>
+                    </div>
+                    <div class="button_save" onclick="saveMainPath()">
+                        <button id="button_save">Guardar configuracion</button>
+                    </div>
+                </div>
+            </div>
+        </section>
+        <section class="parametrizar_video"></section>
+        <section class="content_table">
+            <h2>Rutas Parametrizadas Actualmente</h2>
+            <table>
+            <thead>
+                <tr>
+                    <th>Id</th>
+                    <th>Directorio</th>
+                </tr>
+            </thead>
+            <tbody id="tabla-cuerpo">
+
+            </tbody>
+        </table>
+        </section>
+
+    </div>
+    <!------- MODAL CREACION NUEVA RUTA ------->
+    <div class="modal_create_folder" id="modal_create_folder">
+        <div class="modal_background" id="modal_background">
+            <div class="modal_main_content">
+                <div class="content_title_modal">
+                    <h2>Agregar Nueva Carpeta</h2>
+                </div>
+                <div class="content_modal_input">
+                    <input type="text" id="inputFolderName" placeholder="Ingresa el nombre que tendra tu carpeta">
+                    <label for="folderInput">
+                        <img id="folder_icon" src="../static/assets/folder_icon.png" alt="Logo">
+                    </label>
+                </div>
+                <div class="content_modal_buttons">
+                    <button id="close" class="close_button" onclick="closeModal()">Cancelar</button>
+                    <button id="save" class="save_button" onclick="saveNewFolder()">Crear Carpeta</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="../static/scripts/parametrizacion-rutas.js"></script>
+</body>
+</html>

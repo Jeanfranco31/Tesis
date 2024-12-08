@@ -12,6 +12,12 @@
         <div class="main_container">
             <div class="container_file_image">
                 <div class="image_container">
+                    <div class="content_options">
+                        <label>Elije la ruta de guardado:</label>
+                        <select name="select" id="selectOptions">
+
+                        </select>
+                    </div>
                     <img src="../static/assets/banner.png">
                 </div>
                 <div class="drop-zone" id="drop-zone">
@@ -30,7 +36,7 @@
         </div>
 
         <!-- Modal -->
-        <div class="modal fade" id="previewImageModal" tabindex="-1" role="dialog" aria-labelledby="modalLabel" aria-hidden="true">
+        <div class="modal fade" id="previewImageModal" tabindex="-1" role="dialog" aria-labelledby="modalLabel">
             <div class="modal-dialog" role="document">
                 <div class="modal-content">
                     <div class="modal-header">
@@ -50,16 +56,59 @@
         </div>
 
         <!-- Modal-->
-        <div class="modal fade" id="imageModal" tabindex="-1" role="dialog" aria-labelledby="modalLabel" aria-hidden="true">
+        <!--
+        <div class="modal fade" id="imageModal" tabindex="-1" role="dialog" aria-labelledby="modalLabel">
+            <div class="modal-dialog" id="dialog-process" role="document">
+                <div class="modal-content-process">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Imagen Procesada</h5>
+                        <img class="close" src="../static/assets/close_icon.png"/>
+                    </div>
+                    <div class="modal-body-process">
+                        <div class="content_body">
+                            <img id="modal-img" src="" alt="Imagen Procesada">
+                            <div id="point-container"></div>
+                        </div>
+                        <div class="resize_content">
+                            <div class="content_info_resize">
+                                <h2>Dimension de la imagen actual</h2>
+                                <p>Ancho :<span id="w" style="font-weight:400;"></span> </p>
+                                <p class="dimension_h">Alto :<span id="h" style="font-weight:400;"></span> </p>
+                            </div>
+                            <div class="content_options">
+                                <select id="select-option" class="select-option">
+                                    <optgroup label="Elije una dimension en PX"></optgroup>
+                                    <option value="option1">175 X 260</option>
+                                    <option value="option2">225 X 334</option>
+                                    <option value="option3" selected>300 X 445</option>
+                                </select>
+                                <select id="select-option-horizontal" class="select-option">
+                                    <optgroup label="Elije una dimension en PX"></optgroup>
+                                    <option value="option1">250 X 167</option>
+                                    <option value="option2">300 X 200</option>
+                                    <option value="option3" selected>350 X 233</option>
+                                </select>
+                                <button type="button" class="generateButton" onclick="resizeNewDimension()">Redimensionar</button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="generateButton" id="generateButton" onclick="savePoints()">Guardar en BD</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        -->
+         <div class="modal fade" id="imageModal" tabindex="-1" role="dialog" aria-labelledby="modalLabel" aria-hidden="true">
             <div class="modal-dialog" role="document">
-                <div class="modal-content">
+                <div class="modal-content modal-content-process">
                     <div class="modal-header">
                         <h5 class="modal-title">Imagen Procesada</h5>
                         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                             <span aria-hidden="true">&times;</span>
                         </button>
                     </div>
-                    <div class="modal-body">
+                    <div class="modal-body-process">
                         <div class="content_body">
                             <img id="modal-img" src="" alt="Imagen Procesada">
                             <div id="point-container"></div>
@@ -67,10 +116,9 @@
                         <div class="resize_content">
                             <div>
                                 <h2>Dimension de la imagen actual</h2>
-                                <p style="font-weight:bolder; width:150px;">Ancho :<span id="w" style="font-weight:400;"></span> </p>
-                                <p style="font-weight:bolder; width:150px;">Alto :<span id="h" style="font-weight:400;"></span> </p>
+                                <p>Ancho :<span id="w" style="font-weight:400;"></span></p>
+                                <p class="dimension_h">Alto :<span id="h" style="font-weight:400;"></span></p>
                             </div>
-                            <label>Dimensiones Actual</label>
                             <select id="select-option" class="select-option">
                                 <optgroup label="Elije una dimension en PX"></optgroup>
                                 <option value="option1">175 X 260</option>
@@ -87,7 +135,6 @@
                         </div>
                     </div>
                     <div class="modal-footer">
-                        <button type="button" id="editButton">Editar</button>
                         <button type="button" id="saveButton" onclick="savePoints()">Guardar en BD</button>
                     </div>
                 </div>
@@ -95,8 +142,7 @@
         </div>
 
 
-
-    <!--<script src="../static/scripts/file.js"></script>-->
+    <script src="../static/scripts/file.js"></script>
 
     </body>
 

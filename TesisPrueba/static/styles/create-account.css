@@ -14,10 +14,10 @@ body {
 
 .main_container {
   display: flex;
-  flex-wrap: wrap; /* Permite que los elementos se ajusten */
+  flex-wrap: wrap;
   width: 90%;
   max-width: 1200px;
-  height: auto;
+  height: 90vh;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
   border-radius: 12px;
   overflow: hidden;
@@ -67,7 +67,7 @@ body {
   display: flex;
   flex-direction: column;
   gap: 15px;
-  width: 55vh;
+  width: 100%;
 }
 
 .input-group {
@@ -76,6 +76,7 @@ body {
   text-align: left;
   font-size: 0.875rem;
   line-height: 1.25rem;
+  width:100%;
 }
 
 .input-group input {
@@ -87,6 +88,7 @@ body {
   color: rgba(243, 244, 246, 1);
   font-size: 0.875rem;
   transition: border-color 0.3s;
+  font-family: 'Montserrat', sans-serif;
 }
 
 .input-group input:focus {
@@ -121,6 +123,7 @@ button {
   font-weight: 600;
   margin-top: 20px;
   cursor: pointer;
+  font-family: 'Montserrat', sans-serif;
 }
 
 button:hover {

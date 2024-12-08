@@ -7,7 +7,10 @@ const button = document.getElementById('button');
 const modalImgPreview = document.getElementById('modal-imgPreview');
 const modalImg = document.getElementById('modal-img');
 const option = document.getElementById('select-option');
+const selectOptions = document.getElementById('selectOptions');
 const optionHorizontalImage = document.getElementById('select-option-horizontal');
+const modalEdit = document.getElementById('imageModal');
+var selectedOption = '';
 const h = document.getElementById('h');
 const w = document.getElementById('w');
 
@@ -17,7 +20,7 @@ let points = [];
 const fileModalImageName = '';
 const width_resize = 0;
 const height_resize = 0;
-console.log('SE CARGO EL SCRIPT FILE.JS')
+
     // Permite arrastrar el archivo sobre la zona de drop
     dropZone.addEventListener('dragover', (e) => {
         e.preventDefault();
@@ -118,8 +121,8 @@ console.log('SE CARGO EL SCRIPT FILE.JS')
         pointContainer.innerHTML = '';
 
         pointContainer.style.position = 'absolute';
-        pointContainer.style.width = ${imgW}px;
-        pointContainer.style.height = ${imgH}px;
+        pointContainer.style.width = `${imgW}px`;
+        pointContainer.style.height = `${imgH}px`;
 
         points.forEach((point) => {
             const [index, x, y] = point;
@@ -128,8 +131,8 @@ console.log('SE CARGO EL SCRIPT FILE.JS')
             pointDiv.classList.add('point');
             pointDiv.style.position = 'absolute';
 
-            pointDiv.style.left = ${(x / imgW) * imgW}px;
-            pointDiv.style.top = ${(y / imgH) * imgH}px;
+            pointDiv.style.left = `${(x / imgW) * imgW}px`;
+            pointDiv.style.top = `${(y / imgH) * imgH}px`;
             pointDiv.style.backgroundColor = 'red';
             pointDiv.style.borderRadius = '100%';
             pointDiv.style.width = '7px';
@@ -156,8 +159,8 @@ console.log('SE CARGO EL SCRIPT FILE.JS')
             newX = Math.max(0, Math.min(newX, pointDiv.parentElement.clientWidth - pointDiv.offsetWidth));
             newY = Math.max(0, Math.min(newY, pointDiv.parentElement.clientHeight - pointDiv.offsetHeight));
 
-            pointDiv.style.left = ${newX}px;
-            pointDiv.style.top = ${newY}px;
+            pointDiv.style.left = `${newX}px`;
+            pointDiv.style.top = `${newY}px`;
         }
 
         const onMouseMove = (event) => {
@@ -182,7 +185,8 @@ console.log('SE CARGO EL SCRIPT FILE.JS')
             points_position : this.points,
             file : this.fileModalImageName,
             width : this.width_resize,
-            height : this.height_resize
+            height : this.height_resize,
+            pathToSave : selectedOption
         };
 
         try{
@@ -263,13 +267,38 @@ console.log('SE CARGO EL SCRIPT FILE.JS')
     }
 
     //CAMBIO DE OPCIONES EN EL SELECT
-    option.addEventListener('change', (event) => {
-        this.option = event.target.value;
+
+
+    $('#imageModal').modal({
+        backdrop:'static',
+        keyboard:false
     });
 
+    /*
+    select.addEventListener('click', (event) => {
+        event.stopPropagation();
+    });
+    */
+    option.addEventListener('change', (event) =>{
+        this.option = event.target.value;
+        console.log(event.target.value);
+    });
+    document.addEventListener('click', (event) => {
+    console.log('Click detectado:', event.target);
+    });
+
+    optionHorizontalImage.addEventListener('click', (event) => {
+        event.stopPropagation();
+    });
     optionHorizontalImage.addEventListener('change', (event) => {
         this.optionHorizontalImage = event.target.value;
     });
+
+    selectOptions.addEventListener('change', (event) => {
+        selectedOption = event.target.selectedOptions[0].textContent; // Obtiene la opción seleccionada
+        console.log(selectedOption);
+    });
+
 
 
     async function resizeNewDimension() {
@@ -312,7 +341,6 @@ console.log('SE CARGO EL SCRIPT FILE.JS')
         this.new_image = '';
         this.width_resize = width;
         this.height_resize = height;
-
         const formData = new FormData();
         formData.append('image', this.fileModalImageName);
         formData.append('width', this.width_resize);
@@ -358,7 +386,25 @@ console.log('SE CARGO EL SCRIPT FILE.JS')
         console.log("OPT:", this.option);
     }
 
+    async function cargarRutas() {
+        try {
+            let data = new FormData();
+            data.append('id', localStorage.getItem('id'));
 
+            const response = await fetch('/all_paths', {
+                method: 'POST',
+                body: data
+            });
+            const datos = await response.json();
 
-
+            datos.forEach(fila => {
+                const option = document.createElement('option');
+                option.value = fila.id;
+                option.textContent = fila.nombre;
+                selectOptions.appendChild(option);
+            });
+        } catch (error) {
+            console.error('Error al cargar los datos:', error);
+        }
+    }
 

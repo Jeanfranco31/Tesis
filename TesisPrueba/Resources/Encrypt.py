@@ -5,3 +5,4 @@ def encrypt_password(password):
     hashed_password = hashlib.sha256(password_bytes).hexdigest()
 
     return hashed_password
+

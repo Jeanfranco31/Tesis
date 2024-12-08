@@ -1,5 +1,6 @@
 from flask import request, json, jsonify
 import jwt
+from pycparser.ply.yacc import token
 
 KEY = "@JustD0I7_2024X"
 
@@ -23,3 +24,8 @@ def token_required(f):
 
 def get_key():
     return KEY
+
+def deserialize_token():
+    decoded_data = jwt.decode(token, KEY, algorithms=["HS256"])
+    print(decoded_data)
+    return decoded_data

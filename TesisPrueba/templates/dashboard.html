@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <link rel="stylesheet" href="../static/styles/dashboard.css">
-    <title>Inicio</title>
+    <title>BoiPose | Inicio</title>
 </head>
 <body>
     <header>
@@ -15,10 +15,12 @@
 
     <nav id="nav">
         <ul>
+            <li><a onclick="">Dashboard</a></li>
             <li><a onclick="viewUsers()">Gestion de Usuarios</a></li>
-            <li><a>Configuracion de archivos</a></li>
-            <li><a onclick="viewImages()">Cargas de imagenes</a></li>
-            <li><a>Cargas de videos</a></li>
+            <li><a onclick="viewConfiguration()">Configuracion de archivos</a></li>
+            <li><a onclick="viewImages()">Deteccion en imagen</a></li>
+            <li><a>Deteccion en video</a></li>
+            <li><a onclick="viewCloseSession()">Cerrar Sesion</a></li>
         </ul>
         <div class="toggle_button" id="toggle_button">
             <img src="../static/assets/forward_arrow_icon.png">
@@ -44,18 +46,18 @@
                 <h2>Lo que puedes lograr</h2>
                 <div class="cards">
                     <div class="card">
-                        <div class="content_info_card" id="img">
-                            <h4>Detección en Imagenes</h4>
-                        </div>
-                    </div>
-                    <div class="card">
-                        <div class="content_info_card" id="folder">
+                        <div class="content_info_card" id="folder" onclick="viewConfiguration()">
                             <h4>Configuracion Personalizada</h4>
                         </div>
                     </div>
                     <div class="card">
+                        <div class="content_info_card" id="img" onclick="viewImages()">
+                            <h4>Detección en Imagenes</h4>
+                        </div>
+                    </div>
+                    <div class="card">
                         <div class="content_info_card" id="video">
-                            <h4>Deteccion en videos</h4>
+                            <h4>Deteccion en Videos</h4>
                         </div>
                     </div>
                 </div>

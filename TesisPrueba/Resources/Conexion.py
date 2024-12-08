@@ -1,18 +1,22 @@
-import pyodbc
+import psycopg2
 
-server = 'DESKTOP-C9HNIMU'
+host = 'localhost'
+port = '5432'
 database = 'Operaciones2024'
+user = 'postgres'
+password = 'jean31'
+
 def get_connection():
-    connection = pyodbc.Connection
+    connection = None
     try:
-        connection = pyodbc.connect(
-            'DRIVER={ODBC Driver 17 for SQL Server};'
-            f'SERVER={server};'
-            f'DATABASE={database};'
-            'Trusted_Connection=yes;'
+        connection = psycopg2.connect(
+            host = host,
+            port = port,
+            database = database,
+            user = user,
+            password = password
         )
         print("Conexión exitosa")
-    except pyodbc.Error as e:
+    except psycopg2.Error as e:
         print("Error en la conexión:", e)
-
     return connection

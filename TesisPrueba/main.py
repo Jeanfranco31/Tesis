@@ -1,17 +1,22 @@
 import datetime
+from xml.etree.ElementTree import indent
 
-from flask import Flask, render_template, request, jsonify, json, redirect, url_for
+from flask import Flask, render_template, request, jsonify, json, redirect, url_for, session
 import pyodbc
 import os
 import cv2 as cv
 import glob
 import jwt
+import tkinter as tk
+import threading
+import queue
+from tkinter import filedialog
 from shutil import copyfile
 from PIL import Image
-
+import psycopg2
 
 from Resources.Middleware import token_required
-from Resources.Middleware import get_key
+from Resources.Middleware import get_key, deserialize_token
 from model.PoseModule import poseDetector
 from Resources.Conexion import get_connection
 from Resources.Encrypt import  encrypt_password
@@ -23,9 +28,6 @@ conn = get_connection()
 # Crear una carpeta para guardar las imágenes subidas
 UPLOAD_FOLDER = 'static/uploads/'
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
-path_save_json = 'C:/Users/Dell/Desktop/archivo_generado/'
-path_save_images = 'C:/Users/Dell/Desktop/archivo_generado/Imagen/'
-
 
 # Crear el detector de poses
 detector = poseDetector()
@@ -47,6 +49,10 @@ def login():
 @app.route('/create_account')
 def create_accountView():
     return render_template('create-account.html')
+
+@app.route('/configuration_path')
+def configuration_path():
+    return render_template('parametrizacion-rutas.html')
 
 @app.route('/dashboard')
 #@token_required
@@ -221,48 +227,76 @@ def resize_image_params():
 
 @app.route('/save', methods=['POST'])
 def saveImageData():
-    data = request.get_json()
-    file_name = data['data']['file']
-    points_position = data['data']['points_position']
-    width_file = data['data']['width']
-    heigth_file = data['data']['height']
-    center_x = width_file/2
-    center_y = heigth_file/2
+    try:
+        data = request.get_json()
+        file_name = data['data']['file']
+        points_position = data['data']['points_position']
+        width_file = data['data']['width']
+        heigth_file = data['data']['height']
+        file = data['data']['pathToSave']
+        center_x = width_file/2
+        center_y = heigth_file/2
+        local_path = str(file)
+        final_path = local_path+'\\Imagen'
 
-    #obtener archivos totales
-    total = get_total_files() + 1
+        # si la ruta Imagen no existe la crea
+        if not os.path.exists(final_path):
+            os.makedirs(final_path)
 
-    #nuevo formato de nombre  000001
-    name, ext = os.path.splitext(file_name)
-    name_to_save = f"{total}{ext}"
+        #obtener archivos totales
+        total = get_total_files(final_path)
 
-    # Guardar el JSON con los puntos
-    json_file_name = "Points_Json.json"
-    path_json = os.path.join(path_save_json, json_file_name)
-    with open(path_json, "w") as json_file:
-        json.dump(
-            {
-                    "path":name_to_save,
-                    "content":{
-                        "points_position": points_position
-                    },
-                    "size":{
-                        "width": width_file,
-                        "heigth" : heigth_file
-                    },
-                    "center": {
-                        "x": center_x,
-                        "y": center_y
+        #nuevo formato de nombre  000001
+        name, ext = os.path.splitext(file_name)
+        name_to_save = f"{total}{ext}"
+
+        # Guardar el JSON con los puntos
+        json_file_name = "Points_Json.json"
+        path_json = os.path.join(local_path, json_file_name)
+
+        new_image_json = {
+                        "path":name_to_save,
+                        "content":{
+                            "points_position": points_position
+                        },
+                        "size":{
+                            "width": width_file,
+                            "heigth" : heigth_file
+                        },
+                        "center": {
+                            "x": center_x,
+                            "y": center_y
+                        }
                     }
-                }, json_file)
 
-    image_file_path = os.path.join(path_save_images,name_to_save)
-    path_base_image = os.path.join(UPLOAD_FOLDER,f"points_{file_name}")
+        if os.path.exists(path_json):
+            with open(path_json,"r") as json_file:
+                data = json.load(json_file)
+                if not isinstance(data, list):
+                    data = [data]
+        else:
+            data = []
+        data.append(new_image_json)
 
-    # Crear o copiar la imagen con el nombre indicado
-    copyfile(path_base_image, image_file_path)  # Copia una imagen base con el nuevo nombre
+        with open(path_json, "w") as json_file:
+            json.dump(data, json_file, indent= 4)
 
-    delete_temp_image(UPLOAD_FOLDER)
+        image_file_path = os.path.join(final_path,name_to_save)
+        path_base_image = os.path.join(UPLOAD_FOLDER,f"points_{file_name}")
+
+        print(image_file_path)
+
+        # Crear o copiar la imagen con el nombre indicado
+        copyfile(path_base_image, image_file_path)  # Copia una imagen base con el nuevo nombre
+
+        delete_temp_image(UPLOAD_FOLDER)
+        return jsonify({'success': True, 'message': 'Imagen y datos guardados exitosamente!'}), 200
+
+    except Exception as e:
+        print(f"Error: {str(e)}")
+    return jsonify({'success': False, 'message': 'Ocurrió un error al guardar la imagen o los datos.'}), 500
+
+
 
 def delete_temp_image(carpeta):
     files = glob.glob(os.path.join(carpeta, "*"))  # Lista todos los archivos
@@ -270,10 +304,24 @@ def delete_temp_image(carpeta):
         if os.path.isfile(file):
             os.remove(file)
 
-def get_total_files():
-    file_count = sum(1 for file in os.listdir(path_save_images)
-                     if os.path.isfile(os.path.join(path_save_images, file)))
-    return file_count
+def get_total_files(final_path):
+    file_count = sum(1 for file in os.listdir(final_path)
+                     if os.path.isfile(os.path.join(final_path, file)))
+    file_count_str = str(file_count+1)
+
+    if len(file_count_str) == 1:
+        final_path = '0000'+file_count_str
+
+    elif len(file_count_str) == 2:
+        final_path = '000'+file_count_str
+    elif len(file_count_str) == 3:
+        final_path = '00'+file_count_str
+    elif len(file_count_str) == 4:
+        final_path = '0'+file_count_str
+    else:
+        final_path = file_count_str
+
+    return final_path
 
 #user controllers
 @app.route('/validateLogin', methods=['POST'])
@@ -284,7 +332,7 @@ def validate_login():
 
         with get_connection() as conn:
             cursor = conn.cursor()
-            query = "SELECT id, pass, nombre FROM Users WHERE mail = ?"
+            query = "SELECT id, pass, nombre FROM Users WHERE mail = %s"
             cursor.execute(query, (mail,))
 
             # Recorre los resultados
@@ -295,12 +343,12 @@ def validate_login():
                 token = jwt.encode({
                     "user_id": result[0]
                 }, get_key(), algorithm="HS256")
-                return jsonify({'authenticated': True, 'redirect_url': url_for('view_dashboard'), 'user':result[2], 'token': token}), 200
+                return jsonify({'authenticated': True, 'redirect_url': url_for('view_dashboard'), 'user':result[2], 'id':result[0], 'token': token}), 200
             else:
                 # Usuario no autenticado
                 return jsonify({'authenticated': False, 'message': 'Usuario o contraseña incorrecta'}), 401
 
-    except pyodbc.Error as e:
+    except psycopg2.Error as e:
         print("Error al ejecutar la consulta:", e)
         return jsonify({'authenticated': False, 'message': 'Error interno del servidor'}), 500
 
@@ -316,18 +364,15 @@ def createAccount():
 
         with get_connection() as conn:
             cursor = conn.cursor()
-            query = "INSERT INTO Users(nombre,apellido,cedula,pass,mail,stateUser) VALUES(?,?,?,?,?,1)"
+            query = "INSERT INTO users(nombre,apellido,cedula,pass,mail,stateUser, idrol) VALUES(%s,%s,%s,%s,%s,B'1',1)"
             params = (name,lastName,identification,passw,email)
-            result = cursor.execute(query, params)
+            cursor.execute(query, params)
+            conn.commit()
 
-            if result:
-                # Usuario creado
-                return jsonify({'created': True, 'redirect_url': url_for('login')}), 200
-            else:
-                # Usuario no creado
-                return jsonify({'created': False, 'message': 'Usuario no registrado'}), 401
+            return jsonify({'created': True, 'redirect_url': url_for('login')}), 200
 
-    except pyodbc.Error as e:
+
+    except psycopg2.Error as e:
         print("Error al ejecutar la consulta:", e)
         return jsonify({'authenticated': False, 'message': 'Error interno del servidor'}), 500
 
@@ -358,6 +403,96 @@ def getUsers():
         print("Error al ejecutar la consulta:", e)
         return jsonify({'authenticated': False, 'message': 'Error interno del servidor'}), 500
 
+
+@app.route('/parametrizador-ruta-principal', methods=['POST'])
+def save_main_route():
+    user_id = request.form.get('id')
+    main_path = request.form.get('path')
+
+    with get_connection() as conn:
+        cursor = conn.cursor()
+        query = "INSERT INTO parametrizador_rutas(ruta, user_id) VALUES(%s,%s)"
+        params = (main_path, user_id)
+        cursor.execute(query, params)
+        conn.commit()
+
+        return jsonify({'created': True, 'message': 'Ruta guardada'}), 200
+
+
+@app.route('/validate_has_path', methods=['POST'])
+def HasPath():
+    user_id = request.form.get('id')
+    user_id = int(user_id)
+    with get_connection() as conn:
+        cursor = conn.cursor()
+        query = "SELECT ruta FROM parametrizador_rutas WHERE user_id = %s"
+        params = (user_id,)
+        cursor.execute(query, params)
+        row = cursor.fetchone()
+
+        if row:
+            return jsonify({'ruta': row[0], 'message':'Ruta guardada'}), 200
+    return jsonify({'Ocurrio un error al tratar de guardar la ruta'}), 400
+
+
+@app.route('/getIdMainPath', methods=['POST'])
+def get_id_main_path():
+    path = request.form.get('main_path')
+    with get_connection() as conn:
+        cursor = conn.cursor()
+        query = "SELECT id FROM parametrizador_rutas WHERE ruta = %s"
+        params = (path,)
+        cursor.execute(query, params)
+        row = cursor.fetchone()
+
+        if row:
+            print("DATA",row[0])
+            return jsonify({'id_path': row[0]}), 200
+    return jsonify({'Ocurrio un error al obtener el id de la ruta'}), 400
+
+
+@app.route('/save_new_folder', methods=['POST'])
+def save_new_folder():
+    id_main_path = int(request.form.get('id_main_folder'))
+    main_path = request.form.get('nameFolder')
+
+    # Se crea la carpeta automaticamente
+    if not os.path.exists(main_path):
+        os.makedirs(main_path)
+        with get_connection() as conn:
+            cursor = conn.cursor()
+            query = "INSERT INTO parametrizador_ruta_imagen(ruta_imagen, id_ruta_principal) VALUES(%s,%s)"
+            params = (main_path, id_main_path)
+            cursor.execute(query, params)
+            conn.commit()
+
+            return jsonify({'created': True, 'message': 'Ruta creada con exito'}), 200
+    else:
+        return jsonify({'created': False, 'message': 'Ruta ya existe'}), 400
+
+@app.route('/all_paths', methods=['POST'])
+def getPaths():
+    id = int(request.form.get('id'))
+    try:
+        with get_connection() as conn:
+            cursor = conn.cursor()
+            query = "SELECT id_ruta_imagen, ruta_imagen FROM parametrizador_ruta_imagen INNER JOIN parametrizador_rutas pr ON pr.user_id = %s"
+            params = (id,)
+            cursor.execute(query, params)
+            rows = cursor.fetchall()
+
+            # Convertir el resultado en una lista de diccionarios
+            rutas = []
+            for row in rows:
+                rutas.append({
+                    "id": row[0],
+                    "nombre": row[1]
+                })
+            return jsonify(rutas), 200
+
+    except pyodbc.Error as e:
+        print("Error al ejecutar la consulta:", e)
+        return jsonify({'authenticated': False, 'message': 'Error interno del servidor'}), 500
 
 if __name__ == '__main__':
     app.run(debug=True)

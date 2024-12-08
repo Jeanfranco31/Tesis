@@ -88,7 +88,3 @@ async function createAccount() {
     }
 
 }
-
-function redirectLogin(){
-    
-}

@@ -15,6 +15,7 @@ async function getLogin() {
         if (data.authenticated) {
             localStorage.setItem('token',data.token)
             localStorage.setItem('user', data.user)
+            localStorage.setItem('id', data.id)
             window.location.href = data.redirect_url;
         } else {
             document.getElementById('message_content').innerHTML =

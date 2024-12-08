@@ -56,18 +56,75 @@ async function viewUsers() {
     }
 }
 
+async function viewImages() {
+    try {
+        const response = await fetch("/upload-image");
+        const data = await response.text();
+        main_content.innerHTML = data;
+        home_content.style.display = 'none';
 
-async function viewImages(){
-    const response = await fetch("/upload-image")
-    const data = await response.text();
-    main_content.innerHTML = data;
-    home_content.style.display = 'none';
+        // Verificar si el script ya existe y eliminarlo si es necesario
+        const existingScript = document.querySelector('script[src="../static/scripts/file.js"]');
+        if (existingScript) {
+            existingScript.remove();
+        }
 
-
-    const existingScript = document.querySelector('script[src="../static/scripts/file.js"]');
-    if (!existingScript) {
+        // Crear y cargar el nuevo script
         const script = document.createElement("script");
         script.src = "../static/scripts/file.js";
+        script.onload = () => {
+            // Aquí puedes invocar funciones específicas del archivo file.js si es necesario
+            if (typeof cargarRutas === "function") {
+                        console.log("Script file.js cargado correctamente.");
+                cargarRutas(); // Asegúrate de que esta función exista en file.js
+            }
+        };
+        script.onerror = () => {
+            console.error("Error al cargar el script file.js");
+        };
         document.body.appendChild(script);
+    } catch (error) {
+        console.error("Error al cargar la vista de imágenes:", error);
     }
+}
+
+
+
+
+async function viewConfiguration() {
+    try {
+        const response = await fetch("/configuration_path");
+        const data = await response.text();
+        main_content.innerHTML = data;
+        home_content.style.display = 'none';
+
+        const existingScript = document.querySelector('script[src="../static/scripts/parametrizacion-rutas.js"]');
+        if (existingScript) {
+            existingScript.remove();
+        }
+
+        const script = document.createElement("script");
+        script.src = "../static/scripts/parametrizacion-rutas.js";
+        script.onload = () => {
+            if (typeof HasPath === "function") {
+                HasPath();
+                cargarRutas();
+            }
+        };
+        script.onerror = () => {
+            console.error("Error al cargar el script parametrizacion-rutas.js");
+        };
+        document.body.appendChild(script);
+
+    } catch (error) {
+        console.error("Error al cargar la vista de parametriacion:", error);
+    }
+}
+
+async function viewCloseSession(){
+    localStorage.removeItem('token');
+    localStorage.removeItem('id');
+    localStorage.removeItem('user');
+    window.location.href = "/login";
+
 }
