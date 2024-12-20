@@ -10,6 +10,7 @@ const option = document.getElementById('select-option');
 const selectOptions = document.getElementById('selectOptions');
 const optionHorizontalImage = document.getElementById('select-option-horizontal');
 const modalEdit = document.getElementById('imageModal');
+const containerMiniCards = document.getElementById('content_mini_cards');
 var selectedOption = '';
 const h = document.getElementById('h');
 const w = document.getElementById('w');
@@ -17,6 +18,22 @@ const w = document.getElementById('w');
 
 // Almacena los puntos
 let points = [];
+var optionsToPoints = [
+                        {'id':'0', 'name':'Nariz'},
+                        {'id':'11','name':'Hombro Izquierdo'},
+                        {'id':'12','name':'Hombro Derecho'},
+                        {'id':'13','name':'Codo Izquierdo'},
+                        {'id':'14','name':'Codo Derecho'},
+                        {'id':'15','name':'Muñeca Izquierda'},
+                        {'id':'16','name':'Muñeca Derecha'},
+                        {'id':'23','name':'Cadera Izquierda'},
+                        {'id':'24','name':'Cadera Derecha'},
+                        {'id':'25','name':'Hombro Izquierdo'},
+                        {'id':'26','name':'Rodilla Izquierda'},
+                        {'id':'27','name':'Tobillo Izquierdo'},
+                        {'id':'28','name':'Tobillo Derecho'},
+                        {'id':'33','name':'Centro Pecho'}
+                       ]
 const fileModalImageName = '';
 const width_resize = 0;
 const height_resize = 0;
@@ -115,8 +132,10 @@ const height_resize = 0;
     });
 
 
-    // Dibujar puntos sobre la imagen usando las dimensiones correctas
     function drawPoints(points, imgW, imgH) {
+
+        drawMiniCards(points);
+
         const pointContainer = document.getElementById('point-container');
         pointContainer.innerHTML = '';
 
@@ -145,6 +164,41 @@ const height_resize = 0;
         });
     }
 
+    function drawMiniCards(points) {
+        const containerMiniCards = document.getElementById('content_mini_cards'); // Asegúrate de usar el contenedor correcto
+        containerMiniCards.innerHTML = ''; // Limpia el contenido previo
+
+        // Itera sobre los puntos y dibuja un cuadrado por cada uno
+        points.forEach((point) => {
+            const [index, x, y] = point;
+            const cardDiv = document.createElement('div');
+
+            cardDiv.classList.add('card_element');
+            cardDiv.style.position = 'relative'; // Usa `relative` porque estás trabajando dentro del contenedor
+            cardDiv.style.backgroundColor = 'red';
+            cardDiv.style.cursor = 'pointer';
+            cardDiv.style.border = '1px solid black'; // Agregué un borde negro para hacerlo visible
+            cardDiv.style.width = '50px'; // Ancho de la tarjeta
+            cardDiv.style.height = '40px'; // Alto de la tarjeta
+            cardDiv.style.margin = '10px'; // Espaciado entre las tarjetas (opcional)
+
+
+            const indexParagraph = document.createElement('p');
+            indexParagraph.textContent = `Index: ${index}`;
+            indexParagraph.style.color = 'white';
+            indexParagraph.style.fontSize = '12px';
+            indexParagraph.style.textAlign = 'center';
+
+            // Agrega la etiqueta <p> dentro de la tarjeta
+            cardDiv.appendChild(indexParagraph);
+
+
+            // Agrega la tarjeta al contenedor de mini tarjetas
+            containerMiniCards.appendChild(cardDiv);
+        });
+    }
+
+
     // Hacer que un punto sea arrastrable y actualizar su posición
     function makePointDraggable(pointDiv, index) {
         let shiftX, shiftY;
@@ -153,8 +207,8 @@ const height_resize = 0;
         const moveAt = (pageX, pageY) => {
             const containerRect = container.getBoundingClientRect();
 
-            let newX = pageX - shiftX - containerRect.left;
-            let newY = pageY - shiftY - containerRect.top;
+            let newX = pageX - shiftX - containerRect.left + window.scrollX;
+            let newY = pageY - shiftY - containerRect.top + window.scrollY;
 
             newX = Math.max(0, Math.min(newX, pointDiv.parentElement.clientWidth - pointDiv.offsetWidth));
             newY = Math.max(0, Math.min(newY, pointDiv.parentElement.clientHeight - pointDiv.offsetHeight));
@@ -165,12 +219,17 @@ const height_resize = 0;
 
         const onMouseMove = (event) => {
             moveAt(event.pageX, event.pageY);
+                console.log("Mouse Move:", event.pageX, event.pageY);
+
         }
 
         pointDiv.addEventListener('mousedown', (e) => {
+            console.log("Mouse Down:", e.pageX, e.pageY);
+            console.log("Point Initial:", pointDiv.getBoundingClientRect().left, pointDiv.getBoundingClientRect().top);
+
            e.preventDefault();
-           shiftX = e.clientX - pointDiv.getBoundingClientRect().left;
-           shiftY = e.clientY - pointDiv.getBoundingClientRect().top;
+           shiftX = e.pageX  - pointDiv.getBoundingClientRect().left;
+           shiftY = e.pageY  - pointDiv.getBoundingClientRect().top;
 
            document.addEventListener('mousemove', onMouseMove);
            document.addEventListener('mouseup', () => {
@@ -250,6 +309,7 @@ const height_resize = 0;
                 w.textContent = '350px'
                 h.textContent = '233px'
             }
+            fillSelect(optionsToPoints, 'optionsToPoints');
         };
     }
 
@@ -266,19 +326,28 @@ const height_resize = 0;
         $('#imageModal').modal('show');
     }
 
+    function fillSelect(options, selectId) {
+        const selectElement = document.getElementById(selectId);
+
+        // Limpia las opciones existentes (si las hay)
+        selectElement.innerHTML = '';
+
+        // Itera sobre el array para crear <option> por cada objeto
+        options.forEach(option => {
+            const optionElement = document.createElement('option');
+            optionElement.value = option.id; // Asigna el id como value
+            optionElement.textContent = option.name; // Usa el name como texto
+            selectElement.appendChild(optionElement);
+        });
+    }
+
+
     //CAMBIO DE OPCIONES EN EL SELECT
-
-
     $('#imageModal').modal({
         backdrop:'static',
         keyboard:false
     });
 
-    /*
-    select.addEventListener('click', (event) => {
-        event.stopPropagation();
-    });
-    */
     option.addEventListener('change', (event) =>{
         this.option = event.target.value;
         console.log(event.target.value);

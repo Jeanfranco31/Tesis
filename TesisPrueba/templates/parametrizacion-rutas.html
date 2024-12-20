@@ -5,6 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="stylesheet" href="../static/styles/parametrizacion-rutas.css">
     <script src="https://cdn.jsdelivr.net/npm/jwt-decode/build/jwt-decode.min.js"></script>
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+
     <title>BoiPose | Parametrizacion</title>
 </head>
 <body>
@@ -15,16 +17,13 @@
         <section class="parametrizar_ruta">
             <h2>Parametrizacion de Rutas</h2>
             <div class="main_route">
-                <div class="add_route_button">
-                    <button onclick="openModalCreatePath()">Agregar Nueva Ruta</button>
-                </div>
                 <div class="content_configuration">
                     <div class="content_configuration_elements">
                         <label>Ruta Principal:</label>
                         <input type="text" id="folderInput" placeholder="Pega aqui la ruta que tendra tu proyecto completo">
-                        <label for="folderInput">
+                        <!--<label for="folderInput">
                             <img id="logo" src="../static/assets/folder_icon.png" alt="Logo">
-                        </label>
+                        </label>-->
                     </div>
                     <div class="button_save" onclick="saveMainPath()">
                         <button id="button_save">Guardar configuracion</button>
@@ -35,11 +34,16 @@
         <section class="parametrizar_video"></section>
         <section class="content_table">
             <h2>Rutas Parametrizadas Actualmente</h2>
+            <div class="add_route_button">
+                <button onclick="openModalCreatePath()">Agregar Nueva Ruta</button>
+            </div>
             <table>
             <thead>
                 <tr>
                     <th>Id</th>
                     <th>Directorio</th>
+                    <th>Fecha Creacion</th>
+                    <th>Acciones</th>
                 </tr>
             </thead>
             <tbody id="tabla-cuerpo">
@@ -49,6 +53,7 @@
         </section>
 
     </div>
+
     <!------- MODAL CREACION NUEVA RUTA ------->
     <div class="modal_create_folder" id="modal_create_folder">
         <div class="modal_background" id="modal_background">
@@ -66,6 +71,20 @@
                     <button id="close" class="close_button" onclick="closeModal()">Cancelar</button>
                     <button id="save" class="save_button" onclick="saveNewFolder()">Crear Carpeta</button>
                 </div>
+            </div>
+        </div>
+    </div>
+
+    <!------- MODAL ELIMINAR RUTA --------------->
+    <div class="modal_delete_path" id="modal_delete_path">
+        <div class="content_options">
+            <div class="content_options_title">
+                <h2>¿Estás seguro de eliminar la carpeta?</h2>
+                <span>Se perderán todas las imágenes que contenga el directorio</span>
+            </div>
+            <div class="content_options_buttons">
+                <button class="btnCancelOption" onclick="closeModalOptions()">No</button>
+                <button class="btnDeleteOption" id="btnDeleteOption">Si</button>
             </div>
         </div>
     </div>

@@ -5,8 +5,10 @@ const closeModalButton = document.getElementById('save');
 const modalCreateFolder = document.getElementById('modal_create_folder');
 const message = document.getElementById('message_modal');
 const inputCreateFolder = document.getElementById('inputFolderName');
+const deleteButtons = document.getElementById('deletePath');
+const modalOptions = document.getElementById('modal_delete_path');
+const deleteButtonOption = document.getElementById('btnDeleteOption');
 var main_path = '';
-
 
 async function HasPath(){
     const form = new FormData()
@@ -65,6 +67,12 @@ async function cargarRutas() {
             filaTabla.innerHTML = `
                 <td>${fila.id}</td>
                 <td>${fila.nombre}</td>
+                <td>${fila.fechaCreacion}</td>
+                <td>
+                    <button id="deletePath" class="delete-path-btn" style="background-color:red; cursor:pointer; border-radius:4px;" onclick="deletePath(this)">
+                        <i class="bi bi-trash3-fill" style="color:#ffffff;"></i>
+                    </button>
+                </td>
             `;
             tablaCuerpo.appendChild(filaTabla);
         });
@@ -76,13 +84,7 @@ async function cargarRutas() {
     }
 }
 
-function closeModal(){
-    modalCreateFolder.style.display = "none";
-}
 
-function openModalCreatePath(){
-    modalCreateFolder.style.display = "block";
-}
 
 async function saveNewFolder(){
     const data = new FormData();
@@ -94,7 +96,7 @@ async function saveNewFolder(){
         body : data
     });
     let response = await request.json()
-    console.log(response.id_path)
+    //console.log(response.id_path)
 
     const savefolder = new FormData();
     savefolder.append('nameFolder',this.main_path+'\\'+inputCreateFolder.value);
@@ -110,11 +112,11 @@ async function saveNewFolder(){
 
     if(response_folder.created){
         generateMessageSuccesfull(message);
+        location.reload();
     }else{
         generateMessageError(message);
     }
     closeModal();
-    location.reload();
 }
 
 function generateMessageSuccesfull(message){
@@ -122,7 +124,7 @@ function generateMessageSuccesfull(message){
     messageDiv.style.position = 'absolute';
     messageDiv.style.bottom = '4%';
     messageDiv.style.right = '4%';
-    messageDiv.style.backgroundColor = '#6ee90e';
+    messageDiv.style.backgroundColor = 'rgba(103, 220, 17 ,0.8)';
     messageDiv.style.border = '1px solid #ccc';
     messageDiv.style.borderRadius = '5px';
     messageDiv.style.width = '220px';
@@ -164,5 +166,45 @@ function generateMessageError(message){
     setTimeout(() => {
         messageDiv.remove();
     }, 5000);
+}
+
+function deletePath(button){
+    let rows = button.closest('tr');
+    let rowData = Array.from(rows.querySelectorAll('td')).map(td => td.textContent);
+    openModalOptions(rowData[1]);
+}
+
+
+//modals actions
+function closeModal(){
+    modalCreateFolder.style.display = "none";
+}
+
+function openModalCreatePath(){
+    modalCreateFolder.style.display = "block";
+}
+
+function closeModalOptions(){
+    modalOptions.style.display = "none";
+}
+
+async function openModalOptions(rowData){
+    modalOptions.style.display = "block";
+
+    deleteButtonOption.addEventListener("click", async() =>{
+        let request = new FormData();
+        request.append('path',rowData);
+
+        const response = await fetch('/delete_folder', {
+            method: 'POST',
+            body: request
+        });
+
+        var data = await response.json();
+        console.log(data)
+        generateMessageSuccesfull(data.message);
+        closeModalOptions();
+    });
+
 }
 

@@ -43,7 +43,7 @@
 
 .add_route_button{
     width:100%;
-    height:40px;
+    height:50px;
     display:flex;
     justify-content:flex-end;
 }
@@ -54,7 +54,7 @@
     background-color:#0C56BC;
     color:#ffffff;
     border:none;
-    font-size:1rem;
+    font-size:0.9rem;
     font-weight:500;
     transition:200ms all ease-in-out;
 }
@@ -135,35 +135,40 @@
 /****************** CONFIGURACION DE TABLAS ********************/
 .content_table{
     width:90%;
-    height:30vh;
+    height:80vh;
     margin:0 auto;
 }
 .content_table h2{
-    padding:15px 5px;
+    padding:7px 5px;
+    border-left:4px solid #0C56BC;
+    color:#0C56BC;
+    font-size:1.8rem;
 }
 table{
-    width:50%;
+    width:100%;
+    height:50vh;
     border-collapse: collapse;
     text-align: left;
+    border:1px solid rgba(0,0,0,0.1);
 }
+
 thead{
     height:40px;
 }
 
 thead tr{
-    border-top-left-radius:10px;
-    border-top-right-radius:10px;
+    background-color:blue;
 }
 
 thead tr th{
     text-align:center;
-    background-color:blue;
     color:#ffffff;
+    padding:5px 10px;
 }
 
 tbody tr td{
-    text-align:left;
-    padding:5px 5px;
+    text-align:center;
+    padding:5px 30px;
 }
 
 
@@ -262,4 +267,109 @@ tbody tr td{
     font-weight:600;
     border-radius:10px;
     transition:400ms all ease-in-out;
+}
+
+button{
+    width:30px;
+    height:30px;
+    border:none;
+}
+
+button .edit{
+    background-color:none;
+    color:#ffffff;
+    transition:200ms all ease-in-out;
+}
+button .edit:hover{
+    background-color:green;
+    transition:200ms all ease-in-out;
+}
+
+button .delete{
+    background-color:none;
+    color:#ffffff;
+    transition:200ms all ease-in-out;
+}
+button .delete:hover{
+    background-color:red;
+    transition:200ms all ease-in-out;
+}
+
+
+/********************* modal eliminar rutas *************************/
+
+.modal_delete_path{
+    position:fixed;
+    top:0;
+    left:0;
+    background-color:rgba(240, 240, 240, 0.7);
+    width:100%;
+    height:100vh;
+    z-index:2;
+    display:none;
+    transition:400ms ease-in;
+}
+
+.content_options{
+    width:350px;
+    height:30vh;
+    border:none;
+    border-radius:5px;
+    box-shadow:0px 0px 10px rgba(0,0,0,0.7);
+    background-color:#ffffff;
+    position:absolute;
+    top:50%;
+    left:50%;
+    transform:translate(-50%, -50%);
+}
+
+.content_options_title{
+    width:90%;
+    height:15vh;
+    margin:0 auto;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    flex-direction:column;
+}
+
+.content_options_title h2{
+    font-size:1rem;
+}
+
+.content_options_title span{
+    font-size:0.6rem;
+}
+
+.content_options_buttons{
+    width:90%;
+    height:15vh;
+    margin:0 auto;
+    display:flex;
+    justify-content:space-around;
+    align-items:center;
+}
+
+.btnCancelOption, .btnDeleteOption{
+    width:40%;
+    height:30px;
+    border-radius:4px;
+    border:none;
+    color:#ffffff;
+}
+.btnCancelOption{
+    background-color:red;
+}
+.btnDeleteOption{
+    background-color:rgba(98, 218, 10);
+}
+.btnCancelOption:hover, .btnDeleteOption:hover{
+    cursor:pointer;
+    font-weight:700;
+}
+.btnCancelOption:hover{
+    background-color:red;
+}
+.btnDeleteOption:hover{
+    background-color:rgb(5, 193, 5 );
 }

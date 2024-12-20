@@ -1,5 +1,6 @@
 import datetime
 from xml.etree.ElementTree import indent
+from xmlrpc.client import DateTime
 
 from flask import Flask, render_template, request, jsonify, json, redirect, url_for, session
 import pyodbc
@@ -7,10 +8,7 @@ import os
 import cv2 as cv
 import glob
 import jwt
-import tkinter as tk
-import threading
-import queue
-from tkinter import filedialog
+from datetime import datetime
 from shutil import copyfile
 from PIL import Image
 import psycopg2
@@ -455,14 +453,16 @@ def get_id_main_path():
 def save_new_folder():
     id_main_path = int(request.form.get('id_main_folder'))
     main_path = request.form.get('nameFolder')
+    date = datetime.now().strftime('%d-%m-%Y')
 
     # Se crea la carpeta automaticamente
     if not os.path.exists(main_path):
         os.makedirs(main_path)
+
         with get_connection() as conn:
             cursor = conn.cursor()
-            query = "INSERT INTO parametrizador_ruta_imagen(ruta_imagen, id_ruta_principal) VALUES(%s,%s)"
-            params = (main_path, id_main_path)
+            query = "INSERT INTO parametrizador_ruta_imagen(ruta_imagen, date_created, id_ruta_principal) VALUES(%s,%s,%s)"
+            params = (main_path,date,id_main_path)
             cursor.execute(query, params)
             conn.commit()
 
@@ -476,7 +476,7 @@ def getPaths():
     try:
         with get_connection() as conn:
             cursor = conn.cursor()
-            query = "SELECT id_ruta_imagen, ruta_imagen FROM parametrizador_ruta_imagen INNER JOIN parametrizador_rutas pr ON pr.user_id = %s"
+            query = "SELECT id_ruta_imagen, ruta_imagen, TO_CHAR(date_created, 'DD-MM-YYYY') as fecha  FROM parametrizador_ruta_imagen INNER JOIN parametrizador_rutas pr ON pr.user_id = %s"
             params = (id,)
             cursor.execute(query, params)
             rows = cursor.fetchall()
@@ -486,13 +486,36 @@ def getPaths():
             for row in rows:
                 rutas.append({
                     "id": row[0],
-                    "nombre": row[1]
+                    "nombre": row[1],
+                    "fechaCreacion":row[2]
                 })
             return jsonify(rutas), 200
 
     except pyodbc.Error as e:
         print("Error al ejecutar la consulta:", e)
         return jsonify({'authenticated': False, 'message': 'Error interno del servidor'}), 500
+
+@app.route('/delete_folder', methods=['POST'])
+def delete_folder():
+    path_to_delete = request.form.get('path')
+    try:
+        with get_connection() as conn:
+            cursor = conn.cursor()
+            query = "DELETE FROM parametrizador_ruta_imagen WHERE ruta_imagen = %s"
+            params = (path_to_delete,)
+            cursor.execute(query, params)
+            conn.commit()
+            os.rmdir(path_to_delete)
+
+            return jsonify({
+                'result':True,
+                'message':'Ruta Eliminada'
+            })
+
+    except pyodbc.Error as e:
+        conn.rollback()
+        return jsonify({'result': False, 'message': 'Error interno del servidor'}), 500
+
 
 if __name__ == '__main__':
     app.run(debug=True)

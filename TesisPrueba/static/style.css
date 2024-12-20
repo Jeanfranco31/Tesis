@@ -156,7 +156,7 @@
     }
     .modal.show .modal-dialog{
         width:100vw;
-        height:95vh;
+        height:90vh;
     }
     .modal {
         position:relative;
@@ -212,7 +212,7 @@
     .modal-content-process{
         background:#ffffff;
         min-width: 95vw !important;
-        height:93vh;
+        height:90vh;
         margin: 0 auto !important;
         overflow: hidden;
         position:absolute;
@@ -227,10 +227,11 @@
         height:30px;
         border-radius:100%;
         transition:200ms all ease-in-out;
+        background-color:transparent;
     }
     .modal-header .close:hover{
         transition:200ms all ease-in-out;
-        background-color:#0C56BC;
+        background-color:#2ed3ff;
         cursor:pointer;
     }
 
@@ -244,10 +245,12 @@
     .resize_content{
         width:90%;
         height:20vh;
+        padding-top:30px;
         display:flex;
         flex-direction:row;
         justify-content:center;
         align-items:center;
+        flex-wrap:wrap;
     }
     .resize_content .content_info_resize{
         width:40%;
@@ -289,6 +292,7 @@
         font-weight:500;
         transition:200ms all ease-in-out;
         border:none;
+        margin-left:20px;
     }
     #generateButton{background-color:#0C56BC;color:#ffffff;font-weight:500;}
     #saveButton{
@@ -298,6 +302,7 @@
         border-radius:3px;
         height:40px;
         width:175px;
+        border:none;
     }
     .resize_content .select-option{
         height:40px;
@@ -315,4 +320,12 @@
         align-items:center;
         flex-direction:row;
         justify-content:center;
+    }
+
+    .content_mini_cards{
+        width:90%;
+        height:30vh;
+        display:flex;
+        flex-direction:row;
+        flex-wrap:wrap;
     }
