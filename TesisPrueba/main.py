@@ -1,8 +1,6 @@
 import datetime
-from xml.etree.ElementTree import indent
-from xmlrpc.client import DateTime
 
-from flask import Flask, render_template, request, jsonify, json, redirect, url_for, session
+from flask import Flask, render_template, request, jsonify, json, redirect, url_for, session, send_file
 import pyodbc
 import os
 import cv2 as cv
@@ -12,6 +10,7 @@ from datetime import datetime
 from shutil import copyfile
 from PIL import Image
 import psycopg2
+from six import print_
 
 from Resources.Middleware import token_required
 from Resources.Middleware import get_key, deserialize_token
@@ -20,7 +19,7 @@ from Resources.Conexion import get_connection
 from Resources.Encrypt import  encrypt_password
 
 # Inicializar la app Flask
-app = Flask(__name__)
+app = Flask(__name__, static_folder="static")
 conn = get_connection()
 
 # Crear una carpeta para guardar las imágenes subidas
@@ -51,6 +50,10 @@ def create_accountView():
 @app.route('/configuration_path')
 def configuration_path():
     return render_template('parametrizacion-rutas.html')
+
+@app.route('/verify-images')
+def verify_images():
+    return render_template('verify-images.html')
 
 @app.route('/dashboard')
 #@token_required
@@ -481,7 +484,6 @@ def getPaths():
             cursor.execute(query, params)
             rows = cursor.fetchall()
 
-            # Convertir el resultado en una lista de diccionarios
             rutas = []
             for row in rows:
                 rutas.append({
@@ -515,6 +517,79 @@ def delete_folder():
     except pyodbc.Error as e:
         conn.rollback()
         return jsonify({'result': False, 'message': 'Error interno del servidor'}), 500
+
+
+@app.route('/getFilesByPathname', methods=['POST'])
+def get_files_by_pathname():
+    pathName = request.form.get('pathName')
+
+    # Generar la ruta completa para la carpeta 'files'
+    files_path = os.path.join(pathName, "Imagen")  # Especificamos la ruta de la carpeta "files"
+    print("Ruta de la carpeta 'files':", files_path)  # Imprime la ruta para verificarla
+
+    # Listar los archivos dentro de la carpeta 'files'
+    try:
+        files = os.listdir(files_path)  # Listar archivos en la carpeta "files"
+    except FileNotFoundError:
+        return jsonify({"error": "La carpeta 'files' no se encuentra en la ruta proporcionada."}), 404
+
+    # Buscar el archivo JSON en el directorio 'pathName' (no en 'files')
+    json_file = next((file for file in os.listdir(pathName) if file.lower().endswith('.json')), None)
+
+    if not json_file:
+        return jsonify({"error": "No se encontró un archivo JSON en la ruta proporcionada."}), 404
+
+    # Construir la ruta completa del archivo JSON
+    json_file_path = os.path.join(pathName, json_file)  # Ruta del archivo JSON fuera de la carpeta "Imagen"
+
+    try:
+        # Abrir y leer el archivo JSON
+        with open(json_file_path, 'r', encoding='utf-8') as f:
+            data = json.load(f)
+
+        # Crear la lista de archivos dentro de la carpeta 'files'
+        total_files = [{"nombre": file} for file in files]
+
+        return jsonify({'data': data, 'files': total_files})
+
+    except json.JSONDecodeError:
+        return jsonify({"error": "Error al leer el archivo JSON."}), 400
+    except Exception as e:
+        return jsonify({"error": f"Error inesperado: {str(e)}"}), 500
+
+
+@app.route('/getFiles', methods=['POST'])
+def get_files():
+    pathName = request.form.get('pathName')
+    files = os.listdir(pathName)
+    json_file = next((file for file in files if file.lower().endswith('.json')), None)
+
+    file_path = os.path.join(pathName, json_file)
+    try:
+        with open(file_path, 'r', encoding='utf-8') as f:
+            data = json.load(f)
+        return jsonify(data)
+    except json.JSONDecodeError:
+        return jsonify({"error": "Error al leer el archivo JSON."}), 400
+
+@app.route('/getImage', methods=['POST'])
+def get_image():
+    pathName = request.form.get('path')
+    file = request.form.get('file')
+    pathImage = os.path.join(pathName, 'Imagen')
+    all_path = os.path.join(pathImage, file)
+    print(all_path)
+    extension = os.path.splitext(file)[-1].lower()
+    mime_types = {
+        '.jpg': 'image/jpeg',
+        '.jpeg': 'image/jpeg',
+        '.png': 'image/png',
+    }
+
+    mimetype = mime_types.get(extension)
+
+    return send_file(all_path, mimetype=mimetype)
+
 
 
 if __name__ == '__main__':

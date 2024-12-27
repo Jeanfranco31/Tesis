@@ -4,12 +4,36 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="stylesheet" href="../static/styles/parametrizacion-rutas.css">
+    <link rel="stylesheet" href="../static/styles/header.css">
+    <link rel="stylesheet" href="../static/styles/sidebar.css">
     <script src="https://cdn.jsdelivr.net/npm/jwt-decode/build/jwt-decode.min.js"></script>
         <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
 
     <title>BoiPose | Parametrizacion</title>
 </head>
 <body>
+    <header>
+        <div class="content_logo">
+            <img src="../static/assets/logotipo.png">
+            <p id="name">Bienvenido, <span id="name-user"></span> </p>
+        </div>
+    </header>
+
+    <nav id="nav">
+        <ul>
+            <li><a href="{{ url_for('view_dashboard')}}">Dashboard</a></li>
+            <li><a href="{{ url_for('manage_users')}}">Gestion de Usuarios</a></li>
+            <li><a href="{{ url_for('configuration_path')}}">Configuracion de rutas</a></li>
+            <li><a href="{{ url_for('upload')}}">Deteccion en imagen</a></li>
+            <li><a>Deteccion en video</a></li>
+            <li><a href="{{ url_for('verify_images')}}">Verifica tus imagenes</a></li>
+            <li><a onclick="viewCloseSession()">Cerrar Sesion</a></li>
+        </ul>
+        <div class="toggle_button" id="toggle_button">
+            <img src="../static/assets/forward_arrow_icon.png">
+        </div>
+    </nav>
+
     <div class="main_container_routes" id="main_container_routes">
         <div class="container_routes_title">
             <h1>Configuracion de Archivos</h1>
@@ -21,9 +45,7 @@
                     <div class="content_configuration_elements">
                         <label>Ruta Principal:</label>
                         <input type="text" id="folderInput" placeholder="Pega aqui la ruta que tendra tu proyecto completo">
-                        <!--<label for="folderInput">
-                            <img id="logo" src="../static/assets/folder_icon.png" alt="Logo">
-                        </label>-->
+
                     </div>
                     <div class="button_save" onclick="saveMainPath()">
                         <button id="button_save">Guardar configuracion</button>

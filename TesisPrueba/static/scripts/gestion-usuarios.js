@@ -1,20 +1,35 @@
-console.log('hola')
+const sidebar = document.getElementById('toggle_button');
+const nav = document.getElementById('nav');
+const name = document.getElementById('name-user');
 
-document.addEventListener("DOMContentLoaded", () => {
-    cargarUsuarios();
+var position = -250;
+
+sidebar.addEventListener('click', () =>{
+    if(position === -250){
+        position = 0;
+    } else {
+        position = -250;
+    }
+    nav.style.left = `${position}px`;
 });
+
+document.addEventListener("DOMContentLoaded", async() => {
+    await cargarUsuarios();
+    const nameCache = localStorage.getItem('user');
+    if(nameCache){
+        name.textContent = nameCache;
+    }
+});
+
+
 
 async function cargarUsuarios() {
     try {
         const response = await fetch('/users-all');
         const datos = await response.json();
 
-        console.log('DATOS',datos)
-
-        // Selecciona el cuerpo de la tabla
         const tablaCuerpo = document.getElementById('tabla-cuerpo');
 
-        // Llena la tabla con los datos recibidos
         datos.forEach(fila => {
             if(fila.stateUser === true){
                 fila.stateUser = 'Activo'
@@ -38,7 +53,6 @@ async function cargarUsuarios() {
             tablaCuerpo.appendChild(filaTabla);
         });
 
-        // Muestra la tabla y oculta el mensaje de carga
         document.getElementById('tabla-datos').style.display = 'table';
     } catch (error) {
         console.error('Error al cargar los datos:', error);

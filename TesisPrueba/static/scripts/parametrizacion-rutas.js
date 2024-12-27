@@ -8,7 +8,32 @@ const inputCreateFolder = document.getElementById('inputFolderName');
 const deleteButtons = document.getElementById('deletePath');
 const modalOptions = document.getElementById('modal_delete_path');
 const deleteButtonOption = document.getElementById('btnDeleteOption');
+const sidebar = document.getElementById('toggle_button');
+const nav = document.getElementById('nav');
+const name = document.getElementById('name-user');
+
 var main_path = '';
+
+let position = -250;
+sidebar.addEventListener('click', () =>{
+    if(position === -250){
+        position = 0;
+    } else {
+        position = -250;
+    }
+    nav.style.left = `${position}px`;
+});
+
+document.addEventListener("DOMContentLoaded", async function () {
+   await HasPath();
+   await cargarRutas();
+   const nameCache = localStorage.getItem('user');
+    if(nameCache){
+        name.textContent = nameCache;
+    }
+});
+
+
 
 async function HasPath(){
     const form = new FormData()
@@ -61,7 +86,7 @@ async function cargarRutas() {
         const datos = await response.json();
 
         const tablaCuerpo = document.getElementById('tabla-cuerpo');
-
+        console.log(datos)
         datos.forEach(fila => {
             const filaTabla = document.createElement('tr');
             filaTabla.innerHTML = `
@@ -84,8 +109,6 @@ async function cargarRutas() {
     }
 }
 
-
-
 async function saveNewFolder(){
     const data = new FormData();
     data.append('main_path',this.main_path);
@@ -96,7 +119,6 @@ async function saveNewFolder(){
         body : data
     });
     let response = await request.json()
-    //console.log(response.id_path)
 
     const savefolder = new FormData();
     savefolder.append('nameFolder',this.main_path+'\\'+inputCreateFolder.value);
@@ -112,7 +134,10 @@ async function saveNewFolder(){
 
     if(response_folder.created){
         generateMessageSuccesfull(message);
+        let idUser = localStorage.getItem('id');
+        await getPaths(idUser);
         location.reload();
+
     }else{
         generateMessageError(message);
     }
@@ -208,3 +233,21 @@ async function openModalOptions(rowData){
 
 }
 
+
+async function getPaths(idUser){
+    try{
+        let form = new FormData();
+        console.log(idUser)
+        form.append('id',idUser);
+
+        let request = await fetch('/all_paths',{
+            method: 'POST',
+            body: form
+        });
+
+        let response = await request.json();
+        localStorage.setItem('paths', JSON.stringify(response));
+    }catch(error){
+        console.log(error);
+    }
+}

@@ -1,4 +1,3 @@
-
 const dropZone = document.getElementById('drop-zone');
 const fileInput = document.getElementById('file-input');
 const uploadForm = document.getElementById('upload-form');
@@ -11,6 +10,11 @@ const selectOptions = document.getElementById('selectOptions');
 const optionHorizontalImage = document.getElementById('select-option-horizontal');
 const modalEdit = document.getElementById('imageModal');
 const containerMiniCards = document.getElementById('content_mini_cards');
+const sidebar = document.getElementById('toggle_button');
+const nav = document.getElementById('nav');
+const name = document.getElementById('name-user');
+
+
 var selectedOption = '';
 const h = document.getElementById('h');
 const w = document.getElementById('w');
@@ -18,25 +22,42 @@ const w = document.getElementById('w');
 
 // Almacena los puntos
 let points = [];
-var optionsToPoints = [
-                        {'id':'0', 'name':'Nariz'},
-                        {'id':'11','name':'Hombro Izquierdo'},
-                        {'id':'12','name':'Hombro Derecho'},
-                        {'id':'13','name':'Codo Izquierdo'},
-                        {'id':'14','name':'Codo Derecho'},
-                        {'id':'15','name':'Muñeca Izquierda'},
-                        {'id':'16','name':'Muñeca Derecha'},
-                        {'id':'23','name':'Cadera Izquierda'},
-                        {'id':'24','name':'Cadera Derecha'},
-                        {'id':'25','name':'Hombro Izquierdo'},
-                        {'id':'26','name':'Rodilla Izquierda'},
-                        {'id':'27','name':'Tobillo Izquierdo'},
-                        {'id':'28','name':'Tobillo Derecho'},
-                        {'id':'33','name':'Centro Pecho'}
+var divToPoints = [
+                        {'id':'0', 'name':'Nariz', 'divName': document.getElementById('1')},
+                        {'id':'11','name':'Hombro Izquierdo' , 'divName': document.getElementById('2')},
+                        {'id':'12','name':'Hombro Derecho' , 'divName': document.getElementById('3')},
+                        {'id':'13','name':'Codo Izquierdo' , 'divName': document.getElementById('4')},
+                        {'id':'14','name':'Codo Derecho' , 'divName': document.getElementById('5')},
+                        {'id':'15','name':'Muñeca Izquierda' , 'divName': document.getElementById('6')},
+                        {'id':'16','name':'Muñeca Derecha', 'divName': document.getElementById('7')},
+                        {'id':'23','name':'Cadera Izquierda', 'divName': document.getElementById('8')},
+                        {'id':'24','name':'Cadera Derecha', 'divName': document.getElementById('9')},
+                        {'id':'25','name':'Hombro Izquierdo', 'divName': document.getElementById('10')},
+                        {'id':'26','name':'Rodilla Izquierda', 'divName': document.getElementById('11')},
+                        {'id':'27','name':'Tobillo Izquierdo', 'divName': document.getElementById('12')},
+                        {'id':'28','name':'Tobillo Derecho', 'divName': document.getElementById('13')},
+                        {'id':'33','name':'Centro Pecho', 'divName': document.getElementById('14')}
                        ]
 const fileModalImageName = '';
 const width_resize = 0;
 const height_resize = 0;
+let position = -250;
+sidebar.addEventListener('click', () =>{
+    if(position === -250){
+        position = 0;
+    } else {
+        position = -250;
+    }
+    nav.style.left = `${position}px`;
+});
+
+document.addEventListener('DOMContentLoaded', async () => {
+    const nameCache = localStorage.getItem('user');
+    if(nameCache){
+        name.textContent = nameCache;
+    }
+    await cargarRutas();
+});
 
     // Permite arrastrar el archivo sobre la zona de drop
     dropZone.addEventListener('dragover', (e) => {
@@ -165,39 +186,54 @@ const height_resize = 0;
     }
 
     function drawMiniCards(points) {
-        const containerMiniCards = document.getElementById('content_mini_cards'); // Asegúrate de usar el contenedor correcto
-        containerMiniCards.innerHTML = ''; // Limpia el contenido previo
+                console.log(points)
 
-        // Itera sobre los puntos y dibuja un cuadrado por cada uno
+
+        // Restablece todos los divs al color base
+        divToPoints.forEach((option) => {
+            const card = option.divName;
+            if (card) {
+                card.style.backgroundColor = 'rgb(255, 105, 105)'; // Color base (rojo)
+                card.innerHTML = ''; // Limpia el contenido previo
+            }
+        });
+        // Actualiza solo los divs correspondientes a los puntos encontrados
         points.forEach((point) => {
-            const [index, x, y] = point;
-            const cardDiv = document.createElement('div');
+            const [index] = point; // Desempaqueta el índice del punto
 
-            cardDiv.classList.add('card_element');
-            cardDiv.style.position = 'relative'; // Usa `relative` porque estás trabajando dentro del contenedor
-            cardDiv.style.backgroundColor = 'red';
-            cardDiv.style.cursor = 'pointer';
-            cardDiv.style.border = '1px solid black'; // Agregué un borde negro para hacerlo visible
-            cardDiv.style.width = '50px'; // Ancho de la tarjeta
-            cardDiv.style.height = '40px'; // Alto de la tarjeta
-            cardDiv.style.margin = '10px'; // Espaciado entre las tarjetas (opcional)
+            // Busca el div correspondiente
+            const matchedOption = divToPoints.find((option) => option.id === index.toString());
+            if (matchedOption && matchedOption.divName) {
+                const card = matchedOption.divName;
 
+                card.style.backgroundColor = 'rgb(88, 229, 65)';
 
-            const indexParagraph = document.createElement('p');
-            indexParagraph.textContent = `Index: ${index}`;
-            indexParagraph.style.color = 'white';
-            indexParagraph.style.fontSize = '12px';
-            indexParagraph.style.textAlign = 'center';
+                card.addEventListener("mouseenter", () => {
+                  card.style.cursor = "pointer";
+                  card.style.borderRadius = '10px';
+                  card.style.boxShadow =  "0px 2px 4px black";
+                });
 
-            // Agrega la etiqueta <p> dentro de la tarjeta
-            cardDiv.appendChild(indexParagraph);
+                card.addEventListener("mouseleave", () => {
+                  card.style.cursor = "pointer";
+                  card.style.borderRadius = '0px';
+                  card.style.transition  = '400ms all ease-in-out';
+                  card.style.boxShadow = 'none';
+                });
 
+                const indexParagraph = document.createElement('p');
+                indexParagraph.textContent = `${matchedOption.name}`;
+                indexParagraph.style.color = 'white';
+                indexParagraph.style.fontSize = '12px';
+                indexParagraph.style.textAlign = 'center';
+                indexParagraph.style.height = '30px';
+                indexParagraph.style.lineHeight = '30px';
 
-            // Agrega la tarjeta al contenedor de mini tarjetas
-            containerMiniCards.appendChild(cardDiv);
+                card.innerHTML = ''; // Limpia el contenido anterior
+                card.appendChild(indexParagraph); // Agrega contenido actualizado
+            }
         });
     }
-
 
     // Hacer que un punto sea arrastrable y actualizar su posición
     function makePointDraggable(pointDiv, index) {
@@ -457,6 +493,11 @@ const height_resize = 0;
 
     async function cargarRutas() {
         try {
+            const selectOptions = document.querySelector("#selectOptions");
+            if (!selectOptions) {
+                throw new Error("El elemento selectOptions no existe en el DOM.");
+            }
+
             let data = new FormData();
             data.append('id', localStorage.getItem('id'));
 
@@ -464,8 +505,13 @@ const height_resize = 0;
                 method: 'POST',
                 body: data
             });
-            const datos = await response.json();
 
+            if (!response.ok) {
+                throw new Error("Error al obtener los datos del servidor.");
+            }
+
+            const datos = await response.json();
+            selectOptions.innerHTML = ""; // Limpia opciones previas
             datos.forEach(fila => {
                 const option = document.createElement('option');
                 option.value = fila.id;
@@ -475,5 +521,6 @@ const height_resize = 0;
         } catch (error) {
             console.error('Error al cargar los datos:', error);
         }
-    }
+    };
+
 

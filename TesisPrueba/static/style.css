@@ -327,5 +327,40 @@
         height:30vh;
         display:flex;
         flex-direction:row;
+        justify-content:space-between;
         flex-wrap:wrap;
+    }
+    .content_mini_cards .content_mini_cards_left, .content_mini_cards .content_mini_cards_right{
+        width:35%;
+    }
+    .content_mini_cards .content_mini_cards_center{
+        width:20%;
+    }
+    .
+
+
+    .content_mini_cards_left .card_element,
+    .content_mini_cards_right .card_element,
+    .content_mini_cards_center .card_element
+    {
+        position:relative;
+        background-color:rgb(255, 105, 105);
+        cursor:pointer;
+        width:130px;
+        height:30px;
+        margin:10px;
+        display:flex;
+        justify-content:center;
+        align-items:center;
+        border-radius:4px;
+        font-weight:700;
+        color:#ffffff;
+        transition:400ms all ease-in-out;
+    }
+
+    .content_mini_cards_left .card_element:hover,
+    .content_mini_cards_right .card_element:hover,
+    .content_mini_cards_center .card_element:hover{
+        transition:400ms all ease-in-out;
+        background-color:rgb(243, 52, 52 );
     }

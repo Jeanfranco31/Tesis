@@ -6,9 +6,32 @@
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>Proyecto Titulacion</title>
         <link rel="stylesheet" href="../static/style.css">
+        <link rel="stylesheet" href="../static/styles/header.css">
+    <link rel="stylesheet" href="../static/styles/sidebar.css">
         <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
     </head>
     <body>
+        <header>
+            <div class="content_logo">
+                <img src="../static/assets/logotipo.png">
+                <p id="name">Bienvenido, <span id="name-user"></span> </p>
+            </div>
+        </header>
+
+        <nav id="nav">
+            <ul>
+                <li><a href="{{ url_for('view_dashboard')}}">Dashboard</a></li>
+                <li><a href="{{ url_for('manage_users')}}">Gestion de Usuarios</a></li>
+                <li><a href="{{ url_for('configuration_path')}}">Configuracion de rutas</a></li>
+                <li><a href="{{ url_for('upload')}}">Deteccion en imagen</a></li>
+                <li><a>Deteccion en video</a></li>
+                <li><a href="{{ url_for('verify_images')}}">Verifica tus imagenes</a></li>
+                <li><a onclick="viewCloseSession()">Cerrar Sesion</a></li>
+            </ul>
+            <div class="toggle_button" id="toggle_button">
+                <img src="../static/assets/forward_arrow_icon.png">
+            </div>
+        </nav>
         <div class="main_container">
             <div class="container_file_image">
                 <div class="image_container">
@@ -88,8 +111,32 @@
                             </select>
                             <button type="button" class="generateButton" onclick="resizeNewDimension()">Redimensionar</button>
                             <div class="content_mini_cards" id="content_mini_cards">
+                                <div class="content_mini_cards_left">
+                                    <div class="card_element" id="2">2</div>
+                                    <div class="card_element" id="4">4</div>
+                                    <div class="card_element" id="6">6</div>
+                                    <div class="card_element" id="8">8</div>
+                                    <div class="card_element" id="10">10</div>
+                                    <div class="card_element" id="12">12</div>
+                                </div>
+
+                                <div class="content_mini_cards_center">
+                                    <div class="card_element" id="1">1</div>
+                                    <div class="card_element" id="14">14</div>
+                                </div>
+
+                                <div class="content_mini_cards_right">
+                                    <div class="card_element" id="3">3</div>
+                                    <div class="card_element" id="5">5</div>
+                                    <div class="card_element" id="7">7</div>
+                                    <div class="card_element" id="9">9</div>
+                                    <div class="card_element" id="11">11</div>
+                                    <div class="card_element" id="13">13</div>
+                                </div>
+
+
                             </div>
-                            <select id="optionsToPoints"></select>
+
 
                         </div>
                     </div>
@@ -102,6 +149,9 @@
 
 
     <script src="../static/scripts/file.js"></script>
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
+
 
     </body>
 
