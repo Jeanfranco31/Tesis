@@ -143,7 +143,8 @@ document.addEventListener('DOMContentLoaded', async () => {
         this.fileModalImageName = 'resized_'+file.name;
 
         // Dibujar puntos sobre la imagen
-        points = this.response.position;
+        // console.log("Enviar la imagen al servidor"+this.response.position);
+        // points = this.response.position;
 
         // Esperar a que la imagen se cargue para obtener sus dimensiones
         modalImgPreview.onload = () => {
@@ -237,42 +238,86 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     // Hacer que un punto sea arrastrable y actualizar su posición
     function makePointDraggable(pointDiv, index) {
-        let shiftX, shiftY;
-        const container = document.querySelector("#content_body");
+        pointDiv.onmousedown = function (event) {
+            const container = document.getElementById('point-container'); // Contenedor de la imagen
+            const containerRect = container.getBoundingClientRect(); // Obtener los límites del contenedor
+    
+            const onMouseMove = (e) => {
+                // Coordenadas relativas al contenedor
+                let x = e.clientX - containerRect.left;
+                let y = e.clientY - containerRect.top;
+    
+                // Restringir movimiento dentro de los límites del contenedor
+                if (x < 0) x = 0;
+                if (y < 0) y = 0;
+                if (x > containerRect.width) x = containerRect.width;
+                if (y > containerRect.height) y = containerRect.height;
+                
+                // Actualizar posición del punto
+                pointDiv.style.left = `${x}px`;
+                pointDiv.style.top = `${y}px`;
 
-        const moveAt = (pageX, pageY) => {
-            const containerRect = container.getBoundingClientRect();
+                // Mostrar las coordenadas actuales en la consola
+                console.log(`Nueva posición de punto ${index}: x = ${Math.trunc(x)}, y = ${Math.trunc(y)}`);
 
-            let newX = pageX - shiftX - containerRect.left + window.scrollX;
-            let newY = pageY - shiftY - containerRect.top + window.scrollY;
+                const pointIndex = points.findIndex(p => p[0] === index);
 
-            newX = Math.max(0, Math.min(newX, pointDiv.parentElement.clientWidth - pointDiv.offsetWidth));
-            newY = Math.max(0, Math.min(newY, pointDiv.parentElement.clientHeight - pointDiv.offsetHeight));
-
-            pointDiv.style.left = `${newX}px`;
-            pointDiv.style.top = `${newY}px`;
-        }
-
-        const onMouseMove = (event) => {
-            moveAt(event.pageX, event.pageY);
-                console.log("Mouse Move:", event.pageX, event.pageY);
-
-        }
-
-        pointDiv.addEventListener('mousedown', (e) => {
-            console.log("Mouse Down:", e.pageX, e.pageY);
-            console.log("Point Initial:", pointDiv.getBoundingClientRect().left, pointDiv.getBoundingClientRect().top);
-
-           e.preventDefault();
-           shiftX = e.pageX  - pointDiv.getBoundingClientRect().left;
-           shiftY = e.pageY  - pointDiv.getBoundingClientRect().top;
-
-           document.addEventListener('mousemove', onMouseMove);
-           document.addEventListener('mouseup', () => {
-               document.removeEventListener('mousemove', onMouseMove);
-           },{once : true});
-        });
+                if (pointIndex !== -1) {
+                    points[pointIndex][1] = Math.trunc(x);
+                    points[pointIndex][2] = Math.trunc(y);
+                
+                    console.log(`Array actualizado:`, points);
+                } else {
+                    console.error(`No se encontró el índice para index: ${index}`);
+                }                
+            };
+    
+            document.addEventListener('mousemove', onMouseMove);
+    
+            document.onmouseup = () => {
+                document.removeEventListener('mousemove', onMouseMove);
+                document.onmouseup = null;
+            };
+        };
+    
         pointDiv.ondragstart = () => false;
+
+        // let shiftX, shiftY;
+        // const container = document.querySelector("#content_body");
+
+        // const moveAt = (pageX, pageY) => {
+        //     const containerRect = container.getBoundingClientRect();
+
+        //     let newX = pageX - shiftX - containerRect.left + window.scrollX;
+        //     let newY = pageY - shiftY - containerRect.top + window.scrollY;
+
+        //     newX = Math.max(0, Math.min(newX, pointDiv.parentElement.clientWidth - pointDiv.offsetWidth));
+        //     newY = Math.max(0, Math.min(newY, pointDiv.parentElement.clientHeight - pointDiv.offsetHeight));
+
+        //     pointDiv.style.left = `${newX}px`;
+        //     pointDiv.style.top = `${newY}px`;
+        // }
+
+        // const onMouseMove = (event) => {
+        //     moveAt(event.pageX, event.pageY);
+        //         console.log("Mouse Move:", event.pageX, event.pageY);
+
+        // }
+
+        // pointDiv.addEventListener('mousedown', (e) => {
+        //     console.log("Mouse Down:", e.pageX, e.pageY);
+        //     console.log("Point Initial:", pointDiv.getBoundingClientRect().left, pointDiv.getBoundingClientRect().top);
+
+        //    e.preventDefault();
+        //    shiftX = e.pageX  - pointDiv.getBoundingClientRect().left;
+        //    shiftY = e.pageY  - pointDiv.getBoundingClientRect().top;
+
+        //    document.addEventListener('mousemove', onMouseMove);
+        //    document.addEventListener('mouseup', () => {
+        //        document.removeEventListener('mousemove', onMouseMove);
+        //    },{once : true});
+        // });
+        // pointDiv.ondragstart = () => false;
     }
 
     function savePoints(){
@@ -320,11 +365,20 @@ document.addEventListener('DOMContentLoaded', async () => {
 
             const data = await response.json();
             this.response = data;
-            this.points = data.position;
+
+            // Verifica que position sea un array antes de asignarlo
+            if (Array.isArray(this.response.position)) {
+                points = this.response.position;
+            } else {
+                console.error('El formato de position no es válido:', this.response.position);
+                points = [];
+            }
+            
+            // this.points = data.position;
             this.position_image = data.image_pos;
 
             modalImg.src = this.response.path;
-
+            console.log('Array points antes de drawPoints:', points); 
             drawPoints(this.response.position, 300, 445);
 
         } catch (error) {

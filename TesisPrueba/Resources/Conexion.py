@@ -5,6 +5,7 @@ port = '5432'
 database = 'Operaciones2024'
 user = 'postgres'
 password = 'jean31'
+#password = 'admin123'
 
 def get_connection():
     connection = None
