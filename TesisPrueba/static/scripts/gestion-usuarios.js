@@ -29,9 +29,9 @@ async function cargarUsuarios() {
         const datos = await response.json();
 
         const tablaCuerpo = document.getElementById('tabla-cuerpo');
-
+        console.log(datos)
         datos.forEach(fila => {
-            if(fila.stateUser === true){
+            if(fila.stateUser === "1"){
                 fila.stateUser = 'Activo'
             }else{
                 fila.stateUser = 'Inactivo'

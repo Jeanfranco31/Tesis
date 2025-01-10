@@ -30,16 +30,16 @@
 .image_container{
     position:relative;
     width:50%;
+    height:70vh;
     display:flex;
     justify-content:center;
-    align-items:center;
     flex-direction:column;
 }
 .image_container .content_options{
     background-color:rgba(255,255,255,0.8);
     box-shadow:20px 0px 50px rgba(0,0,0,0.7);
     position:relative;
-    top:12vh;
+    top:-5vh;
     width:100%;
     height:50px;
     display:flex;
@@ -68,8 +68,9 @@
         background-color:rgb(255, 255, 255); ;
         box-shadow: 0 0 80px rgba(75, 75, 75, 0.3);
         transform: scale(100%);
-
+        position:relative;
     }
+
     .drop-zone.dragover {
         border-color: #0000ff;
         background-color: #f0f8ff;
@@ -85,13 +86,14 @@
 
     .drop-zone button{
         height: 40px;
-        width: 150px;
+        width: 180px;
         border-radius: 20px;
         border: none;
         background: rgb(37, 152, 38);
         color: white;
         font-weight: 500;
-        margin-top: 15px;
+        position:absolute;
+        top:40px;
     }
 
     .drop-zone button:hover{
@@ -167,16 +169,17 @@
         z-index: 1065;
     }
 
-    .modal-footer .cancelButton{
-        background-color:red;
+    .modal-footer{
+        display:flex;
+        flex-direction:row;
+        justify-content:space-evenly;
+        height:80px;
+        width:100%
+        flex-wrap:nowrap;
         border:none;
-        border-radius:5px;
-        height:40px;
-        width:100px;
-        color:#ffffff;
-        font-weight:400;
-        transition:200ms all ease-in-out;
+        position:relative;
     }
+
     .modal-footer .cancelButton:hover,
     .modal-footer .generateButton:hover{
         font-weight:600;
@@ -189,11 +192,22 @@
         border:none;
         border-radius:5px;
         height:40px;
-        width:175px;
+        width:15%;
         color:#ffffff;
         font-weight:400;
         transition:200ms all ease-in-out;
     }
+
+    .modal-footer #modal_footer_images{
+        display:flex;
+        flex-direction:row;
+        width:75%;
+        height:80px;
+        overflow:scroll;
+        position:absolute;
+        left:0;
+    }
+
     .content_body{
         display:flex;
         justify-content:center;
@@ -203,7 +217,7 @@
     .modal-content-process{
         background:#ffffff;
         min-width: 95vw !important;
-        height:90vh;
+        height:95vh;
         margin: 0 auto !important;
         overflow: hidden;
         position:absolute;
@@ -355,6 +369,20 @@
         transition:400ms all ease-in-out;
         background-color:rgb(243, 52, 52 );
     }
+
+    .video-preview video {
+        height: 200px;
+        object-fit: contain;
+    }
+
+    .imageModal{
+        display:none;
+    }
+
+
+
+
+
 
 
     @media screen and (max-width: 650px) {

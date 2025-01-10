@@ -1,4 +1,5 @@
 import datetime
+import io
 
 from flask import Flask, render_template, request, jsonify, json, redirect, url_for, session, send_file
 import pyodbc
@@ -6,12 +7,13 @@ import os
 import cv2 as cv
 import glob
 import jwt
+import base64
 from datetime import datetime
 from shutil import copyfile
 from PIL import Image
+from moviepy.video.io.VideoFileClip import VideoFileClip
 import psycopg2
-from six import print_
-
+from Resources.QueriesProcedures import validate_login_query, create_account_query, update_session
 from Resources.Middleware import token_required
 from Resources.Middleware import get_key, deserialize_token
 from model.PoseModule import poseDetector
@@ -63,6 +65,10 @@ def view_dashboard():
 @app.route('/gestion-usuarios')
 def manage_users():
     return render_template('gestion-usuarios.html')
+
+@app.route('/upload-videos')
+def upload_videos():
+    return render_template('upload-video.html')
 
 
 
@@ -131,18 +137,25 @@ def resizeImage():
         # Obtener dimensiones de la imagen antes de redimensionar
         with Image.open(filepath) as img:
             original_width, original_height = img.size  # Obtiene ancho y alto
+            original_format = img.format
 
             if original_width > original_height:
                 #Si la Imagen es horizontal
                 with Image.open(filepath) as img:
+                    print("El ancho es mayor")
                     resized_img = img.resize((350, 233))
                     resized_img_w = 350
                     resized_img_h = 233
                     resized_image_name = 'resized_' + image.filename
                     output_path_file = os.path.join(UPLOAD_FOLDER, resized_image_name)
 
-                    # Guardar la imagen redimensionada
-                    resized_img.save(output_path_file, format='JPEG', quality=90)
+                    try:
+                        if original_format == 'PNG':
+                            resized_img.save(output_path_file, format='PNG')
+                        else:
+                            resized_img.save(output_path_file, format='JPEG', quality=90)
+                    except Exception as e:
+                        print(f"Error al guardar la imagen: {e}")
 
             else:
                 #Si la Imagen es vertical
@@ -165,7 +178,6 @@ def resizeImage():
 
 @app.route('/resize_image_params', methods=['POST'])
 def resize_image_params():
-    print("LLEGO AL ENDPOINT")
     try:
         width = request.form.get('width')
         height = request.form.get('height')
@@ -330,21 +342,23 @@ def validate_login():
     try:
         mail = request.form.get('mail')
         passw = encrypt_password(request.form.get('pass'))
-
+        print(passw)
         with get_connection() as conn:
             cursor = conn.cursor()
-            query = "SELECT id, pass, nombre FROM Users WHERE mail = %s"
+            query = validate_login_query()
             cursor.execute(query, (mail,))
 
             # Recorre los resultados
             result = cursor.fetchone()
 
-            if result and result[1] == passw:
+            if result and result[3] == passw:
                 # Usuario autenticaded
                 token = jwt.encode({
                     "user_id": result[0]
                 }, get_key(), algorithm="HS256")
-                return jsonify({'authenticated': True, 'redirect_url': url_for('view_dashboard'), 'user':result[2], 'id':result[0], 'token': token}), 200
+                update_session_login(result)
+
+                return jsonify({'authenticated': True, 'redirect_url': url_for('view_dashboard'), 'user':result[1], 'id':result[0], 'token': token}), 200
             else:
                 # Usuario no autenticado
                 return jsonify({'authenticated': False, 'message': 'Usuario o contraseña incorrecta'}), 401
@@ -352,6 +366,14 @@ def validate_login():
     except psycopg2.Error as e:
         print("Error al ejecutar la consulta:", e)
         return jsonify({'authenticated': False, 'message': 'Error interno del servidor'}), 500
+
+def update_session_login(result):
+    with get_connection() as conn:
+        fecha_actual = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+        query = update_session()
+        with conn.cursor() as cursor:
+            cursor.execute(query, (fecha_actual, result[0]))
+            conn.commit()
 
 @app.route('/createAccount', methods=['POST'])
 def createAccount():
@@ -365,7 +387,7 @@ def createAccount():
 
         with get_connection() as conn:
             cursor = conn.cursor()
-            query = "INSERT INTO users(nombre,apellido,cedula,pass,mail,stateUser, idrol) VALUES(%s,%s,%s,%s,%s,B'1',1)"
+            query = create_account_query()
             params = (name,lastName,identification,passw,email)
             cursor.execute(query, params)
             conn.commit()
@@ -589,6 +611,82 @@ def get_image():
     mimetype = mime_types.get(extension)
 
     return send_file(all_path, mimetype=mimetype)
+
+
+#CONTROLLER FOR VIDEOS VIEW
+
+@app.route('/generate_images_from_videos', methods=['POST'])
+def generate_images_from_videos():
+    if 'video' not in request.files:
+        return jsonify({'error': 'No se envió ningún archivo'}), 400
+
+    video_file = request.files['video']
+    video_path = os.path.join(UPLOAD_FOLDER, video_file.filename)
+
+    try:
+        # Guardar el archivo de video temporalmente
+        video_file.save(video_path)
+    except Exception as e:
+        return jsonify({'error': f'Error al guardar el archivo: {str(e)}'}), 500
+
+    try:
+        frames = []
+        with VideoFileClip(video_path) as clip:
+            fps = 5
+            frame_times = [i / fps for i in range(int(clip.duration * fps))]
+
+            for idx, time in enumerate(frame_times):
+                frame = clip.get_frame(time)
+                img = io.BytesIO()
+                Image.fromarray(frame).save(img, format='JPEG')
+                img.seek(0)
+                encoded_frame = base64.b64encode(img.getvalue()).decode('utf-8')
+                frames.append((f"frame_{idx}.jpg", encoded_frame))
+        os.remove(video_path)
+
+        return jsonify({frame_name: frame_data for frame_name, frame_data in frames}),200
+
+    except Exception as e:
+        print(f"Error al abrir el video: {e}")
+        return jsonify({'error': f'Error procesando el video: {str(e)}'}), 500
+
+
+@app.route('/upload_image_video', methods=['POST'])
+def upload_image_from_video():
+    try:
+        if 'image' not in request.files:
+            return jsonify({'message': 'No se envió ninguna imagen.'}), 400
+
+        image_file = request.files['image']
+        filename = image_file.filename
+        filepath = os.path.join(UPLOAD_FOLDER, filename)
+
+        image_file.save(filepath)
+
+        with Image.open(filepath) as image:
+            original_width, original_height = image.size
+            if original_width > original_height:
+                image_position = 'horizontal'
+            else:
+                image_position = 'vertical'
+
+        img = cv.imread(filepath)
+        img_with_pose = detector.findPose(img)
+
+        output_path = os.path.join(UPLOAD_FOLDER, 'points_' + filename)
+        cv.imwrite(output_path, img_with_pose)
+        position = detector.findPosition(img_with_pose)
+
+        return jsonify({
+            'message': 'Imagen procesada exitosamente.',
+            'path': output_path,
+            'image_pos': image_position,
+            'position': position
+        }), 200
+
+    except Exception as e:
+        return jsonify({'message': f'Error interno del servidor: {str(e)}'}), 500
+
 
 
 

@@ -53,10 +53,41 @@ sidebar.addEventListener('click', () =>{
 
 document.addEventListener('DOMContentLoaded', async () => {
     const nameCache = localStorage.getItem('user');
+    let width, height;
+
     if(nameCache){
         name.textContent = nameCache;
     }
     await cargarRutas();
+
+    option.addEventListener('change', (event) => {
+        selectedOption = event.target.value;
+
+        if (selectedOption === 'option1') {
+            width = 175;
+            height = 260;
+        } else if (selectedOption === 'option2') {
+            width = 225;
+            height = 334;
+        } else if (selectedOption === 'option3') {
+            width = 300;
+            height = 445;
+        } else {
+            console.error('Opción no válida');
+            return;
+        }
+        this.width_resize = width;
+        this.height_resize = height;
+    });
+
+    if (selectOptions.options.length > 0) {
+        selectOptions.selectedIndex = 0;
+        selectedOption = selectOptions.options[0].textContent;
+    }
+    selectOptions.addEventListener('change', (event) => {
+        selectedOption = event.target.selectedOptions[0].textContent;
+    });
+
 });
 
     // Permite arrastrar el archivo sobre la zona de drop
@@ -110,7 +141,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     button.addEventListener('click', async () => {
         //let response = {};
         const file = fileInput.files[0];
-
+        console.log('FILE',file)
         const formData = new FormData();
         formData.append('image', file);
 
@@ -142,10 +173,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         modalImgPreview.src = 'static/uploads/resized_' + file.name;
         this.fileModalImageName = 'resized_'+file.name;
 
-        // Dibujar puntos sobre la imagen
-        // console.log("Enviar la imagen al servidor"+this.response.position);
-        // points = this.response.position;
-
         // Esperar a que la imagen se cargue para obtener sus dimensiones
         modalImgPreview.onload = () => {
             $('#previewImageModal').modal('show'); // Mostrar el modal
@@ -164,6 +191,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         pointContainer.style.position = 'absolute';
         pointContainer.style.width = `${imgW}px`;
         pointContainer.style.height = `${imgH}px`;
+        pointContainer.style.top = '63px';
 
         points.forEach((point) => {
             const [index, x, y] = point;
@@ -187,8 +215,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     function drawMiniCards(points) {
-                console.log(points)
-
 
         // Restablece todos los divs al color base
         divToPoints.forEach((option) => {
@@ -271,7 +297,9 @@ document.addEventListener('DOMContentLoaded', async () => {
                     console.error(`No se encontró el índice para index: ${index}`);
                 }                
             };
-    
+
+            console.log("ARRAY FINAL:",points)
+
             document.addEventListener('mousemove', onMouseMove);
     
             document.onmouseup = () => {
@@ -282,52 +310,17 @@ document.addEventListener('DOMContentLoaded', async () => {
     
         pointDiv.ondragstart = () => false;
 
-        // let shiftX, shiftY;
-        // const container = document.querySelector("#content_body");
-
-        // const moveAt = (pageX, pageY) => {
-        //     const containerRect = container.getBoundingClientRect();
-
-        //     let newX = pageX - shiftX - containerRect.left + window.scrollX;
-        //     let newY = pageY - shiftY - containerRect.top + window.scrollY;
-
-        //     newX = Math.max(0, Math.min(newX, pointDiv.parentElement.clientWidth - pointDiv.offsetWidth));
-        //     newY = Math.max(0, Math.min(newY, pointDiv.parentElement.clientHeight - pointDiv.offsetHeight));
-
-        //     pointDiv.style.left = `${newX}px`;
-        //     pointDiv.style.top = `${newY}px`;
-        // }
-
-        // const onMouseMove = (event) => {
-        //     moveAt(event.pageX, event.pageY);
-        //         console.log("Mouse Move:", event.pageX, event.pageY);
-
-        // }
-
-        // pointDiv.addEventListener('mousedown', (e) => {
-        //     console.log("Mouse Down:", e.pageX, e.pageY);
-        //     console.log("Point Initial:", pointDiv.getBoundingClientRect().left, pointDiv.getBoundingClientRect().top);
-
-        //    e.preventDefault();
-        //    shiftX = e.pageX  - pointDiv.getBoundingClientRect().left;
-        //    shiftY = e.pageY  - pointDiv.getBoundingClientRect().top;
-
-        //    document.addEventListener('mousemove', onMouseMove);
-        //    document.addEventListener('mouseup', () => {
-        //        document.removeEventListener('mousemove', onMouseMove);
-        //    },{once : true});
-        // });
-        // pointDiv.ondragstart = () => false;
     }
 
     function savePoints(){
         const data = {
-            points_position : this.points,
+            points_position : points,
             file : this.fileModalImageName,
             width : this.width_resize,
             height : this.height_resize,
             pathToSave : selectedOption
         };
+        console.log(data)
 
         try{
             const response = fetch('/save', {
@@ -369,6 +362,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             // Verifica que position sea un array antes de asignarlo
             if (Array.isArray(this.response.position)) {
                 points = this.response.position;
+                console.log("GENERATE POSE:",points)
             } else {
                 console.error('El formato de position no es válido:', this.response.position);
                 points = [];
@@ -378,7 +372,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             this.position_image = data.image_pos;
 
             modalImg.src = this.response.path;
-            console.log('Array points antes de drawPoints:', points); 
+            console.log('Array points antes de drawPoints:', points);
             drawPoints(this.response.position, 300, 445);
 
         } catch (error) {
@@ -399,7 +393,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 w.textContent = '350px'
                 h.textContent = '233px'
             }
-            fillSelect(optionsToPoints, 'optionsToPoints');
+            //fillSelect(optionsToPoints, 'optionsToPoints');
         };
     }
 
@@ -439,8 +433,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     });
 
     option.addEventListener('change', (event) =>{
-        this.option = event.target.value;
-        console.log(event.target.value);
+        option = event.target.value;
+        console.log(option);
     });
     document.addEventListener('click', (event) => {
     console.log('Click detectado:', event.target);
@@ -453,10 +447,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         this.optionHorizontalImage = event.target.value;
     });
 
-    selectOptions.addEventListener('change', (event) => {
-        selectedOption = event.target.selectedOptions[0].textContent; // Obtiene la opción seleccionada
-        console.log(selectedOption);
-    });
+
 
 
 
@@ -464,22 +455,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         let data;
         let new_image;
         let width, height;
-
-        if(this.option != null){
-            if (this.option === 'option1') {
-                width = 175;
-                height = 260;
-            } else if (this.option === 'option2') {
-                width = 225;
-                height = 334;
-            } else if (this.option === 'option3') {
-                width = 300;
-                height = 445;
-            } else {
-                console.error('Opción no válida');
-                return;
-            }
-        }
 
         if(this.optionHorizontalImage != null){
             if (this.optionHorizontalImage === 'option1') {
@@ -498,28 +473,21 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
 
         this.new_image = '';
-        this.width_resize = width;
-        this.height_resize = height;
         const formData = new FormData();
         formData.append('image', this.fileModalImageName);
         formData.append('width', this.width_resize);
         formData.append('height', this.height_resize);
-
         try {
             const response = await fetch('/resize_image_params', {
                 method: 'POST',
                 body: formData
             });
 
-            // Espera a que la respuesta se convierta en JSON
             data = await response.json();
 
-            // Verifica que 'data' contenga el path de la imagen
             if (data.path != null) {
-                // Actualiza 'modalImg.src' con la nueva imagen redimensionada
                 this.new_image = `${data.path}?timestamp=${new Date().getTime()}`;
 
-                // Dibuja los puntos si están disponibles
                 if (data.position != null) {
                     drawPoints(data.position, this.width_resize, this.height_resize);
                     this.points = data.position;
@@ -542,7 +510,6 @@ document.addEventListener('DOMContentLoaded', async () => {
             modalImg.src = this.new_image;
         }, 2000);
 
-        console.log("OPT:", this.option);
     }
 
     async function cargarRutas() {

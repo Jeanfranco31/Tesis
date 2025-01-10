@@ -6,6 +6,7 @@
     <link rel="stylesheet" href="../static/styles/verify_images.css">
     <link rel="stylesheet" href="../static/styles/header.css">
     <link rel="stylesheet" href="../static/styles/sidebar.css">
+    <link rel="icon" href="../static/assets/logotipo.png">
     <title>BoiPose | Inicio</title>
 </head>
 <body>
@@ -22,7 +23,7 @@
             <li><a href="{{ url_for('manage_users')}}">Gestion de Usuarios</a></li>
             <li><a href="{{ url_for('configuration_path')}}">Configuracion de rutas</a></li>
             <li><a href="{{ url_for('upload')}}">Deteccion en imagen</a></li>
-            <li><a>Deteccion en video</a></li>
+            <li><a href="{{ url_for('upload_videos')}}">Deteccion en video</a></li>
             <li><a href="{{ url_for('verify_images')}}">Verifica tus imagenes</a></li>
             <li><a onclick="viewCloseSession()">Cerrar Sesion</a></li>
         </ul>

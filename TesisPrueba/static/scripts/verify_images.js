@@ -64,6 +64,11 @@ optionsFiles.addEventListener('change', function () {
 
 
 async function getFilesByPathName(selectedValue){
+     const defaultOption = optionsFiles.querySelector('option:first-child');
+    const options = optionsFiles.querySelectorAll('option:not(:first-child)');
+    options.forEach(option => option.remove());
+
+
     let form = new FormData();
     form.append('pathName',selectedValue);
     const request = await fetch('/getFilesByPathname', {

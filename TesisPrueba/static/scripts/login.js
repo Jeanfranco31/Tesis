@@ -20,6 +20,8 @@ async function getLogin() {
             let idUser = data.id;
             await getPaths(idUser);
 
+            window.location.href = this.ruta;
+
         } else {
             document.getElementById('message_content').innerHTML =
             `
@@ -32,9 +34,16 @@ async function getLogin() {
             }, 4000);
         }
     } catch (error) {
-        console.error('Error:', error);
-    }
-    window.location.href = this.ruta;
+    console.error('Error:', error);
+    document.getElementById('message_content').innerHTML = `
+        <div style="height:50px; display:flex; justify-content:center; align-items:center; background-color:red;">
+            <p style="text-align:center;">Ocurrió un error al iniciar sesión. Inténtalo de nuevo.</p>
+        </div>
+    `;
+    setTimeout(() => {
+        document.getElementById('message_content').innerHTML = '';
+    }, 4000);
+}
 }
 
 async function getPaths(idUser){

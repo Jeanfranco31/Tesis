@@ -6,6 +6,7 @@
     <link rel="stylesheet" href="../static/styles/parametrizacion-rutas.css">
     <link rel="stylesheet" href="../static/styles/header.css">
     <link rel="stylesheet" href="../static/styles/sidebar.css">
+    <link rel="icon" href="../static/assets/logotipo.png">
     <script src="https://cdn.jsdelivr.net/npm/jwt-decode/build/jwt-decode.min.js"></script>
         <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
 
@@ -25,7 +26,7 @@
             <li><a href="{{ url_for('manage_users')}}">Gestion de Usuarios</a></li>
             <li><a href="{{ url_for('configuration_path')}}">Configuracion de rutas</a></li>
             <li><a href="{{ url_for('upload')}}">Deteccion en imagen</a></li>
-            <li><a>Deteccion en video</a></li>
+            <li><a href="{{ url_for('upload_videos')}}">Deteccion en video</a></li>
             <li><a href="{{ url_for('verify_images')}}">Verifica tus imagenes</a></li>
             <li><a onclick="viewCloseSession()">Cerrar Sesion</a></li>
         </ul>

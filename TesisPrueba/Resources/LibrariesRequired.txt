@@ -5,6 +5,9 @@ pip install mediapipe
 pip install opencv
 pip install Pillow
 pip install PyJWT
+pip install flask moviepy
+
 For database:
 
 pip install pyodbc
+

@@ -1,0 +1,329 @@
+const dropZone = document.getElementById('drop-zone');
+const fileInput = document.getElementById('file-input');
+const buttonGenerateImagesFromVideo = document.getElementById('button');
+const modelImages = document.getElementById('imageModal')
+const name = document.getElementById('name-user')
+const loader = document.getElementById('loader_container')
+
+
+let points = [];
+let fileName = "";
+var divToPoints =
+    [
+        {'id':'0', 'name':'Nariz', 'divName': document.getElementById('1')},
+        {'id':'11','name':'Hombro Izquierdo' , 'divName': document.getElementById('2')},
+        {'id':'12','name':'Hombro Derecho' , 'divName': document.getElementById('3')},
+        {'id':'13','name':'Codo Izquierdo' , 'divName': document.getElementById('4')},
+        {'id':'14','name':'Codo Derecho' , 'divName': document.getElementById('5')},
+        {'id':'15','name':'Muñeca Izquierda' , 'divName': document.getElementById('6')},
+        {'id':'16','name':'Muñeca Derecha', 'divName': document.getElementById('7')},
+        {'id':'23','name':'Cadera Izquierda', 'divName': document.getElementById('8')},
+        {'id':'24','name':'Cadera Derecha', 'divName': document.getElementById('9')},
+        {'id':'25','name':'Hombro Izquierdo', 'divName': document.getElementById('10')},
+        {'id':'26','name':'Rodilla Izquierda', 'divName': document.getElementById('11')},
+        {'id':'27','name':'Tobillo Izquierdo', 'divName': document.getElementById('12')},
+        {'id':'28','name':'Tobillo Derecho', 'divName': document.getElementById('13')},
+        {'id':'33','name':'Centro Pecho', 'divName': document.getElementById('14')}
+    ]
+
+document.addEventListener('DOMContentLoaded', async () => {
+    const nameCache = localStorage.getItem('user');
+    let width, height;
+
+    if(nameCache){
+        name.textContent = nameCache;
+    }
+    await cargarRutas();
+});
+
+
+
+// Permite arrastrar el archivo sobre la zona de drop
+    dropZone.addEventListener('dragover', (e) => {
+        e.preventDefault();
+        dropZone.classList.add('dragover');
+    });
+
+    // Quita el estilo al salir
+    dropZone.addEventListener('dragleave', () => {
+        dropZone.classList.remove('dragover');
+    });
+
+    // Manejador para cuando se suelta el archivo
+    dropZone.addEventListener('drop', (e) => {
+        e.preventDefault();
+        dropZone.classList.remove('dragover');
+
+        // Obtiene el archivo y lo asigna al input
+        const file = e.dataTransfer.files[0];
+        if (file && file.type.startsWith('video/')) {
+            fileInput.files = e.dataTransfer.files; // Asignar al input
+            showPreviewVideo(file); // Mostrar la imagen
+        }
+    });
+
+    dropZone.addEventListener('click', () => {
+        e.stopPropagation();
+        fileInput.click();
+    });
+
+    fileInput.addEventListener('change', () => {
+        if (fileInput.files.length > 0) {
+            showPreview(fileInput.files[0]);
+        }
+    });
+
+    function showPreviewVideo(file) {
+        const videoPreview = document.getElementById('video-preview');
+        const videoURL = URL.createObjectURL(file);
+
+        let videoElement = document.createElement('video');
+        videoElement.controls = true;
+        videoElement.src = videoURL;
+
+        // Agrega la clase para limitar el alto
+        videoElement.classList.add('video-preview-video');
+
+        videoPreview.innerHTML = '';
+        videoPreview.appendChild(videoElement);
+        button.style.display = 'block';
+
+    }
+
+    async function GenerateImagesFromVideo(){
+        const file = fileInput.files[0];
+        const formData = new FormData();
+        formData.append('video', file);
+
+        //loader.style.display = 'block';
+
+        try {
+            const response = await fetch('/generate_images_from_videos', {
+                method: 'POST',
+                body: formData,
+            });
+
+            if (!response.ok) {
+                throw new Error(`Error en la solicitud: ${response.statusText}`);
+            }
+
+
+            const data = await response.json();
+            const modal = new bootstrap.Modal(document.getElementById('imageModal')); // Usando Bootstrap Modal
+            modal.show();
+            //loader.style.display = 'none';
+
+
+            const firstImageKey = Object.keys(data)[10];
+
+            generatePoseFromBlob(data[firstImageKey]);
+
+            const previewContainer = document.getElementById('modal_footer_images');
+            previewContainer.innerHTML = '';
+
+            Object.keys(data).forEach((key) => {
+                const imageData = data[key];
+                const img = document.createElement('img');
+                img.src = `data:image/jpeg;base64,${imageData}`;
+                img.style.maxWidth = '50px';
+                img.style.maxHeight = '50px';
+                img.style.margin = '10px';
+                previewContainer.appendChild(img);
+            });
+
+            console.log('Frames descargados con éxito.');
+        } catch (error) {
+            console.error('Error al enviar el video:', error);
+        }
+    }
+
+    async function generatePoseFromBlob(imageBase64) {
+        try {
+            const blob = await fetch(`data:image/jpeg;base64,${imageBase64}`).then((res) => res.blob());
+
+            const formData = new FormData();
+            formData.append('image', blob, 'image.jpg');
+
+            const response = await fetch('/upload_image_video', {
+                method: 'POST',
+                body: formData,
+            });
+
+            if (!response.ok) {
+                throw new Error(`Error en la solicitud: ${response.statusText}`);
+            }
+
+            const result = await response.json();
+            fileName = result.path;
+            points = result.position;
+
+            console.log(fileName);
+            console.log(points);
+
+            if (result.path) {
+                const modalImage = document.getElementById('modal-img');
+                modalImage.style.width = '300px';
+                modalImage.style.height = '445px';
+                modalImage.src = result.path;
+            }
+            drawPoints(points, 300, 445);
+
+        } catch (error) {
+            console.error('Error al enviar la imagen para generar la pose:', error);
+        }
+    }
+
+    function drawPoints(points, imgW, imgH) {
+
+        drawMiniCards(points);
+
+        const pointContainer = document.getElementById('point-container');
+        pointContainer.innerHTML = '';
+
+        pointContainer.style.position = 'absolute';
+        pointContainer.style.width = `${imgW}px`;
+        pointContainer.style.height = `${imgH}px`;
+        pointContainer.style.top = '63px';
+
+        points.forEach((point) => {
+            const [index, x, y] = point;
+            const pointDiv = document.createElement('div');
+
+            pointDiv.classList.add('point');
+            pointDiv.style.position = 'absolute';
+
+            pointDiv.style.left = `${(x / imgW) * imgW}px`;
+            pointDiv.style.top = `${(y / imgH) * imgH}px`;
+            pointDiv.style.backgroundColor = 'red';
+            pointDiv.style.borderRadius = '100%';
+            pointDiv.style.width = '7px';
+            pointDiv.style.height = '7px';
+
+            makePointDraggable(pointDiv, index);
+
+            pointContainer.appendChild(pointDiv);
+
+        });
+    }
+
+    function drawMiniCards(points) {
+
+        divToPoints.forEach((option) => {
+            const card = option.divName;
+            if (card) {
+                card.style.backgroundColor = 'rgb(255, 105, 105)';
+                card.innerHTML = '';
+            }
+        });
+        points.forEach((point) => {
+            const [index] = point;
+
+            const matchedOption = divToPoints.find((option) => option.id === index.toString());
+            if (matchedOption && matchedOption.divName) {
+                const card = matchedOption.divName;
+
+                card.style.backgroundColor = 'rgb(88, 229, 65)';
+
+                card.addEventListener("mouseenter", () => {
+                  card.style.cursor = "pointer";
+                  card.style.borderRadius = '10px';
+                  card.style.boxShadow =  "0px 2px 4px black";
+                });
+
+                card.addEventListener("mouseleave", () => {
+                  card.style.cursor = "pointer";
+                  card.style.borderRadius = '0px';
+                  card.style.transition  = '400ms all ease-in-out';
+                  card.style.boxShadow = 'none';
+                });
+
+                const indexParagraph = document.createElement('p');
+                indexParagraph.textContent = `${matchedOption.name}`;
+                indexParagraph.style.color = 'white';
+                indexParagraph.style.fontSize = '12px';
+                indexParagraph.style.textAlign = 'center';
+                indexParagraph.style.height = '30px';
+                indexParagraph.style.lineHeight = '30px';
+
+                card.innerHTML = '';
+                card.appendChild(indexParagraph);
+            }
+        });
+    }
+
+    function makePointDraggable(pointDiv, index) {
+        pointDiv.onmousedown = function (event) {
+            const container = document.getElementById('point-container');
+            const containerRect = container.getBoundingClientRect();
+
+            const onMouseMove = (e) => {
+                let x = e.clientX - containerRect.left;
+                let y = e.clientY - containerRect.top;
+
+                if (x < 0) x = 0;
+                if (y < 0) y = 0;
+                if (x > containerRect.width) x = containerRect.width;
+                if (y > containerRect.height) y = containerRect.height;
+
+                pointDiv.style.left = `${x}px`;
+                pointDiv.style.top = `${y}px`;
+
+                console.log(`Nueva posición de punto ${index}: x = ${Math.trunc(x)}, y = ${Math.trunc(y)}`);
+
+                const pointIndex = points.findIndex(p => p[0] === index);
+
+                if (pointIndex !== -1) {
+                    points[pointIndex][1] = Math.trunc(x);
+                    points[pointIndex][2] = Math.trunc(y);
+
+                    console.log(`Array actualizado:`, points);
+                } else {
+                    console.error(`No se encontró el índice para index: ${index}`);
+                }
+            };
+
+            console.log("ARRAY FINAL:",points)
+
+            document.addEventListener('mousemove', onMouseMove);
+
+            document.onmouseup = () => {
+                document.removeEventListener('mousemove', onMouseMove);
+                document.onmouseup = null;
+            };
+        };
+        pointDiv.ondragstart = () => false;
+    }
+
+
+
+    async function cargarRutas() {
+        try {
+            const selectOptions = document.querySelector("#selectOptions");
+            if (!selectOptions) {
+                throw new Error("El elemento selectOptions no existe en el DOM.");
+            }
+
+            let data = new FormData();
+            data.append('id', localStorage.getItem('id'));
+
+            const response = await fetch('/all_paths', {
+                method: 'POST',
+                body: data
+            });
+
+            if (!response.ok) {
+                throw new Error("Error al obtener los datos del servidor.");
+            }
+
+            const datos = await response.json();
+            selectOptions.innerHTML = ""; // Limpia opciones previas
+            datos.forEach(fila => {
+                const option = document.createElement('option');
+                option.value = fila.id;
+                option.textContent = fila.nombre;
+                selectOptions.appendChild(option);
+            });
+        } catch (error) {
+            console.error('Error al cargar los datos:', error);
+        }
+    };
