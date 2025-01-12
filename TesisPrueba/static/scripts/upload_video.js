@@ -2,17 +2,12 @@ const dropZone = document.getElementById('drop-zone');
 const fileInput = document.getElementById('file-input');
 const buttonGenerateImagesFromVideo = document.getElementById('button');
 const modelImages = document.getElementById('imageModal');
-<<<<<<< HEAD
-const loader = document.getElementById('loader_container');
-=======
-const name = document.getElementById('name-user');
 const loader = document.getElementById('loader_container');
 const saveButton = document.getElementById('saveButton');
 const option = document.getElementById('select-option');
 const optionHorizontalImage = document.getElementById('select-option-horizontal');
 const close_icon = document.getElementById('closeIcon');
 
->>>>>>> ab76e8799a3c1c72205aa3451f2cdc412d3573d9
 
 let points = [];
 let fileName = "";
@@ -38,12 +33,6 @@ var divToPoints =
         {'id':'33','name':'Centro Pecho', 'divName': document.getElementById('14')}
     ]
 
-<<<<<<< HEAD
-document.addEventListener('DOMContentLoaded', async () => {
-    let width, height;
-    await cargarRutas();
-});
-=======
     document.addEventListener('DOMContentLoaded', async () => {
         const nameCache = localStorage.getItem('user');
         let width, height;
@@ -83,7 +72,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         });
 
     });
->>>>>>> ab76e8799a3c1c72205aa3451f2cdc412d3573d9
 
 
 
