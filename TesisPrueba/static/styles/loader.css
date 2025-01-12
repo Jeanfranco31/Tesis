@@ -13,6 +13,16 @@
     display:none;
 }
 
+.load_container_sub{
+    width:100%;
+    height:100%;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    background-color:rgba(0,0,0,0.4);
+}
+
+
 /* From Uiverse.io by Nawsome */
 .boxes {
   --size: 32px;

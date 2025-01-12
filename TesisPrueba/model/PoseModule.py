@@ -25,7 +25,7 @@ class poseDetector():
             min_tracking_confidence=self.trackCon
         )
 
-    def findPose(self, img, draw=True):
+    def findPose(self, img, draw=False):
         imgRGB = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)  # Convertir a RGB porque MediaPipe trabaja en RGB
         self.results = self.pose.process(imgRGB)  # Procesar la imagen para encontrar poses
         lmList = []
@@ -119,5 +119,5 @@ class poseDetector():
 
             for lm in lmList:
                 x, y = lm[1], lm[2]
-                cv2.circle(img, (x, y), 5, (0, 255, 0), cv2.FILLED)
+                #cv2.circle(img, (x, y), 5, (0, 0, 0), cv2.FILLED)
         return lmList

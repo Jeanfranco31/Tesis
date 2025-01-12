@@ -1,6 +1,6 @@
 import datetime
 import io
-
+import traceback
 from flask import Flask, render_template, request, jsonify, json, redirect, url_for, session, send_file
 import pyodbc
 import os
@@ -10,7 +10,7 @@ import jwt
 import base64
 from datetime import datetime
 from shutil import copyfile
-from PIL import Image
+from PIL import Image,UnidentifiedImageError
 from moviepy.video.io.VideoFileClip import VideoFileClip
 import psycopg2
 from Resources.QueriesProcedures import validate_login_query, create_account_query, update_session
@@ -659,33 +659,126 @@ def upload_image_from_video():
 
         image_file = request.files['image']
         filename = image_file.filename
-        filepath = os.path.join(UPLOAD_FOLDER, filename)
 
+        if filename == '':
+            return jsonify({'message': 'El nombre del archivo está vacío.'}), 400
+
+        filepath = os.path.join(UPLOAD_FOLDER, filename)
         image_file.save(filepath)
 
-        with Image.open(filepath) as image:
-            original_width, original_height = image.size
-            if original_width > original_height:
-                image_position = 'horizontal'
-            else:
-                image_position = 'vertical'
+        try:
+            with Image.open(filepath) as image:
+                original_width, original_height = image.size
+                resized_img = image.resize((300, 445))
+                resized_image_name = 'resized_' + filename
+                output_path_file = os.path.join(UPLOAD_FOLDER, resized_image_name)
+                resized_img.save(output_path_file)
+        except Exception as e:
+            return jsonify({'message': f'Error al procesar la imagen: {str(e)}'}), 500
 
-        img = cv.imread(filepath)
-        img_with_pose = detector.findPose(img)
+        img = cv.imread(output_path_file)
+        if img is None:
+            return jsonify({'message': 'Error al cargar la imagen con OpenCV.'}), 400
+
+        try:
+            img_with_pose = detector.findPose(img)
+            position = detector.findPosition(img_with_pose)
+        except Exception as e:
+            return jsonify({'message': f'Error al detectar la pose: {str(e)}'}), 500
 
         output_path = os.path.join(UPLOAD_FOLDER, 'points_' + filename)
         cv.imwrite(output_path, img_with_pose)
-        position = detector.findPosition(img_with_pose)
+
+        image_position = 'horizontal' if original_width > original_height else 'vertical'
 
         return jsonify({
             'message': 'Imagen procesada exitosamente.',
             'path': output_path,
             'image_pos': image_position,
-            'position': position
+            'position': position,
+            'filename': 'points_' + filename,
+            'height':445,
+            'width':300
         }), 200
 
     except Exception as e:
         return jsonify({'message': f'Error interno del servidor: {str(e)}'}), 500
+
+
+@app.route('/save_image_from_video', methods=['POST'])
+def save_image_from_video():
+    try:
+        data = request.get_json()
+        file_name = data['data']['file']
+        points_position = data['data']['points_position']
+        width_file = data['data']['width']
+        heigth_file = data['data']['height']
+        file = data['data']['pathToSave']
+        center_x = width_file/2
+        center_y = heigth_file/2
+        local_path = str(file)
+        final_path = local_path+'\\Imagen'
+
+
+        # si la ruta Imagen no existe la crea
+        if not os.path.exists(final_path):
+            os.makedirs(final_path)
+
+        #obtener archivos totales
+        total = get_total_files(final_path)
+
+        #nuevo formato de nombre  000001
+        name, ext = os.path.splitext(file_name)
+        name_to_save = f"{total}{ext}"
+
+        # Guardar el JSON con los puntos
+        json_file_name = "Points_Json.json"
+        path_json = os.path.join(local_path, json_file_name)
+
+        new_image_json = {
+                        "path":name_to_save,
+                        "content":{
+                            "points_position": points_position
+                        },
+                        "size":{
+                            "width": width_file,
+                            "heigth" : heigth_file
+                        },
+                        "center": {
+                            "x": center_x,
+                            "y": center_y
+                        }
+                    }
+
+        if os.path.exists(path_json):
+            with open(path_json,"r") as json_file:
+                data = json.load(json_file)
+                if not isinstance(data, list):
+                    data = [data]
+        else:
+            data = []
+        data.append(new_image_json)
+
+        with open(path_json, "w") as json_file:
+            json.dump(data, json_file, indent= 4)
+
+        image_file_path = os.path.join(final_path,name_to_save)
+        path_base_image = os.path.join(UPLOAD_FOLDER,file_name)
+
+        print(image_file_path)
+        print("path_base_image->",path_base_image)
+        print("UPLOAD_FOLDER->", UPLOAD_FOLDER)
+        print("file_name->", file_name)
+
+        # Crear o copiar la imagen con el nombre indicado
+        copyfile(path_base_image, image_file_path)  # Copia una imagen base con el nuevo nombre
+
+        delete_temp_image(UPLOAD_FOLDER)
+        return jsonify({'success': True, 'message': 'Imagen y datos guardados exitosamente!'}), 200
+
+    except Exception as e:
+        print(f"Error en la línea {e.__traceback__.tb_lineno}: {str(e)}")
+    return jsonify({'success': False, 'message': 'Ocurrió un error al guardar la imagen o los datos.'}), 500
 
 
 

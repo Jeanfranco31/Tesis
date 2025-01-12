@@ -224,7 +224,7 @@
         flex-direction:row;
         width:75%;
         height:80px;
-        overflow:scroll;
+        overflow-x:scroll;
         position:absolute;
         left:0;
     }
@@ -233,6 +233,7 @@
         display:flex;
         justify-content:center;
         align-items:center;
+        position:relative;
     }
 
     .modal-content-process{
@@ -399,6 +400,9 @@
         display:none;
     }
 
+    #select-option-horizontal, #select-option{
+        display:block;
+    }
 
 
 
