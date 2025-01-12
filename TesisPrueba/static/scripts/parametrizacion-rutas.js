@@ -8,12 +8,34 @@ const inputCreateFolder = document.getElementById('inputFolderName');
 const deleteButtons = document.getElementById('deletePath');
 const modalOptions = document.getElementById('modal_delete_path');
 const deleteButtonOption = document.getElementById('btnDeleteOption');
+const selectOption = document.getElementById('select-option');
+const iconSaveNewFrame = document.getElementById('iconSaveNewFrame');
 
 var main_path = '';
+let opcionActual = '';
 
 document.addEventListener("DOMContentLoaded", async function () {
    await HasPath();
    await cargarRutas();
+   let frame = localStorage.getItem('frames');
+   selectOption.disabled = true;
+
+   if (frame) {
+        for (let i = 0; i < selectOption.options.length; i++) {
+            if (selectOption.options[i].value === frame) {
+                selectOption.selectedIndex = i;
+                break;
+            }
+        }
+   } else {
+        if (selectOption.options.length > 0) {
+            selectOption.selectedIndex = 0;
+        }
+   }
+
+   selectOption.addEventListener('change', (event) => {
+       opcionActual = event.target.value;
+   });
 });
 
 async function HasPath(){
@@ -76,7 +98,7 @@ async function cargarRutas() {
                 <td>${fila.fechaCreacion}</td>
                 <td>
                     <button id="deletePath" class="delete-path-btn" style="background-color:red; cursor:pointer; border-radius:4px;" onclick="deletePath(this)">
-                        <i class="bi bi-trash3-fill" style="color:#ffffff;"></i>
+                        <i class="bi bi-trash3-fill" style="color:#ffffff; margin:0 auto;"></i>
                     </button>
                 </td>
             `;
@@ -214,21 +236,51 @@ async function openModalOptions(rowData){
 
 }
 
-
-async function getPaths(idUser){
-    try{
-        let form = new FormData();
-        console.log(idUser)
-        form.append('id',idUser);
-
-        let request = await fetch('/all_paths',{
-            method: 'POST',
-            body: form
-        });
-
-        let response = await request.json();
-        localStorage.setItem('paths', JSON.stringify(response));
-    }catch(error){
-        console.log(error);
+    function enabledSelectFrame(){
+        selectOption.disabled = false;
+        iconSaveNewFrame.style.display = 'block';
     }
-}
+
+    async function saveNewFrame() {
+          const form = new FormData();
+          form.append('frame_value', opcionActual);
+          form.append('id_user', localStorage.getItem('id'));
+
+          try {
+            const response = await fetch('/saveNewFrame', {
+              method: 'POST',
+              body: form
+            });
+
+            if (!response.ok) {
+              throw new Error(`Error saving frame: ${response.statusText}`);
+            }
+
+            const data = await response.json();
+            console.log(data);
+            localStorage.setItem('frames', opcionActual);
+            generateMessageSuccesfull(data.message);
+            iconSaveNewFrame.style.display = 'none';
+          } catch (error) {
+            console.error('Error saving frame:', error);
+          }
+    }
+
+
+    async function getPaths(idUser){
+        try{
+            let form = new FormData();
+            console.log(idUser)
+            form.append('id',idUser);
+
+            let request = await fetch('/all_paths',{
+                method: 'POST',
+                body: form
+            });
+
+            let response = await request.json();
+            localStorage.setItem('paths', JSON.stringify(response));
+        }catch(error){
+            console.log(error);
+        }
+    }

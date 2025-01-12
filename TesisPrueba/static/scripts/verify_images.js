@@ -89,10 +89,16 @@ async function showImage() {
                     body: form
                 });
 
+                console.log(data)
+
                 if (request.ok) {
                     const blob = await request.blob();
                     const imageUrl = URL.createObjectURL(blob);
+                    const container = document.querySelector('.content_image');
+
                     imageContent.src = imageUrl;
+                    container.style.width = `${data.size.width}px`;
+                    container.style.height = `${data.size.heigth}px`;
                     imageContent.style.width = `${data.size.width}px`;
                     imageContent.style.height = `${data.size.heigth}px`;
                     select_image.innerHTML = '';

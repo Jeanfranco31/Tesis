@@ -7,6 +7,7 @@ const saveButton = document.getElementById('saveButton');
 const option = document.getElementById('select-option');
 const optionHorizontalImage = document.getElementById('select-option-horizontal');
 const close_icon = document.getElementById('closeIcon');
+const selectFrames = document.getElementById('frames');
 
 
 let points = [];
@@ -15,6 +16,8 @@ let width_resize = 0;
 let height_resize = 0;
 let currentIndex = 0;
 let imagesArray = [];
+let opcionActual = '';
+
 var divToPoints =
     [
         {'id':'0', 'name':'Nariz', 'divName': document.getElementById('1')},
@@ -36,6 +39,9 @@ var divToPoints =
     document.addEventListener('DOMContentLoaded', async () => {
         const nameCache = localStorage.getItem('user');
         let width, height;
+        let frame = localStorage.getItem('frames');
+
+        selectFrames.disabled = true;
 
         if(nameCache){
             name.textContent = nameCache;
@@ -70,6 +76,24 @@ var divToPoints =
             selectedOption = event.target.selectedOptions[0].textContent;
             console.log(selectedOption)
         });
+
+        if (frame) {
+            for (let i = 0; i < selectFrames.options.length; i++) {
+                if (selectFrames.options[i].value === frame) {
+                    selectFrames.selectedIndex = i;
+                    break;
+                }
+            }
+       } else {
+            if (selectFrames.options.length > 0) {
+                selectFrames.selectedIndex = 0;
+            }
+       }
+
+       selectFrames.addEventListener('change', (event) => {
+           opcionActual = event.target.value;
+       });
+
 
     });
 
@@ -132,6 +156,7 @@ var divToPoints =
         const file = fileInput.files[0];
         const formData = new FormData();
         formData.append('video', file);
+        formData.append('fps_value',localStorage.getItem('frames'))
 
         loader.style.display = 'block';
 

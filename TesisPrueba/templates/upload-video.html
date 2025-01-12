@@ -28,6 +28,20 @@
                                     </select>
                                 </div>
                             </div>
+                            <div class="content_options_frames">
+                                <div>
+                                    <label>Imagenes por Segundo:</label>
+                                </div>
+                                <div>
+                                    <select class="form-select" name="select" id="frames">
+                                        <optgroup label="Frames para video"></optgroup>
+                                        <option value="2">2</option>
+                                        <option value="5">5</option>
+                                        <option value="7">7</option>
+                                    </select>
+                                </div>
+                            </div>
+
                             <div class="banner-img">
                                 <img src="../static/assets/Banner_video.png" style="height:250px;">
                             </div>
@@ -40,6 +54,7 @@
                                 <input type="file" id="file-input" accept="video/*" style="display: none;">
                                 <div id="video-preview" class="video-preview" style="height:100px;"></div>
                                 <button type="button" id="button" style="display: none;" onclick="GenerateImagesFromVideo()">Obtener Imagenes</button>
+                                <p class="message_informative"><strong>Importante:</strong> Todos tus videos seran recortados hasta 30 segundos</p>
                             </div>
                         </div>
                     </div>

@@ -20,22 +20,36 @@
         <div class="container_routes_title">
             <h1>Configuracion de Archivos</h1>
         </div>
-        <section class="parametrizar_ruta">
-            <h2>Parametrizacion de Rutas</h2>
-            <div class="main_route">
-                <div class="content_configuration">
-                    <div class="content_configuration_elements">
-                        <label>Ruta Principal:</label>
-                        <input type="text" id="folderInput" placeholder="Pega aqui la ruta que tendra tu proyecto completo">
-
-                    </div>
-                    <div class="button_save" onclick="saveMainPath()">
-                        <button id="button_save">Guardar configuracion</button>
+        <div class="content_parametrization">
+            <section class="parametrizar_ruta">
+                <h5>Parametrizacion de Rutas</h5>
+                <div class="main_route">
+                    <div class="content_configuration">
+                        <div class="content_configuration_elements">
+                            <label>Ruta Principal:</label>
+                            <input type="text" id="folderInput" placeholder="Pega aqui la ruta que tendra tu proyecto completo">
+                        </div>
+                        <div class="button_save" onclick="saveMainPath()">
+                            <button id="button_save">Guardar configuracion</button>
+                        </div>
                     </div>
                 </div>
-            </div>
-        </section>
-        <section class="parametrizar_video"></section>
+            </section>
+            <section class="parametrizar_video">
+                <h5>Parametrizacion de FPS</h5>
+                <div class="content-select-fps">
+                    <select id="select-option" class="select-option">
+                        <optgroup label="Frames para video"></optgroup>
+                        <option value="2">2</option>
+                        <option value="5">5</option>
+                        <option value="7">7</option>
+                    </select>
+                    <p> FPS</p>
+                    <i class="bi bi-pencil-square" onclick="enabledSelectFrame()"></i>
+                    <i id="iconSaveNewFrame" class="bi bi-floppy" onclick="saveNewFrame()"></i>
+                </div>
+            </section>
+        </div>
         <section class="content_table">
             <h2>Rutas Parametrizadas Actualmente</h2>
             <div class="add_route_button">
