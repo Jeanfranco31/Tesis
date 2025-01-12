@@ -10,14 +10,12 @@ const selectOptions = document.getElementById('selectOptions');
 const optionHorizontalImage = document.getElementById('select-option-horizontal');
 const modalEdit = document.getElementById('imageModal');
 const containerMiniCards = document.getElementById('content_mini_cards');
-const sidebar = document.getElementById('toggle_button');
-const nav = document.getElementById('nav');
-const name = document.getElementById('name-user');
 
 
 var selectedOption = '';
 const h = document.getElementById('h');
 const w = document.getElementById('w');
+let cachedFile = null; 
 
 
 // Almacena los puntos
@@ -41,23 +39,10 @@ var divToPoints = [
 const fileModalImageName = '';
 const width_resize = 0;
 const height_resize = 0;
-let position = -250;
-sidebar.addEventListener('click', () =>{
-    if(position === -250){
-        position = 0;
-    } else {
-        position = -250;
-    }
-    nav.style.left = `${position}px`;
-});
 
 document.addEventListener('DOMContentLoaded', async () => {
-    const nameCache = localStorage.getItem('user');
     let width, height;
 
-    if(nameCache){
-        name.textContent = nameCache;
-    }
     await cargarRutas();
 
     option.addEventListener('change', (event) => {
@@ -110,19 +95,25 @@ document.addEventListener('DOMContentLoaded', async () => {
         const files = e.dataTransfer.files[0];
         if (files && files.type.startsWith('image/')) {
             fileInput.files = e.dataTransfer.files; // Asignar al input
+            cachedFile = files;
             showPreview(files); // Mostrar la imagen
+            toggleButtonState(true);
         }
     });
 
     // Permitir hacer clic en la zona de drop
-    dropZone.addEventListener('click', () => {
+    dropZone.addEventListener('click', (e) => {
         e.stopPropagation();
         fileInput.click();
     });
     // Cuando seleccionas un archivo mediante clic
     fileInput.addEventListener('change', () => {
         if (fileInput.files.length > 0) {
+            cachedFile = fileInput.files[0];
             showPreview(fileInput.files[0]); // Muestra vista previa de la imagen
+            toggleButtonState(true);
+        } else {
+            toggleButtonState(false);
         }
     });
 
@@ -132,18 +123,26 @@ document.addEventListener('DOMContentLoaded', async () => {
         reader.onload = function(event) {
             previewImg.src = event.target.result;
             previewImg.style.display = 'block';
-            button.style.display = 'block';
+            //button.style.display = 'block';
         }
         reader.readAsDataURL(file); // Leer el archivo como una URL
     }
 
+    function toggleButtonState(enabled) {
+        button.disabled = !enabled;
+    }
+
     // Enviar la imagen al servidor
     button.addEventListener('click', async () => {
-        //let response = {};
-        const file = fileInput.files[0];
-        console.log('FILE',file)
+        if(!cachedFile) {
+            console.error('No hay archivo cargado.');
+            return;
+        }
+        
+        // const file = fileInput.files[0];
+        // console.log('FILE',file)
         const formData = new FormData();
-        formData.append('image', file);
+        formData.append('image', cachedFile);
 
         try{
             const response = await fetch('/resize_image', {
@@ -170,8 +169,8 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
 
         // Mostrar imagen procesada en el modal
-        modalImgPreview.src = 'static/uploads/resized_' + file.name;
-        this.fileModalImageName = 'resized_'+file.name;
+        modalImgPreview.src = 'static/uploads/resized_' + cachedFile.name;
+        this.fileModalImageName = 'resized_'+cachedFile.name;
 
         // Esperar a que la imagen se cargue para obtener sus dimensiones
         modalImgPreview.onload = () => {
@@ -191,7 +190,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         pointContainer.style.position = 'absolute';
         pointContainer.style.width = `${imgW}px`;
         pointContainer.style.height = `${imgH}px`;
-        pointContainer.style.top = '63px';
+        //pointContainer.style.top = '63px';
 
         points.forEach((point) => {
             const [index, x, y] = point;
@@ -202,10 +201,11 @@ document.addEventListener('DOMContentLoaded', async () => {
 
             pointDiv.style.left = `${(x / imgW) * imgW}px`;
             pointDiv.style.top = `${(y / imgH) * imgH}px`;
-            pointDiv.style.backgroundColor = 'red';
+            pointDiv.style.backgroundColor = '#f03030';
             pointDiv.style.borderRadius = '100%';
-            pointDiv.style.width = '7px';
-            pointDiv.style.height = '7px';
+            pointDiv.style.border = '1px solid white';
+            pointDiv.style.width = '8px';
+            pointDiv.style.height = '8px';
 
             makePointDraggable(pointDiv, index);
 
@@ -373,16 +373,17 @@ document.addEventListener('DOMContentLoaded', async () => {
 
             modalImg.src = this.response.path;
             console.log('Array points antes de drawPoints:', points);
-            drawPoints(this.response.position, 300, 445);
-
+            //drawPoints(this.response.position, 300, 445);
         } catch (error) {
             console.error('Error al enviar la imagen:', error);
         }
 
         // Esperar a que la imagen se cargue para obtener sus dimensiones
         modalImg.onload = () => {
-            $('#imageModal').modal('show'); // Mostrar el modal
+            const imgW = modalImg.naturalWidth;
+            const imgH = modalImg.naturalHeight;
 
+            $('#imageModal').modal('show'); // Mostrar el modal
 
             if(this.position_image === "vertical"){
                 $('#select-option-horizontal').hide();
@@ -394,6 +395,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 h.textContent = '233px'
             }
             //fillSelect(optionsToPoints, 'optionsToPoints');
+            drawPoints(this.response.position, imgW, imgH);
         };
     }
 

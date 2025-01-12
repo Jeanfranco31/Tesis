@@ -11,28 +11,9 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
 </head>
 <body>
-    <header>
-        <div class="content_logo">
-            <img src="../static/assets/logotipo.png">
-            <p id="name">Bienvenido, <span id="name-user"></span> </p>
-        </div>
-    </header>
+    {% extends "navegacion.html" %}
 
-    <nav id="nav">
-        <ul>
-            <li><a href="{{ url_for('view_dashboard')}}">Dashboard</a></li>
-            <li><a href="{{ url_for('manage_users')}}">Gestion de Usuarios</a></li>
-            <li><a href="{{ url_for('configuration_path')}}">Configuracion de rutas</a></li>
-            <li><a href="{{ url_for('upload')}}">Deteccion en imagen</a></li>
-            <li><a href="{{ url_for('upload_videos')}}">Deteccion en video</a></li>
-            <li><a href="{{ url_for('verify_images')}}">Verifica tus imagenes</a></li>
-            <li><a onclick="viewCloseSession()">Cerrar Sesion</a></li>
-        </ul>
-        <div class="toggle_button" id="toggle_button">
-            <img src="../static/assets/forward_arrow_icon.png">
-        </div>
-    </nav>
-
+    {% block content %}
     <div class="container_main">
         <div class="content_title">
             <h1>Gestion de usuarios</h1>
@@ -53,13 +34,13 @@
 
             </tbody>
         </table>
-
-
     </div>
+    {% endblock %}
 
-
-    <script src="../static/scripts/gestion-usuarios.js"></script>
-
+    {% block scripts %}
+    <script src="{{ url_for('static', filename='scripts/gestion-usuarios.js') }}"></script>
+    <script src="{{ url_for('static', filename='scripts/navegacion.js') }}"></script>
+    {% endblock %}
 </body>
 </html>
 

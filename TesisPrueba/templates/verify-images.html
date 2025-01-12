@@ -4,49 +4,27 @@
     <meta charset="UTF-8">
     <title>Boi Pose | Verificar Imagenes</title>
     <link rel="stylesheet" href="../static/styles/verify_images.css">
-    <link rel="stylesheet" href="../static/styles/header.css">
-    <link rel="stylesheet" href="../static/styles/sidebar.css">
-    <link rel="icon" href="../static/assets/logotipo.png">
 </head>
 <body>
-    <header>
-        <div class="content_logo">
-            <img src="../static/assets/logotipo.png">
-            <p id="name">Bienvenido, <span id="name-user"></span> </p>
-        </div>
-    </header>
+    {% extends "navegacion.html" %}
 
-    <nav id="nav">
-        <ul>
-            <li><a href="{{ url_for('view_dashboard')}}">Dashboard</a></li>
-            <li><a href="{{ url_for('manage_users')}}">Gestion de Usuarios</a></li>
-            <li><a href="{{ url_for('configuration_path')}}">Configuracion de rutas</a></li>
-            <li><a href="{{ url_for('upload')}}">Deteccion en imagen</a></li>
-            <li><a href="{{ url_for('upload_videos')}}">Deteccion en video</a></li>
-            <li><a href="{{ url_for('verify_images')}}">Verifica tus imagenes</a></li>
-            <li><a onclick="viewCloseSession()">Cerrar Sesion</a></li>
-        </ul>
-        <div class="toggle_button" id="toggle_button">
-            <img src="../static/assets/forward_arrow_icon.png">
-        </div>
-    </nav>
-
+    {% block content %}
     <section class="main_container_verify">
         <div class="main_subcontainer">
             <h1>VERIFICACION DE IMAGENES</h1>
             <div class="content_menu">
-                <div class="content_options">
+                <div class="content_options_verify">
                     <div class="content_paths">
                         <label>Selecciona la ruta a cargar</label>
-                        <select id="paths">
+                        <select class="form-select" id="paths">
                             <option>Elige una ruta</option>
                         </select>
                     </div>
                     <div class="content_file">
                         <label>Elige un archivo a cargar</label>
-                        <select id="files">
+                        <select class="form-select" id="files">
                             <optgroup label="Elige una opcion">
-                                <option>Elige una archivo</option>
+                                <option>Elige un archivo</option>
                             </optgroup>
                         </select>
                     </div>
@@ -59,9 +37,11 @@
             </div>
         </div>
     </section>
+    {% endblock %}
 
-
-
-  <script src="../static/scripts/verify_images.js"></script>
+    {% block scripts %}
+    <script src="{{ url_for('static', filename='scripts/verify_images.js') }}"></script>
+    <script src="{{ url_for('static', filename='scripts/navegacion.js') }}"></script>
+    {% endblock %}
 </body>
 </html>

@@ -30,7 +30,7 @@
     justify-content:center;
     flex-wrap:wrap;
 }
-.content_options{
+.content_options_verify{
     width:50%;
     height:100%;
     display:flex;
@@ -86,7 +86,7 @@
     cursor: pointer;
 }
 
-.content_options button{
+.content_options_verify button{
     width:350px;
     height:40px;
     border-radius:5px;
@@ -96,7 +96,7 @@
     border:none;
     transition:200ms all ease-in-out;
 }
-.content_options button:hover{
+.content_options_verify button:hover{
     cursor:pointer;
     background-color:#00B871;
     transition:200ms all ease-in-out;

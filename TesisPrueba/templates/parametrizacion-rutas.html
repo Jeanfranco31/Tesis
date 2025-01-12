@@ -8,33 +8,14 @@
     <link rel="stylesheet" href="../static/styles/sidebar.css">
     <link rel="icon" href="../static/assets/logotipo.png">
     <script src="https://cdn.jsdelivr.net/npm/jwt-decode/build/jwt-decode.min.js"></script>
-        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
 
     <title>BoiPose | Parametrizacion</title>
 </head>
 <body>
-    <header>
-        <div class="content_logo">
-            <img src="../static/assets/logotipo.png">
-            <p id="name">Bienvenido, <span id="name-user"></span> </p>
-        </div>
-    </header>
+    {% extends "navegacion.html" %}
 
-    <nav id="nav">
-        <ul>
-            <li><a href="{{ url_for('view_dashboard')}}">Dashboard</a></li>
-            <li><a href="{{ url_for('manage_users')}}">Gestion de Usuarios</a></li>
-            <li><a href="{{ url_for('configuration_path')}}">Configuracion de rutas</a></li>
-            <li><a href="{{ url_for('upload')}}">Deteccion en imagen</a></li>
-            <li><a href="{{ url_for('upload_videos')}}">Deteccion en video</a></li>
-            <li><a href="{{ url_for('verify_images')}}">Verifica tus imagenes</a></li>
-            <li><a onclick="viewCloseSession()">Cerrar Sesion</a></li>
-        </ul>
-        <div class="toggle_button" id="toggle_button">
-            <img src="../static/assets/forward_arrow_icon.png">
-        </div>
-    </nav>
-
+    {% block content %}
     <div class="main_container_routes" id="main_container_routes">
         <div class="container_routes_title">
             <h1>Configuracion de Archivos</h1>
@@ -111,7 +92,11 @@
             </div>
         </div>
     </div>
+    {% endblock %}
 
-    <script src="../static/scripts/parametrizacion-rutas.js"></script>
+    {% block scripts %}
+    <script src="{{ url_for('static', filename='scripts/parametrizacion-rutas.js') }}"></script>
+    <script src="{{ url_for('static', filename='scripts/navegacion.js') }}"></script>
+    {% endblock %}
 </body>
 </html>

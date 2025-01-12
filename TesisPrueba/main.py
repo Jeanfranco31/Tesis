@@ -356,7 +356,7 @@ def validate_login():
                 token = jwt.encode({
                     "user_id": result[0]
                 }, get_key(), algorithm="HS256")
-                update_session_login(result)
+                # update_session_login(result)
 
                 return jsonify({'authenticated': True, 'redirect_url': url_for('view_dashboard'), 'user':result[1], 'id':result[0], 'token': token}), 200
             else:

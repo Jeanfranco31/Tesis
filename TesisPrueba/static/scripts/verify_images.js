@@ -1,11 +1,7 @@
 const optionsPaths = document.getElementById('paths');
 const optionsFiles = document.getElementById('files');
-const name = document.getElementById('name-user');
-const sidebar = document.getElementById('toggle_button');
-const nav = document.getElementById('nav');
 const imageContent = document.getElementById('image_result');
 const select_image = document.getElementById('select_image');
-var position = -250;
 var optionPath = '';
 var optionFile = '';
 var ArrayJsonData = [];
@@ -15,16 +11,6 @@ document.addEventListener("DOMContentLoaded", async function () {
    await loadPaths();
    await loadUserName();
 });
-
-sidebar.addEventListener('click', () =>{
-    if(position === -250){
-        position = 0;
-    } else {
-        position = -250;
-    }
-    nav.style.left = `${position}px`;
-});
-
 
 async function loadPaths(){
     let options = localStorage.getItem('paths');

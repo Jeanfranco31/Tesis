@@ -1,10 +1,8 @@
 const dropZone = document.getElementById('drop-zone');
 const fileInput = document.getElementById('file-input');
 const buttonGenerateImagesFromVideo = document.getElementById('button');
-const modelImages = document.getElementById('imageModal')
-const name = document.getElementById('name-user')
-const loader = document.getElementById('loader_container')
-
+const modelImages = document.getElementById('imageModal');
+const loader = document.getElementById('loader_container');
 
 let points = [];
 let fileName = "";
@@ -27,12 +25,7 @@ var divToPoints =
     ]
 
 document.addEventListener('DOMContentLoaded', async () => {
-    const nameCache = localStorage.getItem('user');
     let width, height;
-
-    if(nameCache){
-        name.textContent = nameCache;
-    }
     await cargarRutas();
 });
 

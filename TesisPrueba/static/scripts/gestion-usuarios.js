@@ -1,27 +1,6 @@
-const sidebar = document.getElementById('toggle_button');
-const nav = document.getElementById('nav');
-const name = document.getElementById('name-user');
-
-var position = -250;
-
-sidebar.addEventListener('click', () =>{
-    if(position === -250){
-        position = 0;
-    } else {
-        position = -250;
-    }
-    nav.style.left = `${position}px`;
-});
-
 document.addEventListener("DOMContentLoaded", async() => {
     await cargarUsuarios();
-    const nameCache = localStorage.getItem('user');
-    if(nameCache){
-        name.textContent = nameCache;
-    }
 });
-
-
 
 async function cargarUsuarios() {
     try {
