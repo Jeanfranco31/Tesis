@@ -425,7 +425,100 @@ def getUsers():
     except pyodbc.Error as e:
         print("Error al ejecutar la consulta:", e)
         return jsonify({'authenticated': False, 'message': 'Error interno del servidor'}), 500
+    
+@app.route('/user-one', methods = ['POST'])
+def user_one():
+    try: 
+        data = request.get_json()
+        id = data.get('id')
+        with get_connection() as conn:
+            cursor = conn.cursor()
+            query = "SELECT NOMBRE, APELLIDO, CEDULA FROM USERS WHERE ID = %s"
+            cursor.execute(query, (id,))
+            result = cursor.fetchone()
 
+            return jsonify({'result': result}), 2000
+    except Exception as e:
+        return jsonify({'error': 'Error interno del servidor'}), 500
+
+
+@app.route('/check_cedula', methods=['POST'])
+def check_cedula():
+    try:
+        data = request.get_json()
+        cedula = data.get('cedula')
+
+        with get_connection() as conn:
+            cursor = conn.cursor()
+            query = "SELECT COUNT(*) FROM USERS WHERE CEDULA = %s"
+            cursor.execute(query, (cedula,))
+            exits = cursor.fetchone()[0] > 0
+
+            return jsonify({'exists': exits}), 200
+    except Exception as e:
+        return jsonify({'error': 'Error interno del servidor'}), 500
+
+
+@app.route('/check_email', methods=['POST'])
+def check_email():
+    try:
+        data = request.get_json()
+        email = data.get('email')
+
+        with get_connection() as conn:
+            cursor = conn.cursor()
+            query = "SELECT COUNT(*) FROM USERS WHERE MAIL = %s"
+            cursor.execute(query, (email,))
+            exits = cursor.fetchone()[0] > 0
+
+            return jsonify({'exists': exits}), 200
+    except Exception as e:
+        return jsonify({'error': 'Error interno del servidor'}), 500
+
+
+@app.route('/delete_user', methods=['POST'])
+def delete_user():
+    user_to_delete = request.form.get('user')
+    try:
+        with get_connection() as conn:
+            cursor = conn.cursor()
+            query = "DELETE FROM USERS WHERE id = %s"
+            params = (user_to_delete,)
+            cursor.execute(query, params)
+            conn.commit()
+
+            return jsonify({
+                'result':True,
+                'message':'Usuario Eliminado'
+            }), 200
+        
+    except pyodbc.Error as e:
+        conn.rollback()
+        return jsonify({'result': False, 'message': 'Error interno del servidor'}), 500
+
+
+@app.route('/edit_user', methods=['POST'])
+def edit_user():
+    name = request.form.get('name')
+    lastName = request.form.get('lastName')
+    identification = request.form.get('identification')
+    user_id = request.form.get('user_id')
+    try:
+        with get_connection() as conn:
+            cursor = conn.cursor()
+            query = "UPDATE USERS SET NOMBRE = %s, APELLIDO = %s, CEDULA = %s WHERE id = %s"
+            params = (name, lastName, identification, user_id)
+            cursor.execute(query, params)
+            conn.commit()
+
+            return jsonify({
+                'result':True,
+                'message':'Usuario Editado'
+            }), 200
+    except pyodbc.Error as e:
+        conn.rollback()
+        return jsonify({'result': False, 'message': 'Error interno del servidor', 'error': str(e)}), 500
+    
 
 @app.route('/parametrizador-ruta-principal', methods=['POST'])
 def save_main_route():

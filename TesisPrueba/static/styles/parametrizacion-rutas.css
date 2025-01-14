@@ -9,6 +9,8 @@
     width:100%;
     height:100%;
     padding-top:15vh;
+    display:flex;
+    flex-direction:column;
 }
 
 .container_routes_title h1{
@@ -23,8 +25,8 @@
 }
 
 .parametrizar_ruta{
-    width:90%;
-    height:40vh;
+    width:50%;
+    height:25vh;
     margin-left:5%;
     color:rgba(0,0,0,0.8);
     display:flex;
@@ -34,8 +36,9 @@
     text-align:left;
 }
 
-.parametrizar_ruta h2{
+.parametrizar_ruta h5{
     width:90%;
+    font-weight:600;
 }
 .main_route{
     width:90%;
@@ -76,10 +79,11 @@
     width:100%;
     height:100px;
     display:flex;
-    align-items:center;
+    justify-content:flex-start;
+    flex-direction:column;
 }
 .content_configuration_elements label{
-    width:15%;
+    width:40%;
     font-weight:600;
 }
 .content_configuration_elements label img{
@@ -110,9 +114,25 @@
 }
 
 #folderInput{
-    height:30px;
-    width:400px;
-    outline:rgba(0,0,0,0.7);
+    display: block;
+    width: 100%;
+    padding: .375rem 2.25rem .375rem .75rem;
+    -moz-padding-start: calc(0.75rem - 3px);
+    font-size: 1rem;
+    font-weight: 400;
+    line-height: 1.5;
+    color: #212529;
+    background-color: #fff;
+    background-image: url(data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%23343a40' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M2 5l6 6 6-6'/%3e%3c/svg%3e);
+    background-repeat: no-repeat;
+    background-position: right .75rem center;
+    background-size: 16px 12px;
+    border: 1px solid #ced4da;
+    border-radius: .25rem;
+    transition: border-color .15s ease-in-out, box-shadow .15s ease-in-out;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
 }
 
 /* Estilo del botón personalizado */
@@ -273,6 +293,9 @@ button{
     width:30px;
     height:30px;
     border:none;
+    display:flex;
+    justify-content:center;
+    align-items:center;
 }
 
 button .edit{
@@ -293,6 +316,66 @@ button .delete{
 button .delete:hover{
     background-color:red;
     transition:200ms all ease-in-out;
+}
+
+.content_parametrization{
+    display:flex;
+    flex-direction:row;
+}
+
+.parametrizar_video{
+    width:35%;
+    height:25vh;
+    margin-left:5%;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    flex-direction:column;
+}
+.parametrizar_video .content-select-fps{
+    width:50%;
+    display:flex;
+    flex-direction:row;
+    align-items:center;
+    justify-content:center;
+}
+
+.parametrizar_video .content-select-fps i{
+    font-size:1.2rem;
+}
+.bi-pencil-square{
+    color:#00B871;
+    display:block;
+    cursor:pointer;
+}
+.bi-floppy{
+    color:#FF0009;
+    display:none;
+    cursor:pointer;
+}
+
+.parametrizar_video .content-select-fps p{
+    margin:0 0 0 15px;
+}
+.select-option{
+    display: block;
+    padding: .375rem 2.25rem .375rem .75rem;
+    -moz-padding-start: calc(0.75rem - 3px);
+    font-size: 1rem;
+    font-weight: 400;
+    line-height: 1.5;
+    color: #212529;
+    background-color: #fff;
+    background-image: url(data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%23343a40' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M2 5l6 6 6-6'/%3e%3c/svg%3e);
+    background-repeat: no-repeat;
+    background-position: right .75rem center;
+    background-size: 16px 12px;
+    border: 1px solid #ced4da;
+    border-radius: .25rem;
+    transition: border-color .15s ease-in-out, box-shadow .15s ease-in-out;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
 }
 
 

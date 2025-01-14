@@ -35,6 +35,43 @@
             </tbody>
         </table>
     </div>
+
+    <!------- MODAL EDITAR USUARIO --------------->
+    <div class="modal_edit_user" id="modal_edit_user">
+        <div class="card-body">
+            <h5 class="card-title">Editar Usuario</h5>
+            <div class="mb-3">
+                <label class="form-label">Nombre</label>
+                <input type="email" class="form-control" id="nameEdited" aria-describedby="emailHelp">
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Apellido</label>
+                <input type="email" class="form-control" id="lastNameEdited" aria-describedby="emailHelp">
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Cedula</label>
+                <input type="email" class="form-control" id="identificationEdited" aria-describedby="emailHelp">
+            </div>
+            <div class="content_btnEdit">
+                <button type="button" class="btn btn-danger" id="btnCancelEdit" onclick="closeModalEditUser()">Cancelar</button>
+                <button type="button" class="btn btn-success" id="btnGuardarEdit">Guardar</button>
+            </div>
+        </div>
+    </div>
+
+    <!------- MODAL ELIMINAR USUARIO --------------->
+    <div class="modal_delete_user" id="modal_delete_user">
+        <div class="content_options">
+            <div class="content_options_title">
+                <h2>¿Estás seguro de eliminar este usuario?</h2>
+                <span>El usuario será eliminado y ya no podrá acceder al sistema.</span>
+            </div>
+            <div class="content_options_buttons">
+                <button class="btnCancelOption" onclick="closeModalDeleteUser()">No</button>
+                <button class="btnDeleteOption" id="btnDeleteOption">Si</button>
+            </div>
+        </div>
+    </div>
     {% endblock %}
 
     {% block scripts %}

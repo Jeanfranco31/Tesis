@@ -127,6 +127,12 @@ body {
   margin: 0;
 }
 
+.error-message {
+  color: #e74c3c; 
+  font-size: 12px;
+  margin: 0px;
+}
+
 /* Responsive styles */
 @media (max-width: 768px) {
   .main-container {

@@ -29,19 +29,27 @@
                         </div>
                         <div class="input-group">
                             <input type="text" id="inputIdentification" class="input" placeholder="Número de Cédula" maxlength="10" required>
-                            <p id="cedulaMessage" class="error-message"></p>
+                            <div class="content-message-error">
+                                <p id="cedulaMessage" class="error-message"></p>
+                            </div>
                         </div>
                         <div class="input-group">
                             <input type="email" id="inputMail" class="input" placeholder="Correo Electrónico" required>
-                            <p id="emailMessage" class="error-message"></p>
+                            <div class="content-message-error">
+                                <p id="emailMessage" class="error-message"></p>
+                            </div>
                         </div>
                         <div class="input-group">
                             <input type="password" id="inputPass" class="input" placeholder="Contraseña" required>
-                            <p id="passMessage" class="error-message"></p>
+                            <div class="content-message-error">
+                                <p id="passMessage" class="error-message"></p>
+                            </div>
                         </div>
                         <div class="input-group">
                             <input type="password" id="inputVerifyPass" class="input" placeholder="Confirmar contraseña" required>
-                            <p id="passMessageVerify" class="error-message"></p>
+                            <div class="content-message-error">
+                                <p id="passMessageVerify" class="error-message"></p>
+                            </div>
                         </div>
                     </div>
                     <button type="button" onclick="createAccount()">Regístrese</button>
