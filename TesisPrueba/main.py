@@ -11,9 +11,16 @@ import base64
 from datetime import datetime
 from shutil import copyfile
 from PIL import Image,UnidentifiedImageError
+from jax.experimental.sparse.transform import method
 from moviepy.video.io.VideoFileClip import VideoFileClip
 import psycopg2
-from Resources.QueriesProcedures import validate_login_query, create_account_query, update_session
+from Resources.QueriesProcedures import (validate_login_query,
+                                         create_account_query,
+                                         update_session,
+                                         insert_new_frame,
+                                         validate_frame_exists,
+                                         update_frame_value,
+                                         get_frames_query)
 from Resources.Middleware import token_required
 from Resources.Middleware import get_key, deserialize_token
 from model.PoseModule import poseDetector
@@ -638,31 +645,24 @@ def delete_folder():
 def get_files_by_pathname():
     pathName = request.form.get('pathName')
 
-    # Generar la ruta completa para la carpeta 'files'
-    files_path = os.path.join(pathName, "Imagen")  # Especificamos la ruta de la carpeta "files"
-    print("Ruta de la carpeta 'files':", files_path)  # Imprime la ruta para verificarla
+    files_path = os.path.join(pathName, "Imagen")
 
-    # Listar los archivos dentro de la carpeta 'files'
     try:
-        files = os.listdir(files_path)  # Listar archivos en la carpeta "files"
+        files = os.listdir(files_path)
     except FileNotFoundError:
         return jsonify({"error": "La carpeta 'files' no se encuentra en la ruta proporcionada."}), 404
 
-    # Buscar el archivo JSON en el directorio 'pathName' (no en 'files')
     json_file = next((file for file in os.listdir(pathName) if file.lower().endswith('.json')), None)
 
     if not json_file:
         return jsonify({"error": "No se encontró un archivo JSON en la ruta proporcionada."}), 404
 
-    # Construir la ruta completa del archivo JSON
-    json_file_path = os.path.join(pathName, json_file)  # Ruta del archivo JSON fuera de la carpeta "Imagen"
+    json_file_path = os.path.join(pathName, json_file)
 
     try:
-        # Abrir y leer el archivo JSON
         with open(json_file_path, 'r', encoding='utf-8') as f:
             data = json.load(f)
 
-        # Crear la lista de archivos dentro de la carpeta 'files'
         total_files = [{"nombre": file} for file in files]
 
         return jsonify({'data': data, 'files': total_files})
@@ -710,6 +710,8 @@ def get_image():
 
 @app.route('/generate_images_from_videos', methods=['POST'])
 def generate_images_from_videos():
+    fps_value = int(request.form.get('fps_value'))
+
     if 'video' not in request.files:
         return jsonify({'error': 'No se envió ningún archivo'}), 400
 
@@ -725,8 +727,10 @@ def generate_images_from_videos():
     try:
         frames = []
         with VideoFileClip(video_path) as clip:
-            fps = 5
-            frame_times = [i / fps for i in range(int(clip.duration * fps))]
+            max_duration = 10
+            fps = fps_value
+            #frame_times = [i / fps for i in range(int(clip.duration * fps))]
+            frame_times = [i / fps for i in range(int(min(clip.duration, max_duration) * fps))]
 
             for idx, time in enumerate(frame_times):
                 frame = clip.get_frame(time)
@@ -874,6 +878,69 @@ def save_image_from_video():
     return jsonify({'success': False, 'message': 'Ocurrió un error al guardar la imagen o los datos.'}), 500
 
 
+def validate_frame_exists(id_user):
+    with get_connection() as conn:
+        with conn.cursor() as cursor:
+            query = "SELECT COUNT(*) FROM parametrizador_fps WHERE id_user = %s"
+            params = (id_user,)
+            cursor.execute(query, params)
+            count = cursor.fetchone()[0]  # Obtener el resultado de la consulta
+            print(count)  # Imprimir el resultado
+            return count
+
+@app.route('/saveNewFrame', methods=['POST'])
+def save_frames_for_video():
+    id_user = request.form.get('id_user')
+    frame_value = request.form.get('frame_value')
+
+    exist = validate_frame_exists(id_user)
+    print(exist)
+    if exist > 0:
+        try:
+            with get_connection() as conn:
+                with conn.cursor() as cursor:
+                    query = update_frame_value()
+                    params = (frame_value, id_user)
+                    cursor.execute(query, params)
+
+                    return jsonify({
+                        'result': True,
+                        'message': 'Parametrizacion de FPS actualizado'
+                    })
+        except pyodbc.Error as e:
+            return jsonify({'result': False, 'message': 'Error interno del servidor'}), 500
+    else:
+        try:
+            with get_connection() as conn:
+                with conn.cursor() as cursor:
+                    query = insert_new_frame()
+                    params = (frame_value, id_user)
+                    cursor.execute(query, params)
+            return jsonify({
+                'result': True,
+                'message': 'Parametrizacion de FPS registrada'
+            })
+        except pyodbc.Error as e:
+            return jsonify({'result': False, 'message': 'Error interno del servidor'}), 500
+
+@app.route('/get_frames', methods=['POST'])
+def get_frames():
+    id_user = request.form.get('id')
+    try:
+        with get_connection() as conn:
+            with conn.cursor() as cursor:
+                query = get_frames_query()
+                params = (id_user,)
+                cursor.execute(query, params)
+                result = cursor.fetchone()
+
+                if result:
+                    return jsonify({'result': True, 'response': result[0]})
+                else:
+                    return jsonify({'result': False, 'message': 'No se encontraron datos'})
+
+    except pyodbc.Error as e:
+        return jsonify({'result': False, 'message': 'Error interno del servidor'}), 500
 
 
 if __name__ == '__main__':

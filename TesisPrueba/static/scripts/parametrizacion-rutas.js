@@ -284,3 +284,47 @@ async function openModalOptions(rowData){
             console.log(error);
         }
     }
+
+    async function saveNewFrame() {
+          const form = new FormData();
+          form.append('frame_value', opcionActual);
+          form.append('id_user', localStorage.getItem('id'));
+
+          try {
+            const response = await fetch('/saveNewFrame', {
+              method: 'POST',
+              body: form
+            });
+
+            if (!response.ok) {
+              throw new Error(`Error saving frame: ${response.statusText}`);
+            }
+
+            const data = await response.json();
+            console.log(data);
+            localStorage.setItem('frames', opcionActual);
+            generateMessageSuccesfull(data.message);
+            iconSaveNewFrame.style.display = 'none';
+          } catch (error) {
+            console.error('Error saving frame:', error);
+          }
+    }
+
+
+    async function getPaths(idUser){
+        try{
+            let form = new FormData();
+            console.log(idUser)
+            form.append('id',idUser);
+
+            let request = await fetch('/all_paths',{
+                method: 'POST',
+                body: form
+            });
+
+            let response = await request.json();
+            localStorage.setItem('paths', JSON.stringify(response));
+        }catch(error){
+            console.log(error);
+        }
+    }

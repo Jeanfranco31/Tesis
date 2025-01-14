@@ -57,6 +57,7 @@ async function getLogin() {
             localStorage.setItem('id', data.id)
             let idUser = data.id;
             await getPaths(idUser);
+            await getFrames(data.id);
 
             window.location.href = this.ruta;
 
@@ -84,24 +85,42 @@ async function getLogin() {
 }
 }
 
-async function getPaths(idUser){
-    try{
-        let form = new FormData();
-        console.log(idUser)
-        form.append('id',idUser);
+    async function getPaths(idUser){
+        try{
+            let form = new FormData();
+            console.log(idUser)
+            form.append('id',idUser);
 
-        let request = await fetch('/all_paths',{
-            method: 'POST',
-            body: form
-        });
+            let request = await fetch('/all_paths',{
+                method: 'POST',
+                body: form
+            });
 
-        let response = await request.json();
-        console.log(response)
-        localStorage.setItem('paths', JSON.stringify(response));
-    }catch(error){
-        console.log(error);
+            let response = await request.json();
+            localStorage.setItem('paths', JSON.stringify(response));
+        }catch(error){
+            console.log(error);
+        }
     }
-}
+
+    async function getFrames(idUser){
+        try{
+            let form = new FormData();
+            console.log(idUser)
+            form.append('id',idUser);
+
+            let request = await fetch('/get_frames',{
+                method: 'POST',
+                body: form
+            });
+
+            let response = await request.json();
+            console.log(response)
+            localStorage.setItem('frames', JSON.stringify(response.response));
+        }catch(error){
+            console.log(error);
+        }
+    }
 
 document.getElementById('login-form').addEventListener('keydown', function(event) {
     if (event.key === 'Enter') {
