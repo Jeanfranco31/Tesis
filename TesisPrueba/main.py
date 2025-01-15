@@ -438,15 +438,24 @@ def user_one():
     try: 
         data = request.get_json()
         id = data.get('id')
+
+        if not id:
+            return jsonify({'result': None, 'message': 'ID no proporcionado'}), 400
+
         with get_connection() as conn:
             cursor = conn.cursor()
             query = "SELECT NOMBRE, APELLIDO, CEDULA FROM USERS WHERE ID = %s"
             cursor.execute(query, (id,))
             result = cursor.fetchone()
 
-            return jsonify({'result': result}), 2000
+            if result:
+                return jsonify({'result': result}), 200
+            else:
+                return jsonify({'result': None, 'message': 'Usuario no encontrado'}), 404
+    
     except Exception as e:
-        return jsonify({'error': 'Error interno del servidor'}), 500
+        print(f"Error en /user-one: {e}")
+        return jsonify({'error': 'Error interno del servidor', 'details': str(e)}), 500
 
 
 @app.route('/check_cedula', methods=['POST'])
@@ -486,6 +495,7 @@ def check_email():
 @app.route('/delete_user', methods=['POST'])
 def delete_user():
     user_to_delete = request.form.get('user')
+    print(f"ID recibido para eliminar: {user_to_delete}")
     try:
         with get_connection() as conn:
             cursor = conn.cursor()
@@ -510,20 +520,25 @@ def edit_user():
     lastName = request.form.get('lastName')
     identification = request.form.get('identification')
     user_id = request.form.get('user_id')
+
+    if not user_id:
+        return jsonify({'result': False, 'message': 'ID de usuario no proporcionado'}), 400
+
     try:
         with get_connection() as conn:
             cursor = conn.cursor()
-            query = "UPDATE USERS SET NOMBRE = %s, APELLIDO = %s, CEDULA = %s WHERE id = %s"
+            query = "UPDATE USERS SET NOMBRE = %s, APELLIDO = %s, CEDULA = %s WHERE ID = %s"
             params = (name, lastName, identification, user_id)
             cursor.execute(query, params)
             conn.commit()
 
-            return jsonify({
-                'result':True,
-                'message':'Usuario Editado'
-            }), 200
-    except pyodbc.Error as e:
+            if cursor.rowcount > 0:
+                return jsonify({'result': True, 'message': 'Usuario actualizado'}), 200
+            else:
+                return jsonify({'result': False, 'message': 'Usuario no encontrado'}), 404
+    except Exception as e:
         conn.rollback()
+        print(f"Error al actualizar el usuario: {e}")
         return jsonify({'result': False, 'message': 'Error interno del servidor', 'error': str(e)}), 500
     
 
