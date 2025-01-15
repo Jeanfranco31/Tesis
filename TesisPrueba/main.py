@@ -20,7 +20,9 @@ from Resources.QueriesProcedures import (validate_login_query,
                                          insert_new_frame,
                                          validate_frame_exists,
                                          update_frame_value,
-                                         get_frames_query)
+                                         get_frames_query,
+                                         get_users_query
+                                         )
 from Resources.Middleware import token_required
 from Resources.Middleware import get_key, deserialize_token
 from model.PoseModule import poseDetector
@@ -411,11 +413,10 @@ def getUsers():
     try:
         with get_connection() as conn:
             cursor = conn.cursor()
-            query = "SELECT * FROM Users"
+            query = get_users_query()
             cursor.execute(query)
             rows = cursor.fetchall()
 
-            # Convertir el resultado en una lista de diccionarios
             usuarios = []
             for row in rows:
                 usuarios.append({
@@ -423,7 +424,8 @@ def getUsers():
                     "nombre": row[1],
                     "apellido": row[2],
                     "cedula": row[3],
-                    "mail": row[5],
+                    "mail": row[4],
+                    "nombrerol": row[5],
                     "stateUser": row[6],
                 })
 

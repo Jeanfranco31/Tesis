@@ -26,6 +26,7 @@
                     <th>Nombre Completo</th>
                     <th>Cédula</th>
                     <th>Correo</th>
+                    <th>Rol</th>
                     <th>Estado</th>
                     <th>Acciones</th>
                 </tr>
@@ -51,6 +52,19 @@
             <div class="mb-3">
                 <label class="form-label">Cedula</label>
                 <input type="email" class="form-control" id="identificationEdited" aria-describedby="emailHelp">
+            </div>
+            <div class="mb-3">
+                <div>
+                    <label class="form-label">Rol Actual:</label>
+                    <select id="rolEdited" class="rolEdited">
+                        <option class="form-control" value="1">Administrador</option>
+                        <option class="form-control" value="2">Visitante</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="form-label">Estado:</label>
+                    <input type="checkbox" id="stateEdited">
+                </div>
             </div>
             <div class="content_btnEdit">
                 <button type="button" class="btn btn-danger" id="btnCancelEdit" onclick="closeModalEditUser()">Cancelar</button>
