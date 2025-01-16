@@ -1,44 +1,47 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>BoiPose | Inicio de Sesión</title>
-  <link rel="icon" href="../static/assets/logotipo.png">
-  <link href="../static/styles/login.css" rel="stylesheet" type="text/css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BoiPose | Inicio de Sesión</title>
+    <link rel="icon" href="../static/assets/logotipo.png">
+    <link href="../static/styles/login.css" rel="stylesheet" type="text/css">
 </head>
 <body>
-  <div class="main-container">
-    <div class="left-container">
-      <p class="title">Inicia Sesión</p>
-      <form class="form" id="login-form">
-        <div class="input-group">
-          <label for="mail">Correo Electrónico</label>
-          <input type="text" name="mail" id="mail" placeholder="Ingresa tu correo">
-          <div class="content-message-error">
-            <p id="emailMessage" class="error-message"></p>
+      <div class="main-container">
+        <div class="left-container">
+          <p class="title">Inicia Sesión</p>
+          <form class="form" id="login-form">
+            <div class="input-group">
+              <label for="mail">Correo Electrónico</label>
+              <input type="text" name="mail" id="mail" placeholder="Ingresa tu correo">
+              <div class="content-message-error">
+                <p id="emailMessage" class="error-message"></p>
+            </div>
+            </div>
+            <div class="input-group">
+              <label for="password">Contraseña</label>
+              <input type="password" name="password" id="password" placeholder="Ingresa tu contraseña">
+              <div class="content-message-error">
+                <p id="passMessage" class="error-message"></p>
+            </div>
+            </div>
+            <button id="login-button" type="button" class="sign" onclick="getLogin()">Ingresar</button>
+          </form>
+          <p class="signup">
+            ¿No tienes cuenta?
+            <a href="{{ url_for('create_accountView') }}">Regístrate</a>
+          </p>
         </div>
+        <div class="right-container">
+          <div class="content-images">
+            <img id="logo" src="../static/assets/logotipo.png" alt="Logo">
+          </div>
         </div>
-        <div class="input-group">
-          <label for="password">Contraseña</label>
-          <input type="password" name="password" id="password" placeholder="Ingresa tu contraseña">
-          <div class="content-message-error">
-            <p id="passMessage" class="error-message"></p>
-        </div>
-        </div>
-        <button id="login-button" type="button" class="sign" onclick="getLogin()">Ingresar</button>
-      </form>
-      <p class="signup">
-        ¿No tienes cuenta?
-        <a href="{{ url_for('create_accountView') }}">Regístrate</a>
-      </p>
-    </div>
-    <div class="right-container">
-      <div class="content-images">
-        <img id="logo" src="../static/assets/logotipo.png" alt="Logo">
       </div>
-    </div>
-  </div>
+
+      <div id="message_content" class="message-content"></div>
+
   <script src="../static/scripts/login.js"></script>
 </body>
 </html>

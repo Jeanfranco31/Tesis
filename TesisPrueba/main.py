@@ -1,6 +1,7 @@
 import datetime
 import io
 import traceback
+
 from flask import Flask, render_template, request, jsonify, json, redirect, url_for, session, send_file
 import pyodbc
 import os
@@ -21,7 +22,9 @@ from Resources.QueriesProcedures import (validate_login_query,
                                          validate_frame_exists,
                                          update_frame_value,
                                          get_frames_query,
-                                         get_users_query
+                                         get_users_query,
+                                         check_email_query,
+                                         get_menu_options_query
                                          )
 from Resources.Middleware import token_required
 from Resources.Middleware import get_key, deserialize_token
@@ -351,13 +354,10 @@ def validate_login():
     try:
         mail = request.form.get('mail')
         passw = encrypt_password(request.form.get('pass'))
-        print(passw)
         with get_connection() as conn:
             cursor = conn.cursor()
             query = validate_login_query()
             cursor.execute(query, (mail,))
-
-            # Recorre los resultados
             result = cursor.fetchone()
 
             if result and result[3] == passw:
@@ -367,10 +367,10 @@ def validate_login():
                 }, get_key(), algorithm="HS256")
                 # update_session_login(result)
 
-                return jsonify({'authenticated': True, 'redirect_url': url_for('view_dashboard'), 'user':result[1], 'id':result[0], 'token': token}), 200
+                return jsonify({'authenticated': True, 'redirect_url': url_for('view_dashboard'), 'user':result[1], 'id':result[0], 'idRol':result[6], 'token': token}), 200
             else:
                 # Usuario no autenticado
-                return jsonify({'authenticated': False, 'message': 'Usuario o contraseña incorrecta'}), 401
+                return jsonify({'authenticated': False, 'message': 'Correo o contraseña incorrecta', 'stateuser':result[5]}), 401
 
     except psycopg2.Error as e:
         print("Error al ejecutar la consulta:", e)
@@ -407,6 +407,21 @@ def createAccount():
     except psycopg2.Error as e:
         print("Error al ejecutar la consulta:", e)
         return jsonify({'authenticated': False, 'message': 'Error interno del servidor'}), 500
+
+@app.route('/get_menu_options', methods=['GET'])
+def get_menu_option():
+    try:
+        with get_connection() as conn:
+            cursor = conn.cursor()
+            query = get_menu_options_query()
+            cursor.execute(query,)
+            result = cursor.fetchone()
+        return jsonify({'options': result[0]}), 200
+
+    except psycopg2.Error as e:
+        print("Error al ejecutar la consulta:", e)
+        return jsonify({'authenticated': False, 'message': 'Error interno del servidor'}), 500
+
 
 @app.route('/users-all', methods=['GET'])
 def getUsers():
@@ -485,7 +500,7 @@ def check_email():
 
         with get_connection() as conn:
             cursor = conn.cursor()
-            query = "SELECT COUNT(*) FROM USERS WHERE MAIL = %s"
+            query = check_email_query()
             cursor.execute(query, (email,))
             exits = cursor.fetchone()[0] > 0
 

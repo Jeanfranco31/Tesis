@@ -21,6 +21,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     if (nameCache) {
         name.textContent = nameCache;
     }
+
+    await getMenuOptions();
 });
 
 async function viewCloseSession(){
@@ -30,4 +32,19 @@ async function viewCloseSession(){
     localStorage.removeItem('paths');
     localStorage.removeItem('frames');
     window.location.href = "/login";
+}
+
+async function getMenuOptions(){
+    let request = await fetch('/get_menu_options',{
+        method: 'GET'
+    });
+
+    const response = await request.json();
+    console.log(localStorage.getItem('rol'))
+    const manageUsersUrl = "{{ url_for('manage_users') }}";
+    console.log(manageUsersUrl)
+
+    if (localStorage.getItem('rol') != "1") {
+        document.getElementById('user_control').remove();
+    }
 }

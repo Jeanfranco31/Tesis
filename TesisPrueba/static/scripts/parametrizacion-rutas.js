@@ -127,7 +127,6 @@ async function saveNewFolder(){
     savefolder.append('nameFolder',this.main_path+'\\'+inputCreateFolder.value);
     savefolder.append('id_main_folder',response.id_path);
 
-    //HACER UNA CONSULTA PARA OBTENER EL ID DE LA RUTA EN BASE
     const request_folder = await fetch('/save_new_folder',{
         method: 'POST',
         body : savefolder
@@ -241,31 +240,6 @@ async function openModalOptions(rowData){
         iconSaveNewFrame.style.display = 'block';
     }
 
-    async function saveNewFrame() {
-          const form = new FormData();
-          form.append('frame_value', opcionActual);
-          form.append('id_user', localStorage.getItem('id'));
-
-          try {
-            const response = await fetch('/saveNewFrame', {
-              method: 'POST',
-              body: form
-            });
-
-            if (!response.ok) {
-              throw new Error(`Error saving frame: ${response.statusText}`);
-            }
-
-            const data = await response.json();
-            console.log(data);
-            localStorage.setItem('frames', opcionActual);
-            generateMessageSuccesfull(data.message);
-            iconSaveNewFrame.style.display = 'none';
-          } catch (error) {
-            console.error('Error saving frame:', error);
-          }
-    }
-
 
     async function getPaths(idUser){
         try{
@@ -305,6 +279,8 @@ async function openModalOptions(rowData){
             localStorage.setItem('frames', opcionActual);
             generateMessageSuccesfull(data.message);
             iconSaveNewFrame.style.display = 'none';
+            selectOption.disabled = true;
+
           } catch (error) {
             console.error('Error saving frame:', error);
           }

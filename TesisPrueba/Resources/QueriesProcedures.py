@@ -1,12 +1,12 @@
 
 def validate_login_query():
-    return "SELECT id, nombre, apellido, pass, mail, stateuser FROM Users WHERE mail = %s"
+    return "SELECT id, nombre, apellido, pass, mail, stateuser, idrol FROM Users WHERE mail = %s " #and stateuser <> '0'
 
 def update_session():
     return "UPDATE users set lastentry = %s where id = %s"
 
 def create_account_query():
-    return "INSERT INTO users(nombre,apellido,cedula,pass,mail,stateUser, idrol) VALUES(%s,%s,%s,%s,%s,B'0',1)"
+    return "INSERT INTO users(nombre,apellido,cedula,pass,mail,stateUser, idrol) VALUES(%s,%s,%s,%s,%s,B'1',2)"
 
 def insert_new_frame():
     return "INSERT INTO parametrizador_fps(valor_fps,id_user) values (%s,%s)"
@@ -22,3 +22,9 @@ def get_frames_query():
 
 def get_users_query():
     return "SELECT id, nombre, apellido, cedula, mail, nombrerol, stateuser FROM Users u INNER JOIN rol r ON r.id_rol = u.idrol"
+
+def check_email_query():
+    return "SELECT COUNT(*) FROM USERS WHERE MAIL = %s"
+
+def get_menu_options_query():
+    return "select distinct n.nombreoption, u.idrol from menuoption n INNER JOIN users u ON n.rol_id = u.idrol"
