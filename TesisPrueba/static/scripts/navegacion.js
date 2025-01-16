@@ -27,5 +27,7 @@ async function viewCloseSession(){
     localStorage.removeItem('token');
     localStorage.removeItem('id');
     localStorage.removeItem('user');
+    localStorage.removeItem('paths');
+    localStorage.removeItem('frames');
     window.location.href = "/login";
 }

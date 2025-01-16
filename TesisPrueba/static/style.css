@@ -333,7 +333,6 @@
         font-weight:500;
         transition:200ms all ease-in-out;
         border:none;
-        margin-left:20px;
     }
     #generateButton{background-color:#0C56BC;color:#ffffff;font-weight:500;}
     #saveButton{
@@ -364,18 +363,22 @@
     } */
 
     .content_mini_cards{
-        width:90%;
-        height:30vh;
+        width:80%;
+        height:40vh;
         display:flex;
         flex-direction:row;
-        justify-content:space-between;
+        justify-content:center;
         flex-wrap:wrap;
+        overflow:auto;
     }
-    .content_mini_cards .content_mini_cards_left, .content_mini_cards .content_mini_cards_right{
-        width:35%;
-    }
+    .content_mini_cards .content_mini_cards_left,
+    .content_mini_cards .content_mini_cards_right,
     .content_mini_cards .content_mini_cards_center{
-        width:20%;
+        width:30%;
+        display:flex;
+        justify-content:center;
+        flex-direction:column;
+        align-items:center;
     }
 
 

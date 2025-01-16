@@ -104,10 +104,9 @@ body {
 }
 
 .error-message {
-  color: #e74c3c; /* Soft red */
+  color: #e74c3c; 
   font-size: 12px;
-  margin-top: -2px;
-  text-align: left;
+  margin: 0px;
 }
 
 /* Button */
