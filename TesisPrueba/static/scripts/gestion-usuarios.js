@@ -13,6 +13,23 @@ const nameLastNameMessage = document.getElementById('nombreMessage');
 
 document.addEventListener("DOMContentLoaded", async() => {
     await cargarUsuarios();
+
+    checkEstado.addEventListener('change', function() {
+        if (this.checked) {
+            console.log('Activo');
+        } else {
+            console.log('Inactivo');
+        }
+    });
+
+    selectedValue = rolSelected.value;
+    console.log(selectedValue)
+
+    rolSelected.addEventListener('change', function(event){
+        selectedValue = event.target.value;
+        console.log(selectedValue)
+    });
+
 });
 
 async function cargarUsuarios() {
@@ -22,7 +39,6 @@ async function cargarUsuarios() {
 
         const tablaCuerpo = document.getElementById('tabla-cuerpo');
         tablaCuerpo.innerHTML = '';
-        console.log(datos)
         datos.forEach(fila => {
             if(fila.stateUser === "1"){
                 fila.stateUser = 'Activo'
@@ -37,10 +53,11 @@ async function cargarUsuarios() {
                 <td>${fila.nombre} ${fila.apellido}</td>
                 <td>${fila.cedula}</td>
                 <td>${fila.mail}</td>
+                <td>${fila.nombrerol}</td>
                 <td>${fila.stateUser}</td>
                 <td>
-                    <button style="background-color:green; cursor:pointer;" onclick="editUser(this)"><i class="bi bi-pencil-square" style="color:#ffffff;"></i></button>
-                    <button style="background-color:red; cursor:pointer;" onclick="deleteUser(this)"><i class="bi bi-trash3-fill" style="color:#ffffff;"></i></button>
+                    <button style="background-color:green; cursor:pointer; border-radius:3px;" onclick="editUser(this)"><i class="bi bi-pencil-square" style="color:#ffffff;"></i></button>
+                    <button style="background-color:#dc3545; cursor:pointer; border-radius:3px;" onclick="deleteUser(this)"><i class="bi bi-trash3-fill" style="color:#ffffff;"></i></button>
                 </td>
             `;
             tablaCuerpo.appendChild(filaTabla);
@@ -70,7 +87,6 @@ async function openModalDeleteUser(rowData){
         });
 
         const data = await response.json();
-        console.log(data);
         cargarUsuarios();
         generateMessageSuccesfull(data.message);
         closeModalDeleteUser();
@@ -130,6 +146,11 @@ async function openModalEditUser(rowData){
         cedulaMessage.textContent = '';
 
         const formData = new FormData();
+        formData.append('name', inputNameEdited.value.trim());
+        formData.append('lastName', inputLastNameEdited.value.trim());
+        formData.append('identification', inputIdentificationEdited.value.trim());
+        formData.append('stateUser',checkEstado.checked)
+        formData.append('user_id', id)
         let valid = true;
         formData.append('user_id', id);
 
@@ -180,6 +201,10 @@ async function openModalEditUser(rowData){
             console.error('El formulario contiene errores y no se enviará.');
             return;
         }
+
+        formData.forEach((value, key) => {
+            console.log(key + ": " + value);
+        });
 
         try {
             btnGuardarEdit.disabled = true;

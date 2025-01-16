@@ -19,3 +19,6 @@ def update_frame_value():
 
 def get_frames_query():
     return "SELECT valor_fps FROM parametrizador_fps WHERE id_user = %s"
+
+def get_users_query():
+    return "SELECT id, nombre, apellido, cedula, mail, nombrerol, stateuser FROM Users u INNER JOIN rol r ON r.id_rol = u.idrol"
