@@ -360,7 +360,7 @@ def validate_login():
             cursor.execute(query, (mail,))
             result = cursor.fetchone()
 
-            if result and result[3] == passw:
+            if result and result[3] == passw and result[5] == '1':
                 # Usuario autenticaded
                 token = jwt.encode({
                     "user_id": result[0]
@@ -537,6 +537,8 @@ def edit_user():
     lastName = request.form.get('lastName')
     identification = request.form.get('identification')
     user_id = request.form.get('user_id')
+    user_rol = request.form.get('user_rol')
+    user_state = request.form.get('user_state')
 
     if not user_id:
         return jsonify({'result': False, 'message': 'ID de usuario no proporcionado'}), 400
@@ -544,8 +546,8 @@ def edit_user():
     try:
         with get_connection() as conn:
             cursor = conn.cursor()
-            query = "UPDATE USERS SET NOMBRE = %s, APELLIDO = %s, CEDULA = %s WHERE ID = %s"
-            params = (name, lastName, identification, user_id)
+            query = "UPDATE USERS SET NOMBRE = %s, APELLIDO = %s, CEDULA = %s, IDROL = %s, STATEUSER = %s WHERE ID = %s"
+            params = (name, lastName, identification, user_rol, user_state, user_id)
             cursor.execute(query, params)
             conn.commit()
 
