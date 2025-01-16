@@ -6,7 +6,7 @@ def update_session():
     return "UPDATE users set lastentry = %s where id = %s"
 
 def create_account_query():
-    return "INSERT INTO users(nombre,apellido,cedula,pass,mail,stateUser, idrol) VALUES(%s,%s,%s,%s,%s,B'0',1)"
+    return "INSERT INTO users(nombre,apellido,cedula,pass,mail,stateUser, idrol) VALUES(%s,%s,%s,%s,%s,B'0',2)"
 
 def insert_new_frame():
     return "INSERT INTO parametrizador_fps(valor_fps,id_user) values (%s,%s)"

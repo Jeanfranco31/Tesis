@@ -4,6 +4,8 @@ const modalEditUser = document.getElementById('modal_edit_user');
 const btnCancelEdit = document.getElementById('btnCancelEdit');
 let btnGuardarEdit = document.getElementById('btnGuardarEdit');
 const nameUserElement = document.getElementById('name-user');
+const rolSelectEdited = document.getElementById('rolEdited');
+const stateUserCheckbox = document.getElementById('stateEdited');
 
 const inputNameEdited = document.getElementById('nameEdited');
 const inputLastNameEdited = document.getElementById('lastNameEdited');
@@ -14,21 +16,21 @@ const nameLastNameMessage = document.getElementById('nombreMessage');
 document.addEventListener("DOMContentLoaded", async() => {
     await cargarUsuarios();
 
-    checkEstado.addEventListener('change', function() {
-        if (this.checked) {
-            console.log('Activo');
-        } else {
-            console.log('Inactivo');
-        }
-    });
+    // checkEstado.addEventListener('change', function() {
+    //     if (this.checked) {
+    //         console.log('Activo');
+    //     } else {
+    //         console.log('Inactivo');
+    //     }
+    // });
 
-    selectedValue = rolSelected.value;
-    console.log(selectedValue)
+    // selectedValue = rolSelected.value;
+    // console.log(selectedValue)
 
-    rolSelected.addEventListener('change', function(event){
-        selectedValue = event.target.value;
-        console.log(selectedValue)
-    });
+    // rolSelected.addEventListener('change', function(event){
+    //     selectedValue = event.target.value;
+    //     console.log(selectedValue)
+    // });
 
 });
 
@@ -106,7 +108,7 @@ function editUser(button){
 
 async function openModalEditUser(rowData){
     modalEditUser.style.display = "block";
-
+    
     // Limpia el formulario previo
     inputNameEdited.value = '';
     inputLastNameEdited.value = '';
@@ -115,6 +117,8 @@ async function openModalEditUser(rowData){
     cedulaMessage.textContent = '';
 
     const id = rowData[0]; 
+    const rol = rowData[4];
+    const status = rowData[5];
     console.log('ID del usuario a actualizar:', id);
     const originalCedula = rowData[2];
 
@@ -132,6 +136,10 @@ async function openModalEditUser(rowData){
         inputNameEdited.value = result[0];
         inputLastNameEdited.value = result[1];
         inputIdentificationEdited.value = result[2];
+        if (rol === 'Administrador') {
+            rolSelectEdited.value = '1';
+        }
+        stateUserCheckbox.checked = status === 'Activo';
     } else {
         console.error("No se encontraron datos para el usuario.");
         return;
@@ -146,13 +154,9 @@ async function openModalEditUser(rowData){
         cedulaMessage.textContent = '';
 
         const formData = new FormData();
-        formData.append('name', inputNameEdited.value.trim());
-        formData.append('lastName', inputLastNameEdited.value.trim());
-        formData.append('identification', inputIdentificationEdited.value.trim());
-        formData.append('stateUser',checkEstado.checked)
+        //formData.append('stateUser',checkEstado.checked)
         formData.append('user_id', id)
         let valid = true;
-        formData.append('user_id', id);
 
         //Validar Nombre y Apellido
         const nombre = inputNameEdited.value.trim();
@@ -195,6 +199,12 @@ async function openModalEditUser(rowData){
             valid = false;
             cedulaMessage.textContent = 'La cédula debe contener exactamente 10 dígitos.';
         }
+        
+        const selectedRole = rolSelectEdited.value;
+        formData.append('user_rol', selectedRole);
+
+        const isChecked = stateUserCheckbox.checked; 
+        formData.append('user_state', isChecked ? '1' : '0');
 
         // No enviar si hay errores
         if (!valid) {
