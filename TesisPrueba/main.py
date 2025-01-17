@@ -367,7 +367,7 @@ def validate_login():
                 }, get_key(), algorithm="HS256")
                 # update_session_login(result)
 
-                return jsonify({'authenticated': True, 'redirect_url': url_for('view_dashboard'), 'user':result[1], 'id':result[0], 'idRol':result[6], 'token': token}), 200
+                return jsonify({'authenticated': True, 'redirect_url': url_for('view_dashboard'), 'user':result[1], 'id':result[0], 'idRol':result[6], 'stateuser':result[5], 'token': token}), 200
             else:
                 # Usuario no autenticado
                 return jsonify({'authenticated': False, 'message': 'Correo o contraseña incorrecta', 'stateuser':result[5]}), 401
@@ -821,6 +821,14 @@ def upload_image_from_video():
         cv.imwrite(output_path, img_with_pose)
 
         image_position = 'horizontal' if original_width > original_height else 'vertical'
+
+        print('message:', 'Imagen procesada exitosamente.')
+        print('path:', output_path)
+        print('image_pos:' ,image_position)
+        print('position:', position)
+        print('filename:' 'points_' + filename)
+        print('height:',445)
+        print('width:',300)
 
         return jsonify({
             'message': 'Imagen procesada exitosamente.',

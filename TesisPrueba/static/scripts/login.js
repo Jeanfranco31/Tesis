@@ -74,7 +74,7 @@ const passMessageError = document.getElementById('passMessage');
                     setTimeout(() => {
                         document.getElementById('message_content').innerHTML = '';
                     }, 4000);
-                } else {
+                } else if (data.stateuser === '0'){
                     document.getElementById('message_content').innerHTML =
                     `
                         <div style="position:absolute; padding:10px 30px; top:5%; left:50%; transform: translateX(-50%); background-color:rgb(214, 5, 5 );">

@@ -40,9 +40,7 @@ async function getMenuOptions(){
     });
 
     const response = await request.json();
-    console.log(localStorage.getItem('rol'))
     const manageUsersUrl = "{{ url_for('manage_users') }}";
-    console.log(manageUsersUrl)
 
     if (localStorage.getItem('rol') != "1") {
         document.getElementById('user_control').remove();

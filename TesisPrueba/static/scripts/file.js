@@ -30,8 +30,8 @@ var divToPoints = [
                         {'id':'16','name':'Muñeca Derecha', 'divName': document.getElementById('7')},
                         {'id':'23','name':'Cadera Izquierda', 'divName': document.getElementById('8')},
                         {'id':'24','name':'Cadera Derecha', 'divName': document.getElementById('9')},
-                        {'id':'25','name':'Hombro Izquierdo', 'divName': document.getElementById('10')},
-                        {'id':'26','name':'Rodilla Izquierda', 'divName': document.getElementById('11')},
+                        {'id':'25','name':'Rodilla Izquierda', 'divName': document.getElementById('10')},
+                        {'id':'26','name':'Rodilla Derecha', 'divName': document.getElementById('11')},
                         {'id':'27','name':'Tobillo Izquierdo', 'divName': document.getElementById('12')},
                         {'id':'28','name':'Tobillo Derecho', 'divName': document.getElementById('13')},
                         {'id':'33','name':'Centro Pecho', 'divName': document.getElementById('14')}
@@ -190,13 +190,13 @@ document.addEventListener('DOMContentLoaded', async () => {
         pointContainer.style.position = 'absolute';
         pointContainer.style.width = `${imgW}px`;
         pointContainer.style.height = `${imgH}px`;
-        //pointContainer.style.top = '63px';
 
         points.forEach((point) => {
             const [index, x, y] = point;
             const pointDiv = document.createElement('div');
 
             pointDiv.classList.add('point');
+            pointDiv.setAttribute('data-index', index);
             pointDiv.style.position = 'absolute';
 
             pointDiv.style.left = `${(x / imgW) * imgW}px`;
@@ -216,19 +216,16 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     function drawMiniCards(points) {
 
-        // Restablece todos los divs al color base
         divToPoints.forEach((option) => {
             const card = option.divName;
             if (card) {
-                card.style.backgroundColor = 'rgb(255, 105, 105)'; // Color base (rojo)
-                card.innerHTML = ''; // Limpia el contenido previo
+                card.style.backgroundColor = 'rgb(255, 105, 105)';
+                card.innerHTML = '';
             }
         });
-        // Actualiza solo los divs correspondientes a los puntos encontrados
         points.forEach((point) => {
-            const [index] = point; // Desempaqueta el índice del punto
+            const [index] = point;
 
-            // Busca el div correspondiente
             const matchedOption = divToPoints.find((option) => option.id === index.toString());
             if (matchedOption && matchedOption.divName) {
                 const card = matchedOption.divName;
@@ -236,16 +233,28 @@ document.addEventListener('DOMContentLoaded', async () => {
                 card.style.backgroundColor = 'rgb(88, 229, 65)';
 
                 card.addEventListener("mouseenter", () => {
-                  card.style.cursor = "pointer";
-                  card.style.borderRadius = '10px';
-                  card.style.boxShadow =  "0px 2px 4px black";
+                    card.style.cursor = "pointer";
+                    card.style.borderRadius = '10px';
+                    card.style.boxShadow =  "0px 2px 4px black";
+
+                    //VALOR QUE ASOCIA LA LISTA CON EL ARRAY DE PUNTOS
+                    const pointDiv = document.querySelector(`.point[data-index="${index}"]`);
+                    if (pointDiv) {
+                        pointDiv.style.backgroundColor = '#00f';
+                    }
                 });
 
                 card.addEventListener("mouseleave", () => {
-                  card.style.cursor = "pointer";
-                  card.style.borderRadius = '0px';
-                  card.style.transition  = '400ms all ease-in-out';
-                  card.style.boxShadow = 'none';
+                    card.style.cursor = "pointer";
+                    card.style.borderRadius = '0px';
+                    card.style.transition  = '400ms all ease-in-out';
+                    card.style.boxShadow = 'none';
+
+                    // Restaurar el color original del punto
+                    const pointDiv = document.querySelector(`.point[data-index="${index}"]`);
+                    if (pointDiv) {
+                        pointDiv.style.backgroundColor = '#f03030'; // Color original
+                    }
                 });
 
                 const indexParagraph = document.createElement('p');
@@ -256,34 +265,29 @@ document.addEventListener('DOMContentLoaded', async () => {
                 indexParagraph.style.height = '30px';
                 indexParagraph.style.lineHeight = '30px';
 
-                card.innerHTML = ''; // Limpia el contenido anterior
-                card.appendChild(indexParagraph); // Agrega contenido actualizado
+                card.innerHTML = '';
+                card.appendChild(indexParagraph);
             }
         });
     }
 
-    // Hacer que un punto sea arrastrable y actualizar su posición
     function makePointDraggable(pointDiv, index) {
         pointDiv.onmousedown = function (event) {
-            const container = document.getElementById('point-container'); // Contenedor de la imagen
-            const containerRect = container.getBoundingClientRect(); // Obtener los límites del contenedor
+            const container = document.getElementById('point-container');
+            const containerRect = container.getBoundingClientRect();
     
             const onMouseMove = (e) => {
-                // Coordenadas relativas al contenedor
                 let x = e.clientX - containerRect.left;
                 let y = e.clientY - containerRect.top;
     
-                // Restringir movimiento dentro de los límites del contenedor
                 if (x < 0) x = 0;
                 if (y < 0) y = 0;
                 if (x > containerRect.width) x = containerRect.width;
                 if (y > containerRect.height) y = containerRect.height;
                 
-                // Actualizar posición del punto
                 pointDiv.style.left = `${x}px`;
                 pointDiv.style.top = `${y}px`;
 
-                // Mostrar las coordenadas actuales en la consola
                 console.log(`Nueva posición de punto ${index}: x = ${Math.trunc(x)}, y = ${Math.trunc(y)}`);
 
                 const pointIndex = points.findIndex(p => p[0] === index);

@@ -8,6 +8,7 @@ const option = document.getElementById('select-option');
 const optionHorizontalImage = document.getElementById('select-option-horizontal');
 const close_icon = document.getElementById('closeIcon');
 const selectFrames = document.getElementById('frames');
+const modalImage = document.getElementById('modal-img');
 
 
 let points = [];
@@ -47,7 +48,7 @@ var divToPoints =
             name.textContent = nameCache;
         }
         await cargarRutas();
-        option.addEventListener('change', (event) => {
+        /*option.addEventListener('change', (event) => {
             selectedOption = event.target.value;
 
             if (selectedOption === 'option1') {
@@ -66,7 +67,7 @@ var divToPoints =
             this.width_resize = width;
             this.height_resize = height;
         });
-
+        */
         if (selectOptions.options.length > 0) {
             selectOptions.selectedIndex = 0;
             selectedOption = selectOptions.options[0].textContent;
@@ -94,6 +95,8 @@ var divToPoints =
            opcionActual = event.target.value;
        });
 
+       const modalImage = document.getElementById('modal-img');
+        console.log(modalImage);
 
     });
 
@@ -262,7 +265,6 @@ var divToPoints =
                 method: 'POST',
                 body: formData,
             });
-
             if (!response.ok) {
                 throw new Error(`Error en la solicitud: ${response.statusText}`);
             }
@@ -273,11 +275,14 @@ var divToPoints =
             height_resize = result.height;
             fileName = result.filename;
 
+console.log(result)
+            /*
             if(result.image_pos === 'vertical'){
                 optionHorizontalImage.style.display = 'none';
             }else{
                 option.style.display = 'none';
             }
+            */
 
             if (result.path) {
                 const modalImage = document.getElementById('modal-img');
@@ -286,9 +291,12 @@ var divToPoints =
                 modalImage.style.width = '300px';
                 modalImage.style.height = '445px';
 
+                console.log('RESULT PATH:',result.path)
+
                 modalImage.src = `${result.path}?${Math.random()}`;
             }
             drawPoints(points, 300, 445);
+
 
         } catch (error) {
             console.error('Error al enviar la imagen para generar la pose:', error);
