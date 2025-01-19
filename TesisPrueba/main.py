@@ -24,7 +24,11 @@ from Resources.QueriesProcedures import (validate_login_query,
                                          get_frames_query,
                                          get_users_query,
                                          check_email_query,
-                                         get_menu_options_query
+                                         get_menu_options_query,
+                                         get_all_paths_query,
+                                         get_tutorial_state_query,
+                                         update_tutorial_state_query,
+                                         insert_tutorial_path_query
                                          )
 from Resources.Middleware import token_required
 from Resources.Middleware import get_key, deserialize_token
@@ -580,16 +584,17 @@ def save_main_route():
 def HasPath():
     user_id = request.form.get('id')
     user_id = int(user_id)
-    with get_connection() as conn:
+    with (get_connection() as conn):
         cursor = conn.cursor()
-        query = "SELECT ruta FROM parametrizador_rutas WHERE user_id = %s"
+        query = "SELECT ruta, count(*) as total FROM parametrizador_rutas WHERE user_id = %s group by ruta"
+        #"SELECT ruta FROM parametrizador_rutas WHERE user_id = %s"
         params = (user_id,)
         cursor.execute(query, params)
         row = cursor.fetchone()
 
         if row:
             return jsonify({'ruta': row[0], 'message':'Ruta guardada'}), 200
-    return jsonify({'Ocurrio un error al tratar de guardar la ruta'}), 400
+    return jsonify({'message':'Ocurrio un error al tratar de guardar la ruta', 'total':0}), 400
 
 
 @app.route('/getIdMainPath', methods=['POST'])
@@ -632,10 +637,11 @@ def save_new_folder():
 @app.route('/all_paths', methods=['POST'])
 def getPaths():
     id = int(request.form.get('id'))
+    print("ID:",id)
     try:
         with get_connection() as conn:
             cursor = conn.cursor()
-            query = "SELECT id_ruta_imagen, ruta_imagen, TO_CHAR(date_created, 'DD-MM-YYYY') as fecha  FROM parametrizador_ruta_imagen INNER JOIN parametrizador_rutas pr ON pr.user_id = %s"
+            query = get_all_paths_query()
             params = (id,)
             cursor.execute(query, params)
             rows = cursor.fetchall()
@@ -763,7 +769,6 @@ def generate_images_from_videos():
         with VideoFileClip(video_path) as clip:
             max_duration = 10
             fps = fps_value
-            #frame_times = [i / fps for i in range(int(clip.duration * fps))]
             frame_times = [i / fps for i in range(int(min(clip.duration, max_duration) * fps))]
 
             for idx, time in enumerate(frame_times):
@@ -778,7 +783,6 @@ def generate_images_from_videos():
         return jsonify({frame_name: frame_data for frame_name, frame_data in frames}),200
 
     except Exception as e:
-        print(f"Error al abrir el video: {e}")
         return jsonify({'error': f'Error procesando el video: {str(e)}'}), 500
 
 
@@ -800,7 +804,18 @@ def upload_image_from_video():
         try:
             with Image.open(filepath) as image:
                 original_width, original_height = image.size
-                resized_img = image.resize((300, 445))
+
+                if original_width > original_height:
+                    resized_img = image.resize((350, 233))
+                    final_width = 350
+                    final_height = 233
+                else:
+                    resized_img = image.resize((300, 445))
+                    final_width = 300
+                    final_height = 445
+
+
+                #resized_img = image.resize((300, 445))
                 resized_image_name = 'resized_' + filename
                 output_path_file = os.path.join(UPLOAD_FOLDER, resized_image_name)
                 resized_img.save(output_path_file)
@@ -822,22 +837,14 @@ def upload_image_from_video():
 
         image_position = 'horizontal' if original_width > original_height else 'vertical'
 
-        print('message:', 'Imagen procesada exitosamente.')
-        print('path:', output_path)
-        print('image_pos:' ,image_position)
-        print('position:', position)
-        print('filename:' 'points_' + filename)
-        print('height:',445)
-        print('width:',300)
-
         return jsonify({
             'message': 'Imagen procesada exitosamente.',
             'path': output_path,
             'image_pos': image_position,
             'position': position,
             'filename': 'points_' + filename,
-            'height':445,
-            'width':300
+            'height':final_height,
+            'width':final_width
         }), 200
 
     except Exception as e:
@@ -903,11 +910,6 @@ def save_image_from_video():
 
         image_file_path = os.path.join(final_path,name_to_save)
         path_base_image = os.path.join(UPLOAD_FOLDER,file_name)
-
-        print(image_file_path)
-        print("path_base_image->",path_base_image)
-        print("UPLOAD_FOLDER->", UPLOAD_FOLDER)
-        print("file_name->", file_name)
 
         # Crear o copiar la imagen con el nombre indicado
         copyfile(path_base_image, image_file_path)  # Copia una imagen base con el nuevo nombre
@@ -983,6 +985,61 @@ def get_frames():
 
     except pyodbc.Error as e:
         return jsonify({'result': False, 'message': 'Error interno del servidor'}), 500
+
+
+@app.route('/getTutorialState',methods=['POST'])
+def get_tutorial_state():
+    id_user = int(request.form.get('id'))
+
+    try:
+        with get_connection() as conn:
+            with conn.cursor() as cursor:
+                query = get_tutorial_state_query()
+                params = (id_user,)
+                cursor.execute(query, params)
+                result = cursor.fetchone()
+
+                if result:
+                    return jsonify({'result': True, 'state_tutorial': result[0]})
+                else:
+                    return jsonify({'result': False, 'message': 'No se encontraron datos'})
+
+    except pyodbc.Error as e:
+        return jsonify({'result': False, 'message': 'Error interno del servidor'}), 500
+
+@app.route('/saveFirstTutorialInfo', methods=['POST'])
+def save_first_tutorial_info():
+    id_user = request.form.get('id_user')
+    fps_value = request.form.get('fps_value')
+    path = request.form.get('main_path')
+
+    try:
+        with get_connection() as conn:
+            print("Conexión establecida.")
+            with conn.cursor() as cursor:
+                print("Cursor creado.")
+                query = insert_new_frame()
+                params = (fps_value, id_user)
+                print(f"Ejecutando consulta: {query} con parámetros {params}")
+                cursor.execute(query, params)
+
+                query = insert_tutorial_path_query()
+                params = (path, id_user)
+                print(f"Ejecutando consulta: {query} con parámetros {params}")
+                cursor.execute(query, params)
+
+                query = update_tutorial_state_query()
+                params = (id_user,)
+                print(f"Ejecutando consulta: {query} con parámetros {params}")
+                cursor.execute(query, params)
+
+            print("Consultas ejecutadas exitosamente.")
+            return jsonify({'result': True, 'message': 'Datos registrados correctamente'}), 200
+
+    except Exception as e:
+        print(f"Error al ejecutar las consultas: {e}")
+        return jsonify({'result': False, 'message': 'Error interno del servidor'}), 500
+
 
 
 if __name__ == '__main__':

@@ -9,6 +9,7 @@ const optionHorizontalImage = document.getElementById('select-option-horizontal'
 const close_icon = document.getElementById('closeIcon');
 const selectFrames = document.getElementById('frames');
 const modalImage = document.getElementById('modal-img');
+const txtNumberFPS = document.getElementById('txtNumberFPS');
 
 
 let points = [];
@@ -19,30 +20,27 @@ let currentIndex = 0;
 let imagesArray = [];
 let opcionActual = '';
 
-var divToPoints =
-    [
-        {'id':'0', 'name':'Nariz', 'divName': document.getElementById('1')},
-        {'id':'11','name':'Hombro Izquierdo' , 'divName': document.getElementById('2')},
-        {'id':'12','name':'Hombro Derecho' , 'divName': document.getElementById('3')},
-        {'id':'13','name':'Codo Izquierdo' , 'divName': document.getElementById('4')},
-        {'id':'14','name':'Codo Derecho' , 'divName': document.getElementById('5')},
-        {'id':'15','name':'Muñeca Izquierda' , 'divName': document.getElementById('6')},
-        {'id':'16','name':'Muñeca Derecha', 'divName': document.getElementById('7')},
-        {'id':'23','name':'Cadera Izquierda', 'divName': document.getElementById('8')},
-        {'id':'24','name':'Cadera Derecha', 'divName': document.getElementById('9')},
-        {'id':'25','name':'Hombro Izquierdo', 'divName': document.getElementById('10')},
-        {'id':'26','name':'Rodilla Izquierda', 'divName': document.getElementById('11')},
-        {'id':'27','name':'Tobillo Izquierdo', 'divName': document.getElementById('12')},
-        {'id':'28','name':'Tobillo Derecho', 'divName': document.getElementById('13')},
-        {'id':'33','name':'Centro Pecho', 'divName': document.getElementById('14')}
-    ]
+var divToPoints = [
+                        {'id':'0', 'name':'Nariz', 'divName': document.getElementById('1')},
+                        {'id':'11','name':'Hombro Izquierdo' , 'divName': document.getElementById('2')},
+                        {'id':'12','name':'Hombro Derecho' , 'divName': document.getElementById('3')},
+                        {'id':'13','name':'Codo Izquierdo' , 'divName': document.getElementById('4')},
+                        {'id':'14','name':'Codo Derecho' , 'divName': document.getElementById('5')},
+                        {'id':'15','name':'Muñeca Izquierda' , 'divName': document.getElementById('6')},
+                        {'id':'16','name':'Muñeca Derecha', 'divName': document.getElementById('7')},
+                        {'id':'23','name':'Cadera Izquierda', 'divName': document.getElementById('8')},
+                        {'id':'24','name':'Cadera Derecha', 'divName': document.getElementById('9')},
+                        {'id':'25','name':'Rodilla Izquierda', 'divName': document.getElementById('10')},
+                        {'id':'26','name':'Rodilla Derecha', 'divName': document.getElementById('11')},
+                        {'id':'27','name':'Tobillo Izquierdo', 'divName': document.getElementById('12')},
+                        {'id':'28','name':'Tobillo Derecho', 'divName': document.getElementById('13')},
+                        {'id':'33','name':'Centro Pecho', 'divName': document.getElementById('14')}
+                       ]
 
     document.addEventListener('DOMContentLoaded', async () => {
         const nameCache = localStorage.getItem('user');
         let width, height;
         let frame = localStorage.getItem('frames');
-
-        selectFrames.disabled = true;
 
         if(nameCache){
             name.textContent = nameCache;
@@ -78,25 +76,10 @@ var divToPoints =
             console.log(selectedOption)
         });
 
-        if (frame) {
-            for (let i = 0; i < selectFrames.options.length; i++) {
-                if (selectFrames.options[i].value === frame) {
-                    selectFrames.selectedIndex = i;
-                    break;
-                }
-            }
-       } else {
-            if (selectFrames.options.length > 0) {
-                selectFrames.selectedIndex = 0;
-            }
-       }
+        txtNumberFPS.disabled = true;
+        txtNumberFPS.placeholder = localStorage.getItem('frames');
 
-       selectFrames.addEventListener('change', (event) => {
-           opcionActual = event.target.value;
-       });
-
-       const modalImage = document.getElementById('modal-img');
-        console.log(modalImage);
+        const modalImage = document.getElementById('modal-img');
 
     });
 
@@ -274,28 +257,19 @@ var divToPoints =
             width_resize  = result.width;
             height_resize = result.height;
             fileName = result.filename;
-
-console.log(result)
-            /*
-            if(result.image_pos === 'vertical'){
-                optionHorizontalImage.style.display = 'none';
-            }else{
-                option.style.display = 'none';
-            }
-            */
-
+            console.log('result',result)
             if (result.path) {
                 const modalImage = document.getElementById('modal-img');
 
                 modalImage.src = '';
-                modalImage.style.width = '300px';
-                modalImage.style.height = '445px';
+                modalImage.style.width = `${result.width}`;
+                modalImage.style.height = `${result.height}`;
 
                 console.log('RESULT PATH:',result.path)
 
                 modalImage.src = `${result.path}?${Math.random()}`;
             }
-            drawPoints(points, 300, 445);
+            drawPoints(points, result.width, result.height);
 
 
         } catch (error) {
@@ -323,6 +297,7 @@ console.log(result)
             const pointDiv = document.createElement('div');
 
             pointDiv.classList.add('point');
+            pointDiv.setAttribute('data-index', index);
             pointDiv.style.position = 'absolute';
 
             // Ajustar las posiciones al tamaño del contenedor
@@ -368,16 +343,26 @@ console.log(result)
                 card.style.backgroundColor = 'rgb(88, 229, 65)';
 
                 card.addEventListener("mouseenter", () => {
-                  card.style.cursor = "pointer";
-                  card.style.borderRadius = '10px';
-                  card.style.boxShadow =  "0px 2px 4px black";
+                    card.style.cursor = "pointer";
+                    card.style.borderRadius = '10px';
+                    card.style.boxShadow =  "0px 2px 4px black";
+
+                    const pointDiv = document.querySelector(`.point[data-index="${index}"]`);
+                    if (pointDiv) {
+                        pointDiv.style.backgroundColor = '#00f';
+                    }
                 });
 
                 card.addEventListener("mouseleave", () => {
-                  card.style.cursor = "pointer";
-                  card.style.borderRadius = '0px';
-                  card.style.transition  = '400ms all ease-in-out';
-                  card.style.boxShadow = 'none';
+                    card.style.cursor = "pointer";
+                    card.style.borderRadius = '0px';
+                    card.style.transition  = '400ms all ease-in-out';
+                    card.style.boxShadow = 'none';
+
+                    const pointDiv = document.querySelector(`.point[data-index="${index}"]`);
+                    if (pointDiv) {
+                        pointDiv.style.backgroundColor = '#f03030'; // Color original
+                    }
                 });
 
                 const indexParagraph = document.createElement('p');

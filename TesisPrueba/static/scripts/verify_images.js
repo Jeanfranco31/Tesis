@@ -76,7 +76,6 @@ async function getFilesByPathName(selectedValue){
 }
 
 async function showImage() {
-    console.log(optionPath, ' -Y- ', optionFile);
     for (const data of ArrayJsonData) {
         if (data.path === optionFile) {
             try {
@@ -89,7 +88,6 @@ async function showImage() {
                     body: form
                 });
 
-                console.log(data)
 
                 if (request.ok) {
                     const blob = await request.blob();

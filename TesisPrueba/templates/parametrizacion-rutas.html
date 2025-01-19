@@ -38,12 +38,7 @@
             <section class="parametrizar_video">
                 <h5>Parametrizacion de FPS</h5>
                 <div class="content-select-fps">
-                    <select id="select-option" class="select-option">
-                        <optgroup label="Frames para video"></optgroup>
-                        <option value="2">2</option>
-                        <option value="5">5</option>
-                        <option value="7">7</option>
-                    </select>
+                    <input type="number" class="select-option" id="txtNumberFPS" placeholder="No tienes parametrizado un valor" min="1" max="24">
                     <p> FPS</p>
                     <i class="bi bi-pencil-square" onclick="enabledSelectFrame()"></i>
                     <i id="iconSaveNewFrame" class="bi bi-floppy" onclick="saveNewFrame()"></i>

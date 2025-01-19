@@ -28,3 +28,15 @@ def check_email_query():
 
 def get_menu_options_query():
     return "select distinct n.nombreoption, u.idrol from menuoption n INNER JOIN users u ON n.rol_id = u.idrol"
+
+def get_all_paths_query():
+    return "SELECT id_ruta_imagen, ruta_imagen, TO_CHAR(date_created, 'DD-MM-YYYY') as fecha FROM parametrizador_ruta_imagen pri, parametrizador_rutas pr where pr.user_id = %s and pr.id = pri.id_ruta_principal;"
+
+def get_tutorial_state_query():
+    return "select first_tutorial from users where id = %s"
+
+def update_tutorial_state_query():
+    return "UPDATE users SET first_tutorial = b'1' where id = %s"
+
+def insert_tutorial_path_query():
+    return "INSERT INTO parametrizador_rutas(ruta, user_id) VALUES(%s,%s)"

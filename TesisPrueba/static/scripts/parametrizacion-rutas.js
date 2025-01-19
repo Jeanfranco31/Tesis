@@ -8,34 +8,21 @@ const inputCreateFolder = document.getElementById('inputFolderName');
 const deleteButtons = document.getElementById('deletePath');
 const modalOptions = document.getElementById('modal_delete_path');
 const deleteButtonOption = document.getElementById('btnDeleteOption');
-const selectOption = document.getElementById('select-option');
 const iconSaveNewFrame = document.getElementById('iconSaveNewFrame');
+const txtNumberFPS = document.getElementById('txtNumberFPS');
+
 
 var main_path = '';
 let opcionActual = '';
 
 document.addEventListener("DOMContentLoaded", async function () {
-   await HasPath();
-   await cargarRutas();
-   let frame = localStorage.getItem('frames');
-   selectOption.disabled = true;
+    await HasPath();
+    await cargarRutas();
+    let frame = localStorage.getItem('frames');
+    txtNumberFPS.disabled = true;
 
-   if (frame) {
-        for (let i = 0; i < selectOption.options.length; i++) {
-            if (selectOption.options[i].value === frame) {
-                selectOption.selectedIndex = i;
-                break;
-            }
-        }
-   } else {
-        if (selectOption.options.length > 0) {
-            selectOption.selectedIndex = 0;
-        }
-   }
+    txtNumberFPS.placeholder = localStorage.getItem('frames');
 
-   selectOption.addEventListener('change', (event) => {
-       opcionActual = event.target.value;
-   });
 });
 
 async function HasPath(){
@@ -48,7 +35,10 @@ async function HasPath(){
             body: form
         });
         const data = await response.json()
+        console.log('HasPath:',data)
+
         if(data.ruta){
+
             folderPath.placeholder = '';
             folderPath.disabled = true;
             buttonSave.style.display = "none";
@@ -57,6 +47,7 @@ async function HasPath(){
         }else {
             folderPath.placeholder = 'Pega aqui la ruta que tendra tu proyecto completo'
         }
+
     }catch(error){
         console.log(error)
     }
@@ -68,10 +59,18 @@ async function saveMainPath(){
     form.append('id', localStorage.getItem('id'))
 
     try{
-        const response = await fetch('/parametrizador-ruta-principal',{
+        const request = await fetch('/parametrizador-ruta-principal',{
             method: 'POST',
             body: form
         });
+
+        const response = await request.json();
+        if(response.created){
+            location.reload();
+        }
+        //HasPath();
+        //cargarRutas();
+
     }catch(error){
         console.log(error)
     }
@@ -87,26 +86,34 @@ async function cargarRutas() {
             body: data
         });
         const datos = await response.json();
+        console.log('all_paths',datos)
 
         const tablaCuerpo = document.getElementById('tabla-cuerpo');
-        console.log(datos)
-        datos.forEach(fila => {
-            const filaTabla = document.createElement('tr');
-            filaTabla.innerHTML = `
-                <td>${fila.id}</td>
-                <td>${fila.nombre}</td>
-                <td>${fila.fechaCreacion}</td>
-                <td>
-                    <button id="deletePath" class="delete-path-btn" style="background-color:red; cursor:pointer; border-radius:4px;" onclick="deletePath(this)">
-                        <i class="bi bi-trash3-fill" style="color:#ffffff; margin:0 auto;"></i>
-                    </button>
-                </td>
-            `;
-            tablaCuerpo.appendChild(filaTabla);
-        });
+        tablaCuerpo.style.position = 'relative';
 
+        if(datos.length != 0){
+            datos.forEach(fila => {
+                const filaTabla = document.createElement('tr');
+                filaTabla.innerHTML = `
+                    <td>${fila.id}</td>
+                    <td>${fila.nombre}</td>
+                    <td>${fila.fechaCreacion}</td>
+                    <td>
+                        <button id="deletePath" class="delete-path-btn" style="background-color:red; cursor:pointer; border-radius:4px;" onclick="deletePath(this)">
+                            <i class="bi bi-trash3-fill" style="color:#ffffff; margin:0 auto;"></i>
+                        </button>
+                    </td>
+                `;
+                tablaCuerpo.appendChild(filaTabla);
+            });
+        }else{
+            console.log('ARRAY VACIO')
+            const filaTabla = document.createElement('tr');
+            filaTabla.innerHTML = `<td style="text-align:center; position:absolute; width:100%;">Actualmente no tienes rutas registradas</td>`
+            tablaCuerpo.appendChild(filaTabla);
+        }
         // Muestra la tabla y oculta el mensaje de carga
-        document.getElementById('tabla-datos').style.display = 'table';
+        //document.getElementById('tabla-datos').style.display = 'block';
     } catch (error) {
         console.error('Error al cargar los datos:', error);
     }
@@ -116,12 +123,15 @@ async function saveNewFolder(){
     const data = new FormData();
     data.append('main_path',this.main_path);
 
-    //HACER UNA CONSULTA PARA OBTENER EL ID DE LA RUTA EN BASE
     const request = await fetch('/getIdMainPath',{
         method: 'POST',
         body : data
     });
+
+    //OBTENER ID DE RUTA PRINCIPAL
     let response = await request.json()
+
+    console.log('response:',response)
 
     const savefolder = new FormData();
     savefolder.append('nameFolder',this.main_path+'\\'+inputCreateFolder.value);
@@ -133,6 +143,8 @@ async function saveNewFolder(){
     });
     let response_folder = await request_folder.json();
     let message = response_folder.message;
+
+    console.log('response_folder:',response_folder)
 
     if(response_folder.created){
         generateMessageSuccesfull(message);
@@ -228,7 +240,6 @@ async function openModalOptions(rowData){
         });
 
         var data = await response.json();
-        console.log(data)
         generateMessageSuccesfull(data.message);
         closeModalOptions();
     });
@@ -236,7 +247,7 @@ async function openModalOptions(rowData){
 }
 
     function enabledSelectFrame(){
-        selectOption.disabled = false;
+        txtNumberFPS.disabled = false;
         iconSaveNewFrame.style.display = 'block';
     }
 
@@ -260,14 +271,14 @@ async function openModalOptions(rowData){
     }
 
     async function saveNewFrame() {
-          const form = new FormData();
-          form.append('frame_value', opcionActual);
-          form.append('id_user', localStorage.getItem('id'));
+         const form = new FormData();
+         form.append('frame_value',txtNumberFPS.value)
+         form.append('id_user', localStorage.getItem('id'));
 
-          try {
+         try {
             const response = await fetch('/saveNewFrame', {
-              method: 'POST',
-              body: form
+                method: 'POST',
+                body: form
             });
 
             if (!response.ok) {
@@ -275,15 +286,14 @@ async function openModalOptions(rowData){
             }
 
             const data = await response.json();
-            console.log(data);
-            localStorage.setItem('frames', opcionActual);
+            localStorage.setItem('frames', txtNumberFPS.value);
             generateMessageSuccesfull(data.message);
             iconSaveNewFrame.style.display = 'none';
-            selectOption.disabled = true;
+            txtNumberFPS.disabled = true;
 
-          } catch (error) {
+         } catch (error) {
             console.error('Error saving frame:', error);
-          }
+         }
     }
 
 
