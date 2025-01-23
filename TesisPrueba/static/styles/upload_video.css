@@ -268,17 +268,16 @@
         flex-direction:row;
         background-color:#f7f7f7;
         height:80vh;
+        position:relative;
     }
 
     .resize_content{
         width:90%;
-        height:20vh;
-        padding-top:30px;
+        height:80vh;
         display:flex;
         flex-direction:row;
         justify-content:center;
-        align-items:center;
-        flex-wrap:wrap;
+        position:relative;
     }
     .resize_content .content_info_resize{
         width:40%;
@@ -400,6 +399,23 @@
         font-size:0.7rem;
         bottom:0;
         text-align:center;
+    }
+
+    .btn-omitir{
+        width:200px;
+        height:30px;
+        background-color:rgb(250, 87, 87);
+        border:none;
+        border-radius:5px;
+        position:absolute;
+        bottom:0;
+        left:5%;
+        font-size:0.8rem;
+        color:#ffffff;
+    }
+    .btn-omitir:hover{
+         background-color:rgb(225, 64, 64);
+         font-weight:500;
     }
 
 

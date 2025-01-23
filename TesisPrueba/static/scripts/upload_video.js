@@ -10,6 +10,8 @@ const close_icon = document.getElementById('closeIcon');
 const selectFrames = document.getElementById('frames');
 const modalImage = document.getElementById('modal-img');
 const txtNumberFPS = document.getElementById('txtNumberFPS');
+const omitirImagen = document.getElementById('btn_omitir_imagen');
+
 
 
 let points = [];
@@ -46,26 +48,7 @@ var divToPoints = [
             name.textContent = nameCache;
         }
         await cargarRutas();
-        /*option.addEventListener('change', (event) => {
-            selectedOption = event.target.value;
 
-            if (selectedOption === 'option1') {
-                width = 175;
-                height = 260;
-            } else if (selectedOption === 'option2') {
-                width = 225;
-                height = 334;
-            } else if (selectedOption === 'option3') {
-                width = 300;
-                height = 445;
-            } else {
-                console.error('Opción no válida');
-                return;
-            }
-            this.width_resize = width;
-            this.height_resize = height;
-        });
-        */
         if (selectOptions.options.length > 0) {
             selectOptions.selectedIndex = 0;
             selectedOption = selectOptions.options[0].textContent;
@@ -194,6 +177,24 @@ var divToPoints = [
                 // Aquí procesas la imagen actual, por ejemplo:
                 generatePoseFromBlob(currentImageData);
 
+                //EVENTO PARA OMITIR IMAGEN
+                omitirImagen.addEventListener('click', ()=>{
+                    console.log('OMITIENDO IMAGEN');
+                    imagesArray.shift();
+                    updatePreviewContainer();
+                    if (imagesArray.length > 0) {
+                        generatePoseFromBlob(imagesArray[0]);
+                    } else {
+                        alert("Todas las imágenes han sido procesadas y guardadas.");
+                        modelImages.style.display = 'none';
+                        modelImages.style.backgroundColor = 'transparent';
+                        const backdrop = document.querySelector('.modal-backdrop');
+                        if (backdrop) {
+                          backdrop.remove(); // Elimina el fondo
+                        }
+                    }
+                });
+
                 saveButton.addEventListener('click', async () => {
                     const data = {
                         'points_position': points,
@@ -202,7 +203,6 @@ var divToPoints = [
                         'height': height_resize,
                         'pathToSave': selectedOption
                     };
-                    console.log(data);
 
                     modal.hide();
                     try {
@@ -214,7 +214,6 @@ var divToPoints = [
                             body: JSON.stringify({ data })
                         });
 
-                        // Eliminar la imagen guardada del array y actualizar el contenedor de vista previa
                         imagesArray.shift();
                         updatePreviewContainer();
 
@@ -323,7 +322,6 @@ var divToPoints = [
         });
     }
 
-
     function drawMiniCards(points) {
 
         divToPoints.forEach((option) => {
@@ -429,8 +427,6 @@ var divToPoints = [
         });
         buttonGenerateImagesFromVideo.style.opacity = '0' ;
     }
-
-
 
     async function cargarRutas() {
         try {

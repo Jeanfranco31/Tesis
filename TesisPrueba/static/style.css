@@ -285,12 +285,10 @@
 
     .resize_content{
         width:90%;
-        height:20vh;
-        padding-top:30px;
+        height:68vh;
         display:flex;
         flex-direction:row;
         justify-content:center;
-        align-items:center;
         flex-wrap:wrap;
     }
     .resize_content .content_info_resize{
