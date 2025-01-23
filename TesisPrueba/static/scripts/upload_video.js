@@ -310,10 +310,11 @@ var divToPoints = [
             console.log(`Punto ${index}: left=${normalizedX}px, top=${normalizedY}px`);
 
             // Estilo del punto
-            pointDiv.style.backgroundColor = 'red';
+            pointDiv.style.backgroundColor = '#f03030';
             pointDiv.style.borderRadius = '50%'; // Para círculos
-            pointDiv.style.width = '7px';
-            pointDiv.style.height = '7px';
+            pointDiv.style.border = '1px solid white';
+            pointDiv.style.width = '8px';
+            pointDiv.style.height = '8px';
 
             // Hacer el punto arrastrable
             makePointDraggable(pointDiv, index);

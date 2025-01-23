@@ -124,6 +124,10 @@ function displayPoints(points) {
 
             point.style.left = `${x}px`;
             point.style.top = `${y}px`;
+            point.style.borderRadius = '50%';
+            point.style.border = '1px solid white';
+            point.style.width = '8px';
+            point.style.height = '8px';
 
             container.appendChild(point);
         });
