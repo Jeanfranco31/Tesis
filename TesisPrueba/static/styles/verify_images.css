@@ -104,9 +104,10 @@
 
 .point {
     position: absolute;
-    width: 10px;
-    height: 10px;
+    width: 6px;
+    height: 6px;
     background-color: red;
     border-radius: 50%;
+    border:1px solid #fff;
     transform: translate(-50%, -50%);
 }
