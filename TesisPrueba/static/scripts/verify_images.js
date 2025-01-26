@@ -85,12 +85,33 @@ async function getFilesByPathName(selectedValue){
 }
 
 async function showImage() {
+    const pathError = document.getElementById('error-path');
+    const fileError = document.getElementById('error-file');
+
+    if(optionPath === '' || optionPath === undefined){
+        pathError.style.display = 'block';
+        pathError.style.fontSize = '0.9rem';
+        pathError.style.color = 'red';
+    }else{
+        pathError.style.display = 'none';
+    }
+
     for (const data of ArrayJsonData) {
         if (data.path === optionFile) {
             try {
+                fileError.style.display = 'none';
+
                 let form = new FormData();
                 form.append('path', optionPath);
                 form.append('file', data.path);
+
+                if(optionPath === '' || optionPath === undefined){
+                    pathError.style.display = 'block';
+                    pathError.style.fontSize = '0.9rem';
+                    pathError.style.color = 'red';
+                }else{
+                    pathError.style.display = 'none';
+                }
 
                 let request = await fetch('/getImage', {
                     method: 'POST',
@@ -118,6 +139,7 @@ async function showImage() {
             }
         }
     }
+
 }
 
 function displayPoints(points) {

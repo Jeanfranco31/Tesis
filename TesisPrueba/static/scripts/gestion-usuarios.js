@@ -13,6 +13,7 @@ const inputIdentificationEdited = document.getElementById('identificationEdited'
 const cedulaMessage = document.getElementById('cedulaMessage');
 const nameLastNameMessage = document.getElementById('nombreMessage');
 const inputMailEdited = document.getElementById('mailEdited');
+const inputApellidoMessage = document.getElementById('apellidoMessage');
 
 document.addEventListener("DOMContentLoaded", async() => {
     const token = localStorage.getItem('token');
@@ -142,6 +143,7 @@ async function openModalEditUser(rowData){
     nameLastNameMessage.textContent = '';
     cedulaMessage.textContent = '';
     inputMailEdited.textContent = '';
+    inputApellidoMessage.textContent = '';
 
     const id = rowData[0]; 
     const rol = rowData[4];
@@ -194,10 +196,13 @@ async function openModalEditUser(rowData){
         if (nombre.length >= 3 && apellido.length >= 3) {
             formData.append('name', nombre);
             formData.append('lastName', apellido);
-        } else if (nombre === '' || apellido === '') {
+        } else if (nombre === '') {
             valid = false;
             nameLastNameMessage.textContent = 'Este campo no debe estar vacío';
-        } else {
+        }else if(apellido === ''){
+            inputApellidoMessage.textContent = 'Este campo no debe estar vacio'
+        }
+        else {
             valid = false;
             nameLastNameMessage.textContent = 'Debe contener minimo 3 letras';
         }
