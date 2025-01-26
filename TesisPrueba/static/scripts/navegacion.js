@@ -31,6 +31,7 @@ async function viewCloseSession(){
     localStorage.removeItem('user');
     localStorage.removeItem('paths');
     localStorage.removeItem('frames');
+    localStorage.removeItem('rol')
     window.location.href = "/login";
 }
 

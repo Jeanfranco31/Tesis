@@ -10,9 +10,17 @@ const selectOptions = document.getElementById('selectOptions');
 const optionHorizontalImage = document.getElementById('select-option-horizontal');
 const modalEdit = document.getElementById('imageModal');
 const containerMiniCards = document.getElementById('content_mini_cards');
+const contentOptions = document.getElementById('content-options');
+const val_width = document.getElementById('val_width');
+const val_height = document.getElementById('val_height');
+const val_width_modal = document.getElementById('val_width_modal');
+const val_height_modal = document.getElementById('val_height_modal');
+const modal_error = document.getElementById('main_content_modal_error');
+const buttonSaveImage = document.getElementById('saveButton');
 
 
 var selectedOption = '';
+var selectedOptionResize = '';
 const h = document.getElementById('h');
 const w = document.getElementById('w');
 let cachedFile = null; 
@@ -37,45 +45,83 @@ var divToPoints = [
                         {'id':'33','name':'Centro Pecho', 'divName': document.getElementById('14')}
                        ]
 const fileModalImageName = '';
-const width_resize = 0;
-const height_resize = 0;
+var width_resize;
+var height_resize;
 
-document.addEventListener('DOMContentLoaded', async () => {
-    let width, height;
+    document.addEventListener('DOMContentLoaded', async () => {
+        let width, height;
+        const token = localStorage.getItem('token');
+        setTimeout(() => {
+            if (!token) {
+                window.location.href = '/login';
+                return;
+            }
+        }, 100);
+        await cargarRutas();
 
-    await cargarRutas();
+        if (selectOptions.options.length > 0) {
+            selectOptions.selectedIndex = 0;
+            selectedOption = selectOptions.options[0].textContent;
+                    console.log('OP1:',selectedOption)
+
+        }
+        selectOptions.addEventListener('change', (event) => {
+            selectedOption = event.target.selectedOptions[0].textContent;
+        });
+
+    });
 
     option.addEventListener('change', (event) => {
         selectedOption = event.target.value;
 
         if (selectedOption === 'option1') {
-            width = 175;
-            height = 260;
+            width_resize = 175;
+            height_resize = 260;
+            val_width.textContent = '175'
+            val_height.textContent = '260'
+
         } else if (selectedOption === 'option2') {
-            width = 225;
-            height = 334;
+            width_resize = 225;
+            height_resize = 334;
+            val_width.textContent = '225'
+            val_height.textContent = '334'
+
         } else if (selectedOption === 'option3') {
-            width = 300;
-            height = 445;
-        } else {
-            console.error('Opción no válida');
-            return;
+            width_resize = 300;
+            height_resize = 445;
+            val_width.textContent = '300'
+            val_height.textContent = '445'
+
         }
-        this.width_resize = width;
-        this.height_resize = height;
+
     });
 
-    if (selectOptions.options.length > 0) {
-        selectOptions.selectedIndex = 0;
-        selectedOption = selectOptions.options[0].textContent;
-    }
-    selectOptions.addEventListener('change', (event) => {
-        selectedOption = event.target.selectedOptions[0].textContent;
+    optionHorizontalImage.addEventListener('change', (event) => {
+        selectedOption = event.target.value;
+
+        if (selectedOption === 'option1') {
+            width_resize = 250;
+            height_resize = 167;
+            val_width.textContent = '250'
+            val_height.textContent = '167'
+
+        } else if (selectedOption === 'option2') {
+            width_resize = 300;
+            height_resize = 200;
+            val_width.textContent = '300'
+            val_height.textContent = '200'
+
+        } else if (selectedOption === 'option3') {
+            width_resize = 350;
+            height_resize = 233;
+            val_width.textContent = '350'
+            val_height.textContent = '233'
+
+        }
+
     });
 
-});
 
-    // Permite arrastrar el archivo sobre la zona de drop
     dropZone.addEventListener('dragover', (e) => {
         e.preventDefault();
         dropZone.classList.add('dragover');
@@ -121,11 +167,35 @@ document.addEventListener('DOMContentLoaded', async () => {
     function showPreview(file) {
         const reader = new FileReader();
         reader.onload = function(event) {
+            const previewImg = document.getElementById('preview-img');
             previewImg.src = event.target.result;
             previewImg.style.display = 'block';
-            //button.style.display = 'block';
+
+            const img = new Image();
+            img.onload = function() {
+
+                if(img.width > img.height){
+                    contentOptions.style.display = 'block';
+                    option.style.display = 'none';
+                    optionHorizontalImage.style.display = 'block';
+                    width_resize = 350;
+                    height_resize = 233;
+                    val_width.textContent = '350'
+                    val_height.textContent = '233'
+
+                }else if(img.width < img.height){
+                    contentOptions.style.display = 'block';
+                    optionHorizontalImage.style.display = 'none';
+                    option.style.display = 'block';
+                    width_resize = 300;
+                    height_resize = 445;
+                    val_width.textContent = '300'
+                    val_height.textContent = '445'
+                }
+            };
+            img.src = event.target.result;
         }
-        reader.readAsDataURL(file); // Leer el archivo como una URL
+        reader.readAsDataURL(file);
     }
 
     function toggleButtonState(enabled) {
@@ -138,11 +208,13 @@ document.addEventListener('DOMContentLoaded', async () => {
             console.error('No hay archivo cargado.');
             return;
         }
-        
-        // const file = fileInput.files[0];
-        // console.log('FILE',file)
+
         const formData = new FormData();
+        let data;
+
         formData.append('image', cachedFile);
+        formData.append('width',width_resize);
+        formData.append('height',height_resize);
 
         try{
             const response = await fetch('/resize_image', {
@@ -156,11 +228,14 @@ document.addEventListener('DOMContentLoaded', async () => {
 
             const contentType = response.headers.get('Content-Type');
             if (contentType && contentType.includes('application/json')) {
-                const data = await response.json();
+                data = await response.json();
                 this.response = data;
                 this.filePathName = data.path;
                 this.width_resize = data.ancho
                 this.height_resize = data.alto
+                val_width_modal.textContent = data.ancho;
+                val_height_modal.textContent = data.alto;
+
             } else {
                 throw new Error('Respuesta no es JSON válido');
             }
@@ -168,8 +243,12 @@ document.addEventListener('DOMContentLoaded', async () => {
             console.error('Error al enviar la imagen:', error);
         }
 
+        const timestamp = new Date().getTime();
+
         // Mostrar imagen procesada en el modal
-        modalImgPreview.src = 'static/uploads/resized_' + cachedFile.name;
+        modalImgPreview.src = '';
+        modalImgPreview.src = `${data.Imagen_Redimensionada}?t=${timestamp}`;
+
         this.fileModalImageName = 'resized_'+cachedFile.name;
 
         // Esperar a que la imagen se cargue para obtener sus dimensiones
@@ -288,21 +367,16 @@ document.addEventListener('DOMContentLoaded', async () => {
                 pointDiv.style.left = `${x}px`;
                 pointDiv.style.top = `${y}px`;
 
-                console.log(`Nueva posición de punto ${index}: x = ${Math.trunc(x)}, y = ${Math.trunc(y)}`);
-
                 const pointIndex = points.findIndex(p => p[0] === index);
 
                 if (pointIndex !== -1) {
                     points[pointIndex][1] = Math.trunc(x);
                     points[pointIndex][2] = Math.trunc(y);
                 
-                    console.log(`Array actualizado:`, points);
                 } else {
                     console.error(`No se encontró el índice para index: ${index}`);
                 }                
             };
-
-            console.log("ARRAY FINAL:",points)
 
             document.addEventListener('mousemove', onMouseMove);
     
@@ -324,7 +398,8 @@ document.addEventListener('DOMContentLoaded', async () => {
             height : this.height_resize,
             pathToSave : selectedOption
         };
-        console.log(data)
+
+        console.log('data',data)
 
         try{
             const response = fetch('/save', {
@@ -361,12 +436,31 @@ document.addEventListener('DOMContentLoaded', async () => {
             }
 
             const data = await response.json();
+
             this.response = data;
 
-            // Verifica que position sea un array antes de asignarlo
             if (Array.isArray(this.response.position)) {
                 points = this.response.position;
-                console.log("GENERATE POSE:",points)
+
+                if(points.length === 0){
+                    modal_error.style.display = 'block';
+                    buttonSaveImage.disabled = true;
+                    buttonSaveImage.style.backgroundColor = '#0067e5';
+                    buttonSaveImage.style.opacity = '0.5';
+
+                    let timeLeft = 5;
+                    const contador = document.getElementById('cont');
+                    const countdown = setInterval(() => {
+                        timeLeft--;
+                        if (timeLeft >= 0) {
+                            contador.textContent = timeLeft;
+                        } else {
+                            clearInterval(countdown);
+                            window.location.reload();
+                        }
+                    }, 1000);
+
+                }
             } else {
                 console.error('El formato de position no es válido:', this.response.position);
                 points = [];
@@ -375,30 +469,22 @@ document.addEventListener('DOMContentLoaded', async () => {
             // this.points = data.position;
             this.position_image = data.image_pos;
 
-            modalImg.src = this.response.path;
-            console.log('Array points antes de drawPoints:', points);
-            //drawPoints(this.response.position, 300, 445);
+            const timestamp = new Date().getTime();
+
+            modalImg.src = `${this.response.path}?t=${timestamp}`;
+
+
         } catch (error) {
             console.error('Error al enviar la imagen:', error);
         }
 
         // Esperar a que la imagen se cargue para obtener sus dimensiones
         modalImg.onload = () => {
-            const imgW = modalImg.naturalWidth;
-            const imgH = modalImg.naturalHeight;
+            const imgW = width_resize;
+            const imgH = height_resize;
 
             $('#imageModal').modal('show'); // Mostrar el modal
 
-            if(this.position_image === "vertical"){
-                $('#select-option-horizontal').hide();
-                w.textContent = '300px'
-                h.textContent = '445px'
-            }else{
-                $('#select-option').hide();
-                w.textContent = '350px'
-                h.textContent = '233px'
-            }
-            //fillSelect(optionsToPoints, 'optionsToPoints');
             drawPoints(this.response.position, imgW, imgH);
         };
     }
@@ -407,9 +493,39 @@ document.addEventListener('DOMContentLoaded', async () => {
         $('#previewImageModal').modal('hide');
     }
 
+    function closeModalImageEditorIcon(){
+         modalImg.src = '';
+         $('#imageModal').modal('hide');
+    }
+
     function closeModalImageEditor(){
         modalImg.src = '';
+        previewImg.src = '';
+        previewImg.style.display = 'none';
         $('#imageModal').modal('hide');
+
+        const messageDiv = document.createElement('div');
+        messageDiv.textContent = 'Imagen guardada correctamente';
+        messageDiv.style.position = 'fixed';
+        messageDiv.style.bottom = '20px';
+        messageDiv.style.right = '20px';
+        messageDiv.style.backgroundColor = '#4caf50';
+        messageDiv.style.color = '#fff';
+        messageDiv.style.padding = '10px 20px';
+        messageDiv.style.borderRadius = '8px';
+        messageDiv.style.boxShadow = '0 2px 6px rgba(0, 0, 0, 0.2)';
+        messageDiv.style.fontSize = '16px';
+        messageDiv.style.zIndex = '1000';
+        messageDiv.style.transition = 'opacity 0.5s';
+
+        document.body.appendChild(messageDiv);
+
+        setTimeout(() => {
+            messageDiv.style.opacity = '0';
+            setTimeout(() => {
+                messageDiv.remove();
+            }, 500);
+        }, 3000);
     }
 
     function openModalImageEditor(){
@@ -433,17 +549,12 @@ document.addEventListener('DOMContentLoaded', async () => {
 
 
     //CAMBIO DE OPCIONES EN EL SELECT
-    $('#imageModal').modal({
+    /*$('#imageModal').modal({
         backdrop:'static',
         keyboard:false
-    });
+    });*/
 
-    option.addEventListener('change', (event) =>{
-        option = event.target.value;
-        console.log(option);
-    });
     document.addEventListener('click', (event) => {
-    console.log('Click detectado:', event.target);
     });
 
     optionHorizontalImage.addEventListener('click', (event) => {
@@ -481,8 +592,11 @@ document.addEventListener('DOMContentLoaded', async () => {
         this.new_image = '';
         const formData = new FormData();
         formData.append('image', this.fileModalImageName);
-        formData.append('width', this.width_resize);
-        formData.append('height', this.height_resize);
+        formData.append('width', width_resize);
+        formData.append('height', height_resize);
+        
+        console.log('formData',formData)
+        
         try {
             const response = await fetch('/resize_image_params', {
                 method: 'POST',
@@ -490,6 +604,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             });
 
             data = await response.json();
+            console.log('data',data)
 
             if (data.path != null) {
                 this.new_image = `${data.path}?timestamp=${new Date().getTime()}`;
@@ -544,6 +659,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 option.value = fila.id;
                 option.textContent = fila.nombre;
                 selectOptions.appendChild(option);
+
             });
         } catch (error) {
             console.error('Error al cargar los datos:', error);

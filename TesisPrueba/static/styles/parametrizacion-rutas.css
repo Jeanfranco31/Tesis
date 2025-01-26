@@ -347,18 +347,59 @@ button .delete:hover{
     color:#00B871;
     display:block;
     cursor:pointer;
+    margin-left:5px;
+    padding:0px 5px;
+    transition:200ms all ease-in-out;
 }
+.icon_edit_button, .icon_delete_button, .icon_cancel_option{
+    height:25px;
+    width:60px;
+}
+.bi-pencil-square:hover{
+    background-color:#00B871;
+    color:#ffffff;
+    border-radius:4px;
+    transition:200ms all ease-in-out;
+}
+
 .bi-floppy{
-    color:#FF0009;
+    color:#3c94ff;
     display:none;
     cursor:pointer;
+    transition:200ms all ease-in-out;
+    padding:0px 5px;
+    margin-left:5px;
+}
+.bi-floppy:hover{
+    background-color:#3c94ff;
+    color:#ffffff;
+    border-radius:4px;
+    transition:200ms all ease-in-out;
+}
+
+.bi-x-square{
+    color:red;
+    display:none;
+    cursor:pointer;
+    transition:200ms all ease-in-out;
+    padding:0px 5px;
+}
+
+.bi-x-square:hover{
+    background-color:#FF0009;
+    color:#ffffff;
+    display:none;
+    cursor:pointer;
+    transition:200ms all ease-in-out;
+    padding:0px 5px;
+    border-radius:4px;
 }
 
 .parametrizar_video .content-select-fps p{
     margin:0 0 0 15px;
 }
-.select-option{
-    display: block;
+.select-option_{
+    /*display: block;*/
     padding: .375rem 2.25rem .375rem .75rem;
     -moz-padding-start: calc(0.75rem - 3px);
     font-size: 1rem;

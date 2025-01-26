@@ -152,6 +152,7 @@ button .delete{
 }
 
 
+
 /********************* modal editar uusuario *************************/
 .modal_edit_user{
     position:fixed;
@@ -176,6 +177,7 @@ button .delete{
     top:50%;
     left:50%;
     transform:translate(-50%, -50%);
+    overflow-y:auto;
 }
 
 .btn-danger, .btn-success{
@@ -184,7 +186,7 @@ button .delete{
 }
 
 .content_btnEdit{
-    height: 15vh;
+    /*height: 15vh;*/
     display: flex;
     justify-content: center;
     align-items: center;
@@ -216,4 +218,13 @@ button .delete{
     -webkit-appearance: none;
     -moz-appearance: none;
     appearance: none;
+}
+
+.form-select{
+    width:60%;
+}
+
+.form-label{
+    font-weight:500;
+    color:rgba(0,0,0,0.7);
 }

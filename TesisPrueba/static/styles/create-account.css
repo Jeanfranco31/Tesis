@@ -41,7 +41,7 @@ body {
 /* Right Container */
 .right_container {
   flex: 1;
-  padding: 40px;
+  padding: 0px 40px;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -143,6 +143,16 @@ button:hover {
 .form-section a:hover {
   text-decoration: underline;
 }
+
+.content_type_identification{
+    display:flex;
+    flex-direction:row;
+    justify-content:space-around;
+    align-items:center;
+    height:40px;
+}
+
+
 
 /* Responsive */
 @media (max-width: 768px) {

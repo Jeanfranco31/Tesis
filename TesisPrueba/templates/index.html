@@ -4,7 +4,8 @@
         <meta charset="UTF-8">
         <meta http-equiv="X-UA-Compatible" content="IE=edge">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Proyecto Titulacion</title>
+        <title>Boi Pose | Carga de Imagen</title>
+        <link rel="icon" href="../static/assets/logo.png">
         <link rel="stylesheet" href="../static/style.css">
         <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
     </head>
@@ -26,6 +27,25 @@
                                     </select>
                                 </div>
                             </div>
+                            <div class="content-options" id="content-options">
+                                    <p>Tu imagen será redimensionada a:
+                                        <strong><span id="val_width"></span></strong>
+                                        X
+                                        <strong><span id="val_height"></span></strong>
+                                    </p>
+                                    <select id="select-option" class="select-option">
+                                        <optgroup label="Elije una dimension en PX"></optgroup>
+                                        <option value="option1">175 X 260</option>
+                                        <option value="option2">225 X 334</option>
+                                        <option value="option3" selected>300 X 445</option>
+                                    </select>
+                                    <select id="select-option-horizontal" class="select-option">
+                                        <optgroup label="Elije una dimension en PX"></optgroup>
+                                        <option value="option1">250 X 167</option>
+                                        <option value="option2">300 X 200</option>
+                                        <option value="option3" selected>350 X 233</option>
+                                    </select>
+                                </div>
                             <div class="banner-img">
                                 <img src="../static/assets/banner.png">
                             </div>
@@ -37,6 +57,8 @@
                                 <img id="preview-img" alt="Vista previa" style="display: none;">
                                 <p>Arrastra y suelta tu archivo aquí o haz clic para elegirlo.</p>
                                 <input type="file" id="file-input" accept="image/*" style="display: none;">
+
+
                             </div>
                             <button type="button" class="btn btn-success" id="button" disabled>Procesar Imagen</button>
                         </div>
@@ -75,7 +97,7 @@
                 <div class="modal-content modal-content-process">
                     <div class="modal-header">
                         <h5 class="modal-title">Imagen Procesada</h5>
-                        <button type="button" class="close" data-dismiss="modal" aria-label="Close" onclick="closeModalImageEditor()">
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close" onclick="closeModalImageEditorIcon()">
                             <img src="../static/assets/close_icon.png" alt="icon close"/>
                         </button>
                     </div>
@@ -85,24 +107,13 @@
                             <div id="point-container"></div>
                         </div>
                         <div class="resize_content">
-                            <div>
-                                <h2>Dimension de la imagen actual</h2>
-                                <p>Ancho :<span id="w" style="font-weight:400;"></span></p>
-                                <p class="dimension_h">Alto :<span id="h" style="font-weight:400;"></span></p>
+                            <div class="resize_subcontent">
+                                <h2>Dimensión de la imagen actual</h2>
+                                <strong><span id="val_width_modal"></span></strong>
+                                X
+                                <strong><span id="val_height_modal"></span></strong>
                             </div>
-                            <select id="select-option" class="select-option">
-                                <optgroup label="Elije una dimension en PX"></optgroup>
-                                <option value="option1">175 X 260</option>
-                                <option value="option2">225 X 334</option>
-                                <option value="option3" selected>300 X 445</option>
-                            </select>
-                            <select id="select-option-horizontal" class="select-option">
-                                <optgroup label="Elije una dimension en PX"></optgroup>
-                                <option value="option1">250 X 167</option>
-                                <option value="option2">300 X 200</option>
-                                <option value="option3" selected>350 X 233</option>
-                            </select>
-                            <button type="button" class="generateButton" onclick="resizeNewDimension()">Redimensionar</button>
+
                             <div class="content_mini_cards" id="content_mini_cards">
                                 <div class="content_mini_cards_left">
                                     <div class="card_element" id="2">2</div>
@@ -130,15 +141,23 @@
 
                             </div>
 
-
                         </div>
                     </div>
                     <div class="modal-footer">
-                        <button type="button" id="saveButton" onclick="savePoints()">Guardar en BD</button>
+                        <button type="button" id="saveButton" onclick="savePoints()">Guardar Imagen</button>
                     </div>
                 </div>
             </div>
         </div>
+
+        <div class="main_content_modal_error" id="main_content_modal_error">
+            <div class="modal_error_model">
+                <img src="../static/assets/error_model.png">
+                <p>Al parecer Mediapipe no pudo generar los Keypoints de tu imagen. Intenta de nuevo.</p>
+                <p style="color:red;font-weight:500;">Regresando al menu principal <span id="cont">5</span></p>
+            </div>
+        </div>
+        
         {% endblock %}
 
     {% block scripts %}

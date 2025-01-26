@@ -45,7 +45,7 @@ def validate_has_path_query():
     return "SELECT ruta, count(*) as total FROM parametrizador_rutas WHERE user_id = %s group by ruta"
 
 def user_one_query():
-    return "SELECT NOMBRE, APELLIDO, CEDULA FROM USERS WHERE ID = %s"
+    return "SELECT NOMBRE, APELLIDO, CEDULA, mail FROM USERS WHERE ID = %s"
 
 def check_cedula_query():
     return "SELECT COUNT(*) FROM USERS WHERE CEDULA = %s"

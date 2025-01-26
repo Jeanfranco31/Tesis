@@ -12,26 +12,17 @@ const inputLastNameEdited = document.getElementById('lastNameEdited');
 const inputIdentificationEdited = document.getElementById('identificationEdited');
 const cedulaMessage = document.getElementById('cedulaMessage');
 const nameLastNameMessage = document.getElementById('nombreMessage');
+const inputMailEdited = document.getElementById('mailEdited');
 
 document.addEventListener("DOMContentLoaded", async() => {
+    const token = localStorage.getItem('token');
+    setTimeout(() => {
+        if (!token) {
+            window.location.href = '/login';
+            return;
+        }
+    }, 100);
     await cargarUsuarios();
-
-    // checkEstado.addEventListener('change', function() {
-    //     if (this.checked) {
-    //         console.log('Activo');
-    //     } else {
-    //         console.log('Inactivo');
-    //     }
-    // });
-
-    // selectedValue = rolSelected.value;
-    // console.log(selectedValue)
-
-    // rolSelected.addEventListener('change', function(event){
-    //     selectedValue = event.target.value;
-    //     console.log(selectedValue)
-    // });
-
 });
 
 async function cargarUsuarios() {
@@ -46,6 +37,10 @@ async function cargarUsuarios() {
                 fila.stateUser = 'Activo'
             }else{
                 fila.stateUser = 'Inactivo'
+            }
+
+            if(fila.nombrerol === "Administrator"){
+                fila.nombrerol = 'Administrador'
             }
 
 
@@ -78,7 +73,6 @@ function deleteUser(button){
 async function openModalDeleteUser(rowData){
     modalDeleteUser.style.display = "block";
 
-    console.log('ID del usuario a eliminar:', rowData[0]);
     deleteButtonOption.addEventListener("click", async() =>{
         let request = new FormData();
         request.append('user',rowData[0]);
@@ -89,10 +83,41 @@ async function openModalDeleteUser(rowData){
         });
 
         const data = await response.json();
+
+        if(data.result === false){
+            generateMessageError(data.message);
+        }else{
+            generateMessageSuccesfull(data.message);
+        }
+
         cargarUsuarios();
-        generateMessageSuccesfull(data.message);
         closeModalDeleteUser();
     }, {once:true});
+}
+
+function generateMessageError(message){
+    const messageDiv = document.createElement('div');
+        messageDiv.textContent = `${message}`;
+        messageDiv.style.position = 'fixed';
+        messageDiv.style.bottom = '20px';
+        messageDiv.style.right = '20px';
+        messageDiv.style.backgroundColor = '#f10202';
+        messageDiv.style.color = '#fff';
+        messageDiv.style.padding = '10px 20px';
+        messageDiv.style.borderRadius = '8px';
+        messageDiv.style.boxShadow = '0 2px 6px rgba(0, 0, 0, 0.2)';
+        messageDiv.style.fontSize = '16px';
+        messageDiv.style.zIndex = '1000';
+        messageDiv.style.transition = 'opacity 0.5s';
+
+        document.body.appendChild(messageDiv);
+
+        setTimeout(() => {
+            messageDiv.style.opacity = '0';
+            setTimeout(() => {
+                messageDiv.remove();
+            }, 500);
+        }, 3000);
 }
 
 function closeModalDeleteUser(){
@@ -103,24 +128,27 @@ function editUser(button){
     let rows = button.closest('tr');
     let rowData = Array.from(rows.querySelectorAll('td')).map(td => td.textContent);
     openModalEditUser(rowData);
-    console.log(rowData);
 }
 
 async function openModalEditUser(rowData){
     modalEditUser.style.display = "block";
-    
+    inputIdentificationEdited.disabled = true;
+    inputMailEdited.disabled = true;
+
     // Limpia el formulario previo
     inputNameEdited.value = '';
     inputLastNameEdited.value = '';
     inputIdentificationEdited.value = '';
     nameLastNameMessage.textContent = '';
     cedulaMessage.textContent = '';
+    inputMailEdited.textContent = '';
 
     const id = rowData[0]; 
     const rol = rowData[4];
     const status = rowData[5];
-    console.log('ID del usuario a actualizar:', id);
     const originalCedula = rowData[2];
+
+    console.log(rowData)
 
     const request = await fetch('/user-one', {
         method: 'POST',
@@ -136,8 +164,11 @@ async function openModalEditUser(rowData){
         inputNameEdited.value = result[0];
         inputLastNameEdited.value = result[1];
         inputIdentificationEdited.value = result[2];
+        inputMailEdited.value = result[3]
         if (rol === 'Administrador') {
             rolSelectEdited.value = '1';
+        }else if(rol === 'Visitante'){
+            rolSelectEdited.value = '2';
         }
         stateUserCheckbox.checked = status === 'Activo';
     } else {
@@ -154,7 +185,6 @@ async function openModalEditUser(rowData){
         cedulaMessage.textContent = '';
 
         const formData = new FormData();
-        //formData.append('stateUser',checkEstado.checked)
         formData.append('user_id', id)
         let valid = true;
 
@@ -229,7 +259,6 @@ async function openModalEditUser(rowData){
                 cargarUsuarios();
                 closeModalEditUser();
                 generateMessageSuccesfull(result.message);
-                console.log('id: ', id, ' localStorageId: ', localStorageId);
                 if (id === localStorageId) {
                     const requestUser = await fetch('/user-one', {
                         method: 'POST',

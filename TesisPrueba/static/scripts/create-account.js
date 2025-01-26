@@ -8,6 +8,8 @@ const cedulaMessage = document.getElementById('cedulaMessage');
 const passMessage = document.getElementById('passMessage');
 const emailMessage = document.getElementById('emailMessage');
 const passMessageVerify = document.getElementById('passMessageVerify');
+const checkIdentification = document.getElementById('rb_identification');
+const checkPassport = document.getElementById('rb_passport');
 
 
 async function createAccount() {
@@ -26,27 +28,40 @@ async function createAccount() {
 
     // Validar cédula
     const cedula = inputCedula.value.trim();
-    if (cedula.length === 10 && /^\d+$/.test(cedula)) {
-        const response = await fetch('/check_cedula', {
-            method: 'POST',
-            body: JSON.stringify({ cedula }),
-            headers: {
-                'Content-Type': 'application/json'
+
+    if(checkIdentification.checked){
+        if (cedula.length === 10 && /^\d+$/.test(cedula)) {
+
+            let validIdentification = validarCedula(cedula);
+
+            if(validIdentification){
+                const response = await fetch('/check_cedula', {
+                    method: 'POST',
+                    body: JSON.stringify({ cedula }),
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                const data = await response.json();
+
+                if (data.exists) {
+                    cedulaMessage.textContent = 'La cédula ingresada ya existe';
+                    valid = false;
+                } else {
+                    form.append('identification', cedula);
+                    cedulaMessage.textContent = '';
+                }
+            }else{
+                    cedulaMessage.textContent = 'La cédula ingresada no cumple con el formato del pais';
             }
-        });
-
-        const data = await response.json();
-
-        if (data.exists) {
-            cedulaMessage.textContent = 'La cédula ingresada ya existe';
-            valid = false;
         } else {
-            form.append('identification', cedula);
-            cedulaMessage.textContent = '';
+            valid = false;
+            cedulaMessage.textContent = 'La cédula debe contener exactamente 10 dígitos.';
         }
-    } else {
-        valid = false;
-        cedulaMessage.textContent = 'La cédula debe contener exactamente 10 dígitos.';
+    }else if(checkPassport.checked){
+        form.append('identification', cedula);
+        cedulaMessage.textContent = '';
     }
 
     // Validar correo electrónico
@@ -112,7 +127,6 @@ async function createAccount() {
         }
         
         const data = await response.json();
-        console.log(data)
         if (data.created) {
             window.location.href = data.redirect_url;
         } else {
@@ -131,3 +145,33 @@ async function createAccount() {
     }
 
 }
+
+function validarCedula(cedula) {
+    if (cedula.length !== 10 || isNaN(cedula)) {
+        return false;
+    }
+
+    const digitos = cedula.split('').map(Number);
+
+    if (digitos[0] < 0 || digitos[0] > 6) {
+        return false;
+    }
+
+    const suma = digitos.slice(0, 9).reduce((acc, digito, index) => {
+        if (index % 2 === 0) {
+            let doble = digito * 2;
+            if (doble > 9) {
+                doble -= 9;
+            }
+            return acc + doble;
+        } else {
+            return acc + digito;
+        }
+    }, 0);
+
+    const modulo = suma % 10;
+    const digitoVerificador = modulo === 0 ? 0 : 10 - modulo;
+
+    return digitoVerificador === digitos[9];
+}
+

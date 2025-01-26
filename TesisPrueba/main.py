@@ -9,7 +9,7 @@ import cv2 as cv
 import glob
 import jwt
 import base64
-from datetime import datetime
+from datetime import datetime, timedelta
 from shutil import copyfile
 from PIL import Image
 from moviepy.video.io.VideoFileClip import VideoFileClip
@@ -39,7 +39,7 @@ from Resources.QueriesProcedures import (validate_login_query,
                                          delete_folder_query
                                          )
 from Resources.Middleware import token_required
-from Resources.Middleware import get_key, deserialize_token
+from Resources.Middleware import get_key #, deserialize_token
 from model.PoseModule import poseDetector
 from Resources.Conexion import get_connection
 from Resources.Encrypt import  encrypt_password
@@ -82,8 +82,8 @@ def verify_images():
     return render_template('verify-images.html')
 
 @app.route('/dashboard')
-#@token_required
 def view_dashboard():
+    print('view_dashboard')
     return render_template('dashboard.html')
 
 @app.route('/gestion-usuarios')
@@ -145,6 +145,8 @@ def upload_image():
 @app.route('/resize_image', methods=['POST'])
 def resizeImage():
     try:
+        width = int(request.form.get('width'))
+        height = int(request.form.get('height'))
 
         # Verificar si el archivo está en la solicitud
         if 'image' not in request.files:
@@ -160,14 +162,14 @@ def resizeImage():
 
         # Obtener dimensiones de la imagen antes de redimensionar
         with Image.open(filepath) as img:
-            original_width, original_height = img.size  # Obtiene ancho y alto
+            #original_width, original_height = img.size  # Obtiene ancho y alto
             original_format = img.format
 
-            if original_width > original_height:
+            if width > height:
                 with Image.open(filepath) as img:
-                    resized_img = img.resize((350, 233))
-                    resized_img_w = 350
-                    resized_img_h = 233
+                    resized_img = img.resize((width, height))
+                    resized_img_w = width
+                    resized_img_h = height
                     resized_image_name = 'resized_' + image.filename
                     output_path_file = os.path.join(UPLOAD_FOLDER, resized_image_name)
 
@@ -182,9 +184,9 @@ def resizeImage():
             else:
                 #Si la Imagen es vertical
                 with Image.open(filepath) as img:
-                    resized_img = img.resize((300, 445))
-                    resized_img_w = 300
-                    resized_img_h = 445
+                    resized_img = img.resize((width, height))
+                    resized_img_w = width
+                    resized_img_h = height
                     resized_image_name = 'resized_' + image.filename
                     output_path_file = os.path.join(UPLOAD_FOLDER, resized_image_name)
 
@@ -368,9 +370,9 @@ def validate_login():
             result = cursor.fetchone()
 
             if result and result[3] == passw and result[5] == '1':
-                # Usuario autenticaded
                 token = jwt.encode({
-                    "user_id": result[0]
+                    "user_id": result[0],
+                    "exp":datetime.utcnow() + timedelta(hours=8)
                 }, get_key(), algorithm="HS256")
 
                 update_session_login(result)
@@ -520,17 +522,22 @@ def delete_user():
             cursor = conn.cursor()
             query = delete_user_query()
             params = (user_to_delete,)
-            cursor.execute(query, params)
+            result = cursor.execute(query, params)
             conn.commit()
-
             return jsonify({
                 'result':True,
                 'message':'Usuario Eliminado'
             }), 200
-        
+
+    except psycopg2.errors.ForeignKeyViolation:
+        return jsonify({
+            'result': False,
+            'message': 'No se puede eliminar el usuario porque tiene rutas activas.'
+        }), 400
+
     except pyodbc.Error as e:
         conn.rollback()
-        return jsonify({'result': False, 'message': 'Error interno del servidor'}), 500
+        return jsonify({'result': False, 'message': e}), 500
 
 
 @app.route('/edit_user', methods=['POST'])
@@ -783,6 +790,8 @@ def upload_image_from_video():
             return jsonify({'message': 'No se envió ninguna imagen.'}), 400
 
         image_file = request.files['image']
+        width = int(request.form.get('width'))
+        height = int(request.form.get('height'))
         filename = image_file.filename
 
         if filename == '':
@@ -796,13 +805,13 @@ def upload_image_from_video():
                 original_width, original_height = image.size
 
                 if original_width > original_height:
-                    resized_img = image.resize((350, 233))
-                    final_width = 350
-                    final_height = 233
+                    resized_img = image.resize((width, height))
+                    final_width = width
+                    final_height = height
                 else:
-                    resized_img = image.resize((300, 445))
-                    final_width = 300
-                    final_height = 445
+                    resized_img = image.resize((width, height))
+                    final_width = width
+                    final_height = height
 
 
                 #resized_img = image.resize((300, 445))
@@ -977,6 +986,7 @@ def get_frames():
 
 
 @app.route('/getTutorialState',methods=['POST'])
+@token_required
 def get_tutorial_state():
     id_user = int(request.form.get('id'))
 
