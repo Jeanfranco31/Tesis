@@ -8,7 +8,11 @@ const inputCreateFolder = document.getElementById('inputFolderName');
 const deleteButtons = document.getElementById('deletePath');
 const modalOptions = document.getElementById('modal_delete_path');
 const deleteButtonOption = document.getElementById('btnDeleteOption');
+
 const iconSaveNewFrame = document.getElementById('iconSaveNewFrame');
+const iconEditFrame = document.getElementById('icon_edit_button');
+const iconCancelFrame = document.getElementById('icon_cancel_option');
+
 const txtNumberFPS = document.getElementById('txtNumberFPS');
 
 
@@ -16,11 +20,17 @@ var main_path = '';
 let opcionActual = '';
 
 document.addEventListener("DOMContentLoaded", async function () {
+    const token = localStorage.getItem('token');
+    setTimeout(() => {
+        if (!token) {
+            window.location.href = '/login';
+            return;
+        }
+    }, 100);
     await HasPath();
     await cargarRutas();
     let frame = localStorage.getItem('frames');
     txtNumberFPS.disabled = true;
-
     txtNumberFPS.placeholder = localStorage.getItem('frames');
 
 });
@@ -35,7 +45,6 @@ async function HasPath(){
             body: form
         });
         const data = await response.json()
-        console.log('HasPath:',data)
 
         if(data.ruta){
 
@@ -68,8 +77,6 @@ async function saveMainPath(){
         if(response.created){
             location.reload();
         }
-        //HasPath();
-        //cargarRutas();
 
     }catch(error){
         console.log(error)
@@ -86,7 +93,6 @@ async function cargarRutas() {
             body: data
         });
         const datos = await response.json();
-        console.log('all_paths',datos)
 
         const tablaCuerpo = document.getElementById('tabla-cuerpo');
         tablaCuerpo.style.position = 'relative';
@@ -107,13 +113,11 @@ async function cargarRutas() {
                 tablaCuerpo.appendChild(filaTabla);
             });
         }else{
-            console.log('ARRAY VACIO')
             const filaTabla = document.createElement('tr');
             filaTabla.innerHTML = `<td style="text-align:center; position:absolute; width:100%;">Actualmente no tienes rutas registradas</td>`
             tablaCuerpo.appendChild(filaTabla);
         }
         // Muestra la tabla y oculta el mensaje de carga
-        //document.getElementById('tabla-datos').style.display = 'block';
     } catch (error) {
         console.error('Error al cargar los datos:', error);
     }
@@ -131,7 +135,6 @@ async function saveNewFolder(){
     //OBTENER ID DE RUTA PRINCIPAL
     let response = await request.json()
 
-    console.log('response:',response)
 
     const savefolder = new FormData();
     savefolder.append('nameFolder',this.main_path+'\\'+inputCreateFolder.value);
@@ -144,7 +147,6 @@ async function saveNewFolder(){
     let response_folder = await request_folder.json();
     let message = response_folder.message;
 
-    console.log('response_folder:',response_folder)
 
     if(response_folder.created){
         generateMessageSuccesfull(message);
@@ -242,6 +244,7 @@ async function openModalOptions(rowData){
         var data = await response.json();
         generateMessageSuccesfull(data.message);
         closeModalOptions();
+        window.location.href = window.location.href;
     });
 
 }
@@ -249,6 +252,15 @@ async function openModalOptions(rowData){
     function enabledSelectFrame(){
         txtNumberFPS.disabled = false;
         iconSaveNewFrame.style.display = 'block';
+        iconEditFrame.style.display = 'none';
+        iconCancelFrame.style.display = 'block';
+    }
+
+    function cancelSelectFrame(){
+        txtNumberFPS.disabled = true;
+        iconSaveNewFrame.style.display = 'none';
+        iconEditFrame.style.display = 'block';
+        iconCancelFrame.style.display = 'none';
     }
 
 
@@ -288,8 +300,10 @@ async function openModalOptions(rowData){
             const data = await response.json();
             localStorage.setItem('frames', txtNumberFPS.value);
             generateMessageSuccesfull(data.message);
-            iconSaveNewFrame.style.display = 'none';
             txtNumberFPS.disabled = true;
+            iconSaveNewFrame.style.display = 'none';
+            iconEditFrame.style.display = 'block';
+            iconCancelFrame.style.display = 'none';
 
          } catch (error) {
             console.error('Error saving frame:', error);

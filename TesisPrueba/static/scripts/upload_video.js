@@ -10,15 +10,20 @@ const close_icon = document.getElementById('closeIcon');
 const selectFrames = document.getElementById('frames');
 const modalImage = document.getElementById('modal-img');
 const txtNumberFPS = document.getElementById('txtNumberFPS');
+const omitirImagen = document.getElementById('btn_omitir_imagen');
+const contentOptions = document.getElementById('content-options-elements');
+
+const val_width = document.getElementById('val_width');
+const val_height = document.getElementById('val_height');
 
 
 let points = [];
 let fileName = "";
-let width_resize = 0;
-let height_resize = 0;
 let currentIndex = 0;
 let imagesArray = [];
 let opcionActual = '';
+var width_resize;
+var height_resize;
 
 var divToPoints = [
                         {'id':'0', 'name':'Nariz', 'divName': document.getElementById('1')},
@@ -42,30 +47,19 @@ var divToPoints = [
         let width, height;
         let frame = localStorage.getItem('frames');
 
+        const token = localStorage.getItem('token');
+        setTimeout(() => {
+            if (!token) {
+                window.location.href = '/login';
+                return;
+            }
+        }, 100);
+
         if(nameCache){
             name.textContent = nameCache;
         }
         await cargarRutas();
-        /*option.addEventListener('change', (event) => {
-            selectedOption = event.target.value;
 
-            if (selectedOption === 'option1') {
-                width = 175;
-                height = 260;
-            } else if (selectedOption === 'option2') {
-                width = 225;
-                height = 334;
-            } else if (selectedOption === 'option3') {
-                width = 300;
-                height = 445;
-            } else {
-                console.error('Opción no válida');
-                return;
-            }
-            this.width_resize = width;
-            this.height_resize = height;
-        });
-        */
         if (selectOptions.options.length > 0) {
             selectOptions.selectedIndex = 0;
             selectedOption = selectOptions.options[0].textContent;
@@ -80,6 +74,56 @@ var divToPoints = [
         txtNumberFPS.placeholder = localStorage.getItem('frames');
 
         const modalImage = document.getElementById('modal-img');
+
+    });
+
+    option.addEventListener('change', (event) => {
+        selectedOption = event.target.value;
+
+        if (selectedOption === 'option1') {
+            width_resize = 175;
+            height_resize = 260;
+            val_width.textContent = '175'
+            val_height.textContent = '260'
+
+        } else if (selectedOption === 'option2') {
+            width_resize = 225;
+            height_resize = 334;
+            val_width.textContent = '225'
+            val_height.textContent = '334'
+
+        } else if (selectedOption === 'option3') {
+            width_resize = 300;
+            height_resize = 445;
+            val_width.textContent = '300'
+            val_height.textContent = '445'
+
+        }
+
+    });
+
+    optionHorizontalImage.addEventListener('change', (event) => {
+        selectedOption = event.target.value;
+
+        if (selectedOption === 'option1') {
+            width_resize = 250;
+            height_resize = 167;
+            val_width.textContent = '250'
+            val_height.textContent = '167'
+
+        } else if (selectedOption === 'option2') {
+            width_resize = 300;
+            height_resize = 200;
+            val_width.textContent = '300'
+            val_height.textContent = '200'
+
+        } else if (selectedOption === 'option3') {
+            width_resize = 350;
+            height_resize = 233;
+            val_width.textContent = '350'
+            val_height.textContent = '233'
+
+        }
 
     });
 
@@ -136,6 +180,31 @@ var divToPoints = [
         videoPreview.appendChild(videoElement);
         button.style.display = 'block';
 
+        videoElement.addEventListener('loadedmetadata', function () {
+            const videoWidth = videoElement.videoWidth;
+            const videoHeight = videoElement.videoHeight;
+
+            console.log('Ancho del video:', videoWidth);
+            console.log('Alto del video:', videoHeight);
+
+            if (videoWidth > videoHeight) {
+                contentOptions.style.display = 'block';
+                option.style.display = 'none';
+                optionHorizontalImage.style.display = 'block';
+                width_resize = 350;
+                height_resize = 233;
+                val_width.textContent = '350';
+                val_height.textContent = '233';
+            } else if (videoWidth < videoHeight) {
+                contentOptions.style.display = 'block';
+                optionHorizontalImage.style.display = 'none';
+                option.style.display = 'block';
+                width_resize = 300;
+                height_resize = 445;
+                val_width.textContent = '300';
+                val_height.textContent = '445';
+            }
+        });
     }
 
     async function GenerateImagesFromVideo() {
@@ -143,6 +212,7 @@ var divToPoints = [
         const formData = new FormData();
         formData.append('video', file);
         formData.append('fps_value',localStorage.getItem('frames'))
+
 
         loader.style.display = 'block';
 
@@ -194,6 +264,22 @@ var divToPoints = [
                 // Aquí procesas la imagen actual, por ejemplo:
                 generatePoseFromBlob(currentImageData);
 
+                omitirImagen.addEventListener('click', ()=>{
+                    imagesArray.shift();
+                    updatePreviewContainer();
+                    if (imagesArray.length > 0) {
+                        generatePoseFromBlob(imagesArray[0]);
+                    } else {
+                        alert("Todas las imágenes han sido procesadas y guardadas.");
+                        modelImages.style.display = 'none';
+                        modelImages.style.backgroundColor = 'transparent';
+                        const backdrop = document.querySelector('.modal-backdrop');
+                        if (backdrop) {
+                          backdrop.remove();
+                        }
+                    }
+                });
+
                 saveButton.addEventListener('click', async () => {
                     const data = {
                         'points_position': points,
@@ -202,7 +288,6 @@ var divToPoints = [
                         'height': height_resize,
                         'pathToSave': selectedOption
                     };
-                    console.log(data);
 
                     modal.hide();
                     try {
@@ -214,7 +299,6 @@ var divToPoints = [
                             body: JSON.stringify({ data })
                         });
 
-                        // Eliminar la imagen guardada del array y actualizar el contenedor de vista previa
                         imagesArray.shift();
                         updatePreviewContainer();
 
@@ -243,6 +327,8 @@ var divToPoints = [
 
             const formData = new FormData();
             formData.append('image', blob, 'image.jpg');
+            formData.append('width',width_resize);
+            formData.append('height',height_resize);
 
             const response = await fetch('/upload_image_video', {
                 method: 'POST',
@@ -264,8 +350,6 @@ var divToPoints = [
                 modalImage.src = '';
                 modalImage.style.width = `${result.width}`;
                 modalImage.style.height = `${result.height}`;
-
-                console.log('RESULT PATH:',result.path)
 
                 modalImage.src = `${result.path}?${Math.random()}`;
             }
@@ -307,7 +391,6 @@ var divToPoints = [
             pointDiv.style.left = `${normalizedX}px`;
             pointDiv.style.top = `${normalizedY}px`;
 
-            console.log(`Punto ${index}: left=${normalizedX}px, top=${normalizedY}px`);
 
             // Estilo del punto
             pointDiv.style.backgroundColor = '#f03030';
@@ -323,7 +406,6 @@ var divToPoints = [
             pointContainer.appendChild(pointDiv);
         });
     }
-
 
     function drawMiniCards(points) {
 
@@ -397,15 +479,12 @@ var divToPoints = [
                 pointDiv.style.left = `${x}px`;
                 pointDiv.style.top = `${y}px`;
 
-                //console.log(`Nueva posición de punto ${index}: x = ${Math.trunc(x)}, y = ${Math.trunc(y)}`);
-
                 const pointIndex = points.findIndex(p => p[0] === index);
 
                 if (pointIndex !== -1) {
                     points[pointIndex][1] = Math.trunc(x);
                     points[pointIndex][2] = Math.trunc(y);
 
-                    console.log(`Array actualizado:`, points);
                 } else {
                     console.error(`No se encontró el índice para index: ${index}`);
                 }
@@ -430,8 +509,6 @@ var divToPoints = [
         });
         buttonGenerateImagesFromVideo.style.opacity = '0' ;
     }
-
-
 
     async function cargarRutas() {
         try {

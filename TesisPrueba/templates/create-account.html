@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>BoiPose | Crear Cuenta</title>
-    <link rel="icon" href="../static/assets/logotipo.png">
+    <link rel="icon" href="../static/assets/logo.png">
     <link href="../static/styles/create-account.css" rel="stylesheet" type="text/css">
 </head>
 <body>
@@ -22,17 +22,28 @@
                 <form class="form">
                     <div class="form-container">
                         <div class="input-group">
+                            <input type="text" id="inputIdentification" class="input" placeholder="Número de Identificación" required>
+                            <div class="content-message-error">
+                                <p id="cedulaMessage" class="error-message"></p>
+                            </div>
+                            <div class="content_type_identification">
+                                <div class="rb_content_identification">
+                                    <input type="radio" id="rb_identification" name="fav_language" value="identification" checked>
+                                    <label>Identificación</label>
+                                </div>
+                                <div class="rb_content_passport">
+                                    <input type="radio" id="rb_passport" name="fav_language" value="passport">
+                                    <label>Pasaporte</label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="input-group">
                             <input type="text" id="inputName" class="input" placeholder="Nombres" required>
                         </div>
                         <div class="input-group">
                             <input type="text" id="inputApellido" class="input" placeholder="Apellidos" required>
                         </div>
-                        <div class="input-group">
-                            <input type="text" id="inputIdentification" class="input" placeholder="Número de Cédula" maxlength="10" required>
-                            <div class="content-message-error">
-                                <p id="cedulaMessage" class="error-message"></p>
-                            </div>
-                        </div>
+
                         <div class="input-group">
                             <input type="email" id="inputMail" class="input" placeholder="Correo Electrónico" required>
                             <div class="content-message-error">

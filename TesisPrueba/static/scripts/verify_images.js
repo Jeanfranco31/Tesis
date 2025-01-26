@@ -8,6 +8,14 @@ var ArrayJsonData = [];
 
 
 document.addEventListener("DOMContentLoaded", async function () {
+    const token = localStorage.getItem('token');
+
+    setTimeout(() => {
+        if (!token) {
+            window.location.href = '/login';
+            return;
+        }
+    }, 100);
    await loadPaths();
    await loadUserName();
 });
@@ -64,9 +72,10 @@ async function getFilesByPathName(selectedValue){
 
     let response = await request.json();
     let files = response.files;
-        console.log(response)
+
+    console.log(files)
+
     ArrayJsonData = response.data;
-    console.log(ArrayJsonData);
 
     files.forEach((option) => {
         let opt = document.createElement("option");

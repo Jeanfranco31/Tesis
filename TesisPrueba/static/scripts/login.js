@@ -2,11 +2,14 @@ const inputMail = document.getElementById('mail');
 const inputPassword = document.getElementById('password');
 const emailMessageError = document.getElementById('emailMessage');
 const passMessageError = document.getElementById('passMessage');
+const loader = document.getElementById('loader_container');
 
     async function getLogin() {
         const form = new FormData();
         let ruta;
         let valid = true;
+        loader.style.display = 'block';
+
 
         const email = inputMail.value;
         const response = await fetch('/check_email', {
@@ -20,26 +23,32 @@ const passMessageError = document.getElementById('passMessage');
         const data = await response.json();
         // Validar correo
         if (email === '') {
+            loader.style.display = 'none';
             emailMessageError.textContent = 'Debe ingresar su correo';
             valid = false;
         } else if (!data.exists) {
+            loader.style.display = 'none';
             valid = false;
             emailMessageError.textContent = 'El correo que ingreso no existe';
         } else {
+            loader.style.display = 'none';
             form.append('mail', email);
             emailMessageError.textContent = ''; // Limpiar mensaje de error
         }
 
         const pass = inputPassword.value;
         if (pass === '') {
+            loader.style.display = 'none';
             valid = false;
             passMessageError.textContent = 'Debe ingresar su contraseña';
         } else {
+            loader.style.display = 'none';
             form.append('pass', pass);
             passMessageError.textContent = '';
         }
 
         if (!valid) {
+            loader.style.display = 'none';
             console.error('El formulario contiene errores y no se enviará.');
             return;
         }
@@ -52,7 +61,7 @@ const passMessageError = document.getElementById('passMessage');
             const data = await response.json();
             console.log(data)
             if (data.authenticated) {
-            this.ruta = data.redirect_url;
+                this.ruta = data.redirect_url;
                 localStorage.setItem('token',data.token)
                 localStorage.setItem('user', data.user)
                 localStorage.setItem('id', data.id);
@@ -60,11 +69,14 @@ const passMessageError = document.getElementById('passMessage');
                 let idUser = data.id;
                 await getPaths(idUser);
                 await getFrames(data.id);
+                loader.style.display = 'none';
 
                 window.location.href = this.ruta;
 
             } else {
                 if(data.stateuser === '1'){
+                    loader.style.display = 'none';
+
                     document.getElementById('message_content').innerHTML =
                     `
                         <div style="position:absolute; padding:10px 30px; top:5%; left:50%; transform: translateX(-50%); background-color:rgb(214, 5, 5 );">
@@ -75,6 +87,8 @@ const passMessageError = document.getElementById('passMessage');
                         document.getElementById('message_content').innerHTML = '';
                     }, 4000);
                 } else if (data.stateuser === '0'){
+                    loader.style.display = 'none';
+
                     document.getElementById('message_content').innerHTML =
                     `
                         <div style="position:absolute; padding:10px 30px; top:5%; left:50%; transform: translateX(-50%); background-color:rgb(214, 5, 5 );">
@@ -88,6 +102,7 @@ const passMessageError = document.getElementById('passMessage');
             }
         } catch (error) {
         console.error('Error:', error);
+        loader.style.display = 'none';
         document.getElementById('message_content').innerHTML = `
             <div style="position:absolute; padding:10px 30px; top:5%; left:50%; transform: translateX(-50%); background-color:rgb(214, 5, 5 );">
                 <p style="text-align:center; color:#ffffff;">Ocurrió un error al iniciar sesión. Inténtalo de nuevo.</p>
@@ -102,7 +117,6 @@ const passMessageError = document.getElementById('passMessage');
     async function getPaths(idUser){
         try{
             let form = new FormData();
-            console.log(idUser)
             form.append('id',idUser);
 
             let request = await fetch('/all_paths',{
@@ -120,7 +134,6 @@ const passMessageError = document.getElementById('passMessage');
     async function getFrames(idUser){
         try{
             let form = new FormData();
-            console.log(idUser)
             form.append('id',idUser);
 
             let request = await fetch('/get_frames',{
@@ -129,7 +142,6 @@ const passMessageError = document.getElementById('passMessage');
             });
 
             let response = await request.json();
-            console.log(response)
             localStorage.setItem('frames', JSON.stringify(response.response));
         }catch(error){
             console.log(error);

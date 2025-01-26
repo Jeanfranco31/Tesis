@@ -9,10 +9,9 @@ import cv2 as cv
 import glob
 import jwt
 import base64
-from datetime import datetime
+from datetime import datetime, timedelta
 from shutil import copyfile
-from PIL import Image,UnidentifiedImageError
-from jax.experimental.sparse.transform import method
+from PIL import Image
 from moviepy.video.io.VideoFileClip import VideoFileClip
 import psycopg2
 from Resources.QueriesProcedures import (validate_login_query,
@@ -28,10 +27,19 @@ from Resources.QueriesProcedures import (validate_login_query,
                                          get_all_paths_query,
                                          get_tutorial_state_query,
                                          update_tutorial_state_query,
-                                         insert_tutorial_path_query
+                                         insert_tutorial_path_query,
+                                         validate_has_path_query,
+                                         user_one_query,
+                                         check_cedula_query,
+                                         delete_user_query,
+                                         edit_user_query,
+                                         save_main_route_query,
+                                         get_id_main_path_query,
+                                         get_id_main_path_query_query,
+                                         delete_folder_query
                                          )
 from Resources.Middleware import token_required
-from Resources.Middleware import get_key, deserialize_token
+from Resources.Middleware import get_key #, deserialize_token
 from model.PoseModule import poseDetector
 from Resources.Conexion import get_connection
 from Resources.Encrypt import  encrypt_password
@@ -74,8 +82,8 @@ def verify_images():
     return render_template('verify-images.html')
 
 @app.route('/dashboard')
-#@token_required
 def view_dashboard():
+    print('view_dashboard')
     return render_template('dashboard.html')
 
 @app.route('/gestion-usuarios')
@@ -137,6 +145,8 @@ def upload_image():
 @app.route('/resize_image', methods=['POST'])
 def resizeImage():
     try:
+        width = int(request.form.get('width'))
+        height = int(request.form.get('height'))
 
         # Verificar si el archivo está en la solicitud
         if 'image' not in request.files:
@@ -152,16 +162,14 @@ def resizeImage():
 
         # Obtener dimensiones de la imagen antes de redimensionar
         with Image.open(filepath) as img:
-            original_width, original_height = img.size  # Obtiene ancho y alto
+            #original_width, original_height = img.size  # Obtiene ancho y alto
             original_format = img.format
 
-            if original_width > original_height:
-                #Si la Imagen es horizontal
+            if width > height:
                 with Image.open(filepath) as img:
-                    print("El ancho es mayor")
-                    resized_img = img.resize((350, 233))
-                    resized_img_w = 350
-                    resized_img_h = 233
+                    resized_img = img.resize((width, height))
+                    resized_img_w = width
+                    resized_img_h = height
                     resized_image_name = 'resized_' + image.filename
                     output_path_file = os.path.join(UPLOAD_FOLDER, resized_image_name)
 
@@ -176,9 +184,9 @@ def resizeImage():
             else:
                 #Si la Imagen es vertical
                 with Image.open(filepath) as img:
-                    resized_img = img.resize((300, 445))
-                    resized_img_w = 300
-                    resized_img_h = 445
+                    resized_img = img.resize((width, height))
+                    resized_img_w = width
+                    resized_img_h = height
                     resized_image_name = 'resized_' + image.filename
                     output_path_file = os.path.join(UPLOAD_FOLDER, resized_image_name)
 
@@ -206,7 +214,6 @@ def resize_image_params():
         with Image.open(filepath) as img:
             original_width, original_height = img.size  # Obtiene ancho y alto
             if original_width > original_height:
-                # Si la Imagen es horizontal
                 with Image.open(filepath) as img:
                     resized_img = img.resize((int(width), int(height)))
                     resized_img_w = width
@@ -313,8 +320,6 @@ def saveImageData():
         image_file_path = os.path.join(final_path,name_to_save)
         path_base_image = os.path.join(UPLOAD_FOLDER,f"points_{file_name}")
 
-        print(image_file_path)
-
         # Crear o copiar la imagen con el nombre indicado
         copyfile(path_base_image, image_file_path)  # Copia una imagen base con el nuevo nombre
 
@@ -365,15 +370,15 @@ def validate_login():
             result = cursor.fetchone()
 
             if result and result[3] == passw and result[5] == '1':
-                # Usuario autenticaded
                 token = jwt.encode({
-                    "user_id": result[0]
+                    "user_id": result[0],
+                    "exp":datetime.utcnow() + timedelta(hours=8)
                 }, get_key(), algorithm="HS256")
-                # update_session_login(result)
+
+                update_session_login(result)
 
                 return jsonify({'authenticated': True, 'redirect_url': url_for('view_dashboard'), 'user':result[1], 'id':result[0], 'idRol':result[6], 'stateuser':result[5], 'token': token}), 200
             else:
-                # Usuario no autenticado
                 return jsonify({'authenticated': False, 'message': 'Correo o contraseña incorrecta', 'stateuser':result[5]}), 401
 
     except psycopg2.Error as e:
@@ -409,7 +414,6 @@ def createAccount():
 
 
     except psycopg2.Error as e:
-        print("Error al ejecutar la consulta:", e)
         return jsonify({'authenticated': False, 'message': 'Error interno del servidor'}), 500
 
 @app.route('/get_menu_options', methods=['GET'])
@@ -423,7 +427,6 @@ def get_menu_option():
         return jsonify({'options': result[0]}), 200
 
     except psycopg2.Error as e:
-        print("Error al ejecutar la consulta:", e)
         return jsonify({'authenticated': False, 'message': 'Error interno del servidor'}), 500
 
 
@@ -451,7 +454,6 @@ def getUsers():
             return jsonify(usuarios), 200
 
     except pyodbc.Error as e:
-        print("Error al ejecutar la consulta:", e)
         return jsonify({'authenticated': False, 'message': 'Error interno del servidor'}), 500
     
 @app.route('/user-one', methods = ['POST'])
@@ -465,7 +467,7 @@ def user_one():
 
         with get_connection() as conn:
             cursor = conn.cursor()
-            query = "SELECT NOMBRE, APELLIDO, CEDULA FROM USERS WHERE ID = %s"
+            query = user_one_query()
             cursor.execute(query, (id,))
             result = cursor.fetchone()
 
@@ -475,7 +477,6 @@ def user_one():
                 return jsonify({'result': None, 'message': 'Usuario no encontrado'}), 404
     
     except Exception as e:
-        print(f"Error en /user-one: {e}")
         return jsonify({'error': 'Error interno del servidor', 'details': str(e)}), 500
 
 
@@ -487,7 +488,7 @@ def check_cedula():
 
         with get_connection() as conn:
             cursor = conn.cursor()
-            query = "SELECT COUNT(*) FROM USERS WHERE CEDULA = %s"
+            query = check_cedula_query()
             cursor.execute(query, (cedula,))
             exits = cursor.fetchone()[0] > 0
 
@@ -516,23 +517,27 @@ def check_email():
 @app.route('/delete_user', methods=['POST'])
 def delete_user():
     user_to_delete = request.form.get('user')
-    print(f"ID recibido para eliminar: {user_to_delete}")
     try:
         with get_connection() as conn:
             cursor = conn.cursor()
-            query = "DELETE FROM USERS WHERE id = %s"
+            query = delete_user_query()
             params = (user_to_delete,)
-            cursor.execute(query, params)
+            result = cursor.execute(query, params)
             conn.commit()
-
             return jsonify({
                 'result':True,
                 'message':'Usuario Eliminado'
             }), 200
-        
+
+    except psycopg2.errors.ForeignKeyViolation:
+        return jsonify({
+            'result': False,
+            'message': 'No se puede eliminar el usuario porque tiene rutas activas.'
+        }), 400
+
     except pyodbc.Error as e:
         conn.rollback()
-        return jsonify({'result': False, 'message': 'Error interno del servidor'}), 500
+        return jsonify({'result': False, 'message': e}), 500
 
 
 @app.route('/edit_user', methods=['POST'])
@@ -550,7 +555,7 @@ def edit_user():
     try:
         with get_connection() as conn:
             cursor = conn.cursor()
-            query = "UPDATE USERS SET NOMBRE = %s, APELLIDO = %s, CEDULA = %s, IDROL = %s, STATEUSER = %s WHERE ID = %s"
+            query = edit_user_query()
             params = (name, lastName, identification, user_rol, user_state, user_id)
             cursor.execute(query, params)
             conn.commit()
@@ -561,7 +566,6 @@ def edit_user():
                 return jsonify({'result': False, 'message': 'Usuario no encontrado'}), 404
     except Exception as e:
         conn.rollback()
-        print(f"Error al actualizar el usuario: {e}")
         return jsonify({'result': False, 'message': 'Error interno del servidor', 'error': str(e)}), 500
     
 
@@ -572,7 +576,7 @@ def save_main_route():
 
     with get_connection() as conn:
         cursor = conn.cursor()
-        query = "INSERT INTO parametrizador_rutas(ruta, user_id) VALUES(%s,%s)"
+        query = save_main_route_query()
         params = (main_path, user_id)
         cursor.execute(query, params)
         conn.commit()
@@ -582,12 +586,10 @@ def save_main_route():
 
 @app.route('/validate_has_path', methods=['POST'])
 def HasPath():
-    user_id = request.form.get('id')
-    user_id = int(user_id)
+    user_id = int(request.form.get('id'))
     with (get_connection() as conn):
         cursor = conn.cursor()
-        query = "SELECT ruta, count(*) as total FROM parametrizador_rutas WHERE user_id = %s group by ruta"
-        #"SELECT ruta FROM parametrizador_rutas WHERE user_id = %s"
+        query = validate_has_path_query()
         params = (user_id,)
         cursor.execute(query, params)
         row = cursor.fetchone()
@@ -602,13 +604,12 @@ def get_id_main_path():
     path = request.form.get('main_path')
     with get_connection() as conn:
         cursor = conn.cursor()
-        query = "SELECT id FROM parametrizador_rutas WHERE ruta = %s"
+        query = get_id_main_path_query()
         params = (path,)
         cursor.execute(query, params)
         row = cursor.fetchone()
 
         if row:
-            print("DATA",row[0])
             return jsonify({'id_path': row[0]}), 200
     return jsonify({'Ocurrio un error al obtener el id de la ruta'}), 400
 
@@ -625,7 +626,7 @@ def save_new_folder():
 
         with get_connection() as conn:
             cursor = conn.cursor()
-            query = "INSERT INTO parametrizador_ruta_imagen(ruta_imagen, date_created, id_ruta_principal) VALUES(%s,%s,%s)"
+            query = get_id_main_path_query_query()
             params = (main_path,date,id_main_path)
             cursor.execute(query, params)
             conn.commit()
@@ -637,7 +638,6 @@ def save_new_folder():
 @app.route('/all_paths', methods=['POST'])
 def getPaths():
     id = int(request.form.get('id'))
-    print("ID:",id)
     try:
         with get_connection() as conn:
             cursor = conn.cursor()
@@ -656,7 +656,6 @@ def getPaths():
             return jsonify(rutas), 200
 
     except pyodbc.Error as e:
-        print("Error al ejecutar la consulta:", e)
         return jsonify({'authenticated': False, 'message': 'Error interno del servidor'}), 500
 
 @app.route('/delete_folder', methods=['POST'])
@@ -665,7 +664,7 @@ def delete_folder():
     try:
         with get_connection() as conn:
             cursor = conn.cursor()
-            query = "DELETE FROM parametrizador_ruta_imagen WHERE ruta_imagen = %s"
+            query = delete_folder_query()
             params = (path_to_delete,)
             cursor.execute(query, params)
             conn.commit()
@@ -684,7 +683,6 @@ def delete_folder():
 @app.route('/getFilesByPathname', methods=['POST'])
 def get_files_by_pathname():
     pathName = request.form.get('pathName')
-
     files_path = os.path.join(pathName, "Imagen")
 
     try:
@@ -733,7 +731,6 @@ def get_image():
     file = request.form.get('file')
     pathImage = os.path.join(pathName, 'Imagen')
     all_path = os.path.join(pathImage, file)
-    print(all_path)
     extension = os.path.splitext(file)[-1].lower()
     mime_types = {
         '.jpg': 'image/jpeg',
@@ -793,6 +790,8 @@ def upload_image_from_video():
             return jsonify({'message': 'No se envió ninguna imagen.'}), 400
 
         image_file = request.files['image']
+        width = int(request.form.get('width'))
+        height = int(request.form.get('height'))
         filename = image_file.filename
 
         if filename == '':
@@ -806,13 +805,13 @@ def upload_image_from_video():
                 original_width, original_height = image.size
 
                 if original_width > original_height:
-                    resized_img = image.resize((350, 233))
-                    final_width = 350
-                    final_height = 233
+                    resized_img = image.resize((width, height))
+                    final_width = width
+                    final_height = height
                 else:
-                    resized_img = image.resize((300, 445))
-                    final_width = 300
-                    final_height = 445
+                    resized_img = image.resize((width, height))
+                    final_width = width
+                    final_height = height
 
 
                 #resized_img = image.resize((300, 445))
@@ -918,8 +917,7 @@ def save_image_from_video():
         return jsonify({'success': True, 'message': 'Imagen y datos guardados exitosamente!'}), 200
 
     except Exception as e:
-        print(f"Error en la línea {e.__traceback__.tb_lineno}: {str(e)}")
-    return jsonify({'success': False, 'message': 'Ocurrió un error al guardar la imagen o los datos.'}), 500
+        return jsonify({'success': False, 'message': 'Ocurrió un error al guardar la imagen o los datos.'}), 500
 
 
 def validate_frame_exists(id_user):
@@ -988,6 +986,7 @@ def get_frames():
 
 
 @app.route('/getTutorialState',methods=['POST'])
+@token_required
 def get_tutorial_state():
     id_user = int(request.form.get('id'))
 
@@ -1015,25 +1014,19 @@ def save_first_tutorial_info():
 
     try:
         with get_connection() as conn:
-            print("Conexión establecida.")
             with conn.cursor() as cursor:
-                print("Cursor creado.")
                 query = insert_new_frame()
                 params = (fps_value, id_user)
-                print(f"Ejecutando consulta: {query} con parámetros {params}")
                 cursor.execute(query, params)
 
                 query = insert_tutorial_path_query()
                 params = (path, id_user)
-                print(f"Ejecutando consulta: {query} con parámetros {params}")
                 cursor.execute(query, params)
 
                 query = update_tutorial_state_query()
                 params = (id_user,)
-                print(f"Ejecutando consulta: {query} con parámetros {params}")
                 cursor.execute(query, params)
 
-            print("Consultas ejecutadas exitosamente.")
             return jsonify({'result': True, 'message': 'Datos registrados correctamente'}), 200
 
     except Exception as e:

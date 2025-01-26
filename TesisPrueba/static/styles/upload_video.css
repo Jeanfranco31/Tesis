@@ -268,17 +268,16 @@
         flex-direction:row;
         background-color:#f7f7f7;
         height:80vh;
+        position:relative;
     }
 
     .resize_content{
         width:90%;
-        height:20vh;
-        padding-top:30px;
+        height:80vh;
         display:flex;
         flex-direction:row;
         justify-content:center;
-        align-items:center;
-        flex-wrap:wrap;
+        position:relative;
     }
     .resize_content .content_info_resize{
         width:40%;
@@ -332,13 +331,14 @@
         width:175px;
         border:none;
     }
+    /*
     .resize_content .select-option{
         height:40px;
         width:200px;
         border:1px solid rgb(225, 225, 225);
         color:rgba(0,0,0,0.6);
         margin-left:20px;
-    }
+    }*/
 
     .content_mini_cards{
         height:30vh;
@@ -391,10 +391,11 @@
         display:none;
     }
 
+    /*
     #select-option-horizontal, #select-option{
         display:block;
     }
-
+    */
     .message_informative{
         position:absolute;
         font-size:0.7rem;
@@ -402,6 +403,64 @@
         text-align:center;
     }
 
+    .btn-omitir{
+        width:200px;
+        height:30px;
+        background-color:rgb(250, 87, 87);
+        border:none;
+        border-radius:5px;
+        position:absolute;
+        bottom:0;
+        left:5%;
+        font-size:0.8rem;
+        color:#ffffff;
+    }
+    .btn-omitir:hover{
+         background-color:rgb(225, 64, 64);
+         font-weight:500;
+    }
+
+    .content-options-elements{
+        position:relative;
+        margin: 20px auto 0 20px;
+        width:80%;
+        height: 100px;
+        box-shadow:20px 0px 50px rgba(15, 15, 15, 0.3);
+        border-radius: 10px;
+        background-color:rgba(255,255,255,0.8);
+        display:none;
+    }
+    .content-options-elements p{
+        text-align:center;
+        height:30px;
+        line-height:30px;
+    }
+
+    #val_width_modal,
+    #val_height_modal{
+        color:rgba(0,0,0,0.6);
+        margin:0 7px;
+    }
+
+    .selected-options{
+        height:40px;
+        width:200px;
+        border:1px solid rgb(225, 225, 225);
+        color:rgba(0,0,0,0.6);
+        display:block;
+        margin:0 auto;
+        border-radius:6px;
+    }
+
+    .content_secondary_options{
+        display:flex;
+        flex-direction:row;
+        width:100%;
+    }
+
+    .form-select{
+        margin-bottom:10px;
+    }
 
 
     @media screen and (max-width: 650px) {

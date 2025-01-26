@@ -7,7 +7,7 @@
         <title>Bio Pose | Carga de Video</title>
         <link rel="stylesheet" href="../static/styles/upload_video.css">
         <link rel="stylesheet" href="../static/styles/loader.css">
-        <link rel="icon" href="../static/assets/logotipo.png">
+        <link rel="icon" href="../static/assets/logo.png">
         <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
     </head>
     <body>
@@ -28,14 +28,36 @@
                                     </select>
                                 </div>
                             </div>
-                            <div class="content_options_frames">
-                                <div>
-                                    <label>Imagenes por Segundo:</label>
+                            <div class="content_secondary_options">
+                                <div class="content_options_frames">
+                                    <div>
+                                        <label style="text-align:center;">Imagenes por Segundo:</label>
+                                    </div>
+                                    <div>
+
+                                        <input type="number" class="form-select" id="txtNumberFPS" placeholder="No tienes parametrizado un valor" min="1" max="24">
+
+                                    </div>
                                 </div>
-                                <div>
 
-                                    <input type="number" class="form-select" id="txtNumberFPS" placeholder="No tienes parametrizado un valor" min="1" max="24">
-
+                                <div class="content-options-elements" id="content-options-elements">
+                                    <p>Tu imagen será redimensionada a:
+                                        <strong><span id="val_width"></span></strong>
+                                        X
+                                        <strong><span id="val_height"></span></strong>
+                                    </p>
+                                    <select id="select-option" class="selected-options">
+                                        <optgroup label="Elije una dimension en PX"></optgroup>
+                                        <option value="option1">175 X 260</option>
+                                        <option value="option2">225 X 334</option>
+                                        <option value="option3" selected>300 X 445</option>
+                                    </select>
+                                    <select id="select-option-horizontal" class="selected-options">
+                                        <optgroup label="Elije una dimension en PX"></optgroup>
+                                        <option value="option1">250 X 167</option>
+                                        <option value="option2">300 X 200</option>
+                                        <option value="option3" selected>350 X 233</option>
+                                    </select>
                                 </div>
                             </div>
 
@@ -77,23 +99,7 @@
                         <div class="resize_content">
                             <div>
                                 <h2>Dimension de la imagen actual 300 x 445</h2>
-                                <!--<p>Ancho :<span id="w" style="font-weight:400;"></span></p>
-                                <p class="dimension_h">Alto :<span id="h" style="font-weight:400;"></span></p>-->
                             </div>
-                            <!--<select id="select-option" class="select-option">
-                                <optgroup label="Elije una dimension en PX"></optgroup>
-                                <option value="option1">175 X 260</option>
-                                <option value="option2">225 X 334</option>
-                                <option value="option3" selected>300 X 445</option>
-                            </select>
-                            <select id="select-option-horizontal" class="select-option">
-                                <optgroup label="Elije una dimension en PX"></optgroup>
-                                <option value="option1">250 X 167</option>
-                                <option value="option2">300 X 200</option>
-                                <option value="option3" selected>350 X 233</option>
-                            </select>
-                            <button type="button" class="generateButton" onclick="resizeNewDimension()">Redimensionar</button>
-                            -->
 
                             <div class="content_mini_cards" id="content_mini_cards">
                                 <div class="content_mini_cards_left">
@@ -119,11 +125,12 @@
                                     <div class="card_element" id="13">13</div>
                                 </div>
                             </div>
+                            <button id="btn_omitir_imagen" class="btn-omitir">Omitir Imagen</button>
                         </div>
                     </div>
                     <div class="modal-footer">
                         <div id="modal_footer_images"></div>
-                        <button type="button" id="saveButton">Guardar en BD</button>
+                        <button type="button" id="saveButton">Guardar Imagen</button>
                     </div>
                 </div>
             </div>

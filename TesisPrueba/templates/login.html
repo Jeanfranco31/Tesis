@@ -4,8 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>BoiPose | Inicio de Sesión</title>
-    <link rel="icon" href="../static/assets/logotipo.png">
+    <link rel="icon" href="../static/assets/logo.png">
     <link href="../static/styles/login.css" rel="stylesheet" type="text/css">
+    <link rel="stylesheet" href="../static/styles/loader.css">
+
 </head>
 <body>
       <div class="main-container">
@@ -42,45 +44,37 @@
 
       <div id="message_content" class="message-content"></div>
 
+      <div class="loader_container" id="loader_container">
+            <div class="load_container_sub">
+                <div class="boxes">
+                    <div class="box">
+                        <div></div>
+                        <div></div>
+                        <div></div>
+                        <div></div>
+                    </div>
+                    <div class="box">
+                        <div></div>
+                        <div></div>
+                        <div></div>
+                        <div></div>
+                    </div>
+                    <div class="box">
+                        <div></div>
+                        <div></div>
+                        <div></div>
+                        <div></div>
+                    </div>
+                    <div class="box">
+                        <div></div>
+                        <div></div>
+                        <div></div>
+                        <div></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
   <script src="../static/scripts/login.js"></script>
 </body>
 </html>
-
-
-
-
-<!-- <!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Inicio de Sesión</title>
-    <link href="../static/styles/login.css" rel="stylesheet" type="text/css">
-</head>
-<body>
-  <div class="main_container">
-    <div class="login_box">
-      <div class="header">
-        <h1>Bienvenido</h1>
-        <p>Inicia sesión para continuar</p>
-      </div>
-      <form class="form">
-          <div class="input-group">
-              <label for="mail">Correo Electrónico</label>
-              <input type="text" name="mail" id="mail" placeholder="Ingresa tu correo">
-          </div>
-          <div class="input-group">
-              <label for="password">Contraseña</label>
-              <input type="password" name="password" id="password" placeholder="Ingresa tu contraseña">
-          </div>
-          <button type="button" class="sign" onclick="getLogin()">Ingresar</button>
-      </form>
-      <p class="signup">¿No tienes cuenta?
-          <a href="{{ url_for('create_accountView') }}">Regístrate aquí</a>
-      </p>
-    </div>
-    <div id="message_content" class="message-content"></div>
-  </div>
-  <script src="../static/scripts/login.js"></script>
-</body>
-</html> -->
