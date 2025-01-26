@@ -152,6 +152,33 @@ button:hover {
     height:40px;
 }
 
+.content_pass{
+    position:relative;
+    border-radius:4px;
+    width:100%;
+}
+.bi-eye{
+    color:#fff;
+}
+#inputPass{
+    width: 80%;
+    padding: 0.75rem 1rem;
+    border-radius: 0.375rem;
+    border: 1px solid rgba(55, 65, 81, 1);
+    background-color: rgba(17, 24, 39, 1);
+    color: #f3f4f6;
+    font-size: 0.875rem;
+}
+
+#inputVerifyPass{
+    width: 80%;
+    padding: 0.75rem 1rem;
+    border-radius: 0.375rem;
+    border: 1px solid rgba(55, 65, 81, 1);
+    background-color: rgba(17, 24, 39, 1);
+    color: #f3f4f6;
+    font-size: 0.875rem;
+}
 
 
 /* Responsive */
