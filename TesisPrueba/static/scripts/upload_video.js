@@ -12,6 +12,7 @@ const modalImage = document.getElementById('modal-img');
 const txtNumberFPS = document.getElementById('txtNumberFPS');
 const omitirImagen = document.getElementById('btn_omitir_imagen');
 const contentOptions = document.getElementById('content-options-elements');
+const selectOptions = document.getElementById('selectOptions');
 
 const val_width = document.getElementById('val_width');
 const val_height = document.getElementById('val_height');
@@ -24,6 +25,7 @@ let imagesArray = [];
 let opcionActual = '';
 var width_resize;
 var height_resize;
+var selectedOptionPath = '';
 
 var divToPoints = [
                         {'id':'0', 'name':'Nariz', 'divName': document.getElementById('1')},
@@ -62,12 +64,13 @@ var divToPoints = [
 
         if (selectOptions.options.length > 0) {
             selectOptions.selectedIndex = 0;
-            selectedOption = selectOptions.options[0].textContent;
-            console.log(selectedOption)
+            //selectedOption = selectOptions.options[0].textContent;
+            selectedOptionPath = selectOptions.options[0].textContent;
+            console.log(selectedOptionPath)
         }
         selectOptions.addEventListener('change', (event) => {
-            selectedOption = event.target.selectedOptions[0].textContent;
-            console.log(selectedOption)
+            selectedOptionPath = event.target.selectedOptions[0].textContent;
+            console.log(selectedOptionPath)
         });
 
         txtNumberFPS.disabled = true;
@@ -286,8 +289,9 @@ var divToPoints = [
                         'file': fileName,
                         'width': width_resize,
                         'height': height_resize,
-                        'pathToSave': selectedOption
+                        'pathToSave': selectedOptionPath
                     };
+                    console.log(data)
 
                     modal.hide();
                     try {

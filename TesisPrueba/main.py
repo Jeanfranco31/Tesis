@@ -274,6 +274,7 @@ def saveImageData():
         center_y = heigth_file/2
         local_path = str(file)
         final_path = local_path+'\\Imagen'
+        print('ruta final:',final_path)
 
         # si la ruta Imagen no existe la crea
         if not os.path.exists(final_path):
@@ -289,6 +290,7 @@ def saveImageData():
         # Guardar el JSON con los puntos
         json_file_name = "Points_Json.json"
         path_json = os.path.join(local_path, json_file_name)
+        print('path_json:',path_json)
 
         new_image_json = {
                         "path":name_to_save,
