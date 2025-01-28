@@ -10,7 +10,23 @@ const emailMessage = document.getElementById('emailMessage');
 const passMessageVerify = document.getElementById('passMessageVerify');
 const checkIdentification = document.getElementById('rb_identification');
 const checkPassport = document.getElementById('rb_passport');
+const iconViewPassword = document.getElementById('iconPassword');
+const iconViewPasswordVerify = document.getElementById('iconPasswordVerify');
 
+
+
+
+
+
+iconViewPassword.addEventListener('click', ()=>{
+    const isPassword = inputPass.type === 'password';
+    inputPass.type = isPassword ? 'text' : 'password';
+});
+
+iconViewPasswordVerify.addEventListener('click', ()=>{
+    const isPassword = inputVerifyPass.type === 'password';
+    inputVerifyPass.type = isPassword ? 'text' : 'password';
+});
 
 async function createAccount() {
     const form = new FormData();

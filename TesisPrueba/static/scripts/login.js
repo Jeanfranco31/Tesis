@@ -3,6 +3,12 @@ const inputPassword = document.getElementById('password');
 const emailMessageError = document.getElementById('emailMessage');
 const passMessageError = document.getElementById('passMessage');
 const loader = document.getElementById('loader_container');
+const iconViewPassword = document.getElementById('iconPassword');
+
+iconViewPassword.addEventListener('click', ()=>{
+    const isPassword = inputPassword.type === 'password';
+    inputPassword.type = isPassword ? 'text' : 'password';
+});
 
     async function getLogin() {
         const form = new FormData();

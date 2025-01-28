@@ -20,6 +20,7 @@ const buttonSaveImage = document.getElementById('saveButton');
 
 
 var selectedOption = '';
+var selectedOptionPath = '';
 var selectedOptionResize = '';
 const h = document.getElementById('h');
 const w = document.getElementById('w');
@@ -61,12 +62,12 @@ var height_resize;
 
         if (selectOptions.options.length > 0) {
             selectOptions.selectedIndex = 0;
-            selectedOption = selectOptions.options[0].textContent;
-                    console.log('OP1:',selectedOption)
+            selectedOptionPath = selectOptions.options[0].textContent;
+                    console.log('OP1:',selectedOptionPath)
 
         }
         selectOptions.addEventListener('change', (event) => {
-            selectedOption = event.target.selectedOptions[0].textContent;
+            selectedOptionPath = event.target.selectedOptions[0].textContent;
         });
 
     });
@@ -215,6 +216,8 @@ var height_resize;
         formData.append('image', cachedFile);
         formData.append('width',width_resize);
         formData.append('height',height_resize);
+        console.log(width_resize)
+                console.log(height_resize)
 
         try{
             const response = await fetch('/resize_image', {
@@ -396,8 +399,9 @@ var height_resize;
             file : this.fileModalImageName,
             width : this.width_resize,
             height : this.height_resize,
-            pathToSave : selectedOption
+            pathToSave : selectedOptionPath //
         };
+                console.log('data',selectedOptionPath)
 
         console.log('data',data)
 

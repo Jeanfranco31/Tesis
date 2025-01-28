@@ -67,12 +67,20 @@ async function cargarUsuarios() {
 
 function deleteUser(button){
     let rows = button.closest('tr');
-    let rowData = Array.from(rows.querySelectorAll('td')).map(td => td.textContent);
+    let rowData = [];
+    rowData = Array.from(rows.querySelectorAll('td')).map(td => td.textContent);
+
     openModalDeleteUser(rowData);
 }
 
+
 async function openModalDeleteUser(rowData){
     modalDeleteUser.style.display = "block";
+
+    btnCancelOption.addEventListener('click',()=>{
+        rowData = []
+        modalDeleteUser.style.display = "none";
+    });
 
     deleteButtonOption.addEventListener("click", async() =>{
         let request = new FormData();
@@ -95,6 +103,7 @@ async function openModalDeleteUser(rowData){
         closeModalDeleteUser();
     }, {once:true});
 }
+
 
 function generateMessageError(message){
     const messageDiv = document.createElement('div');
