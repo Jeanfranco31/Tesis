@@ -272,7 +272,7 @@ var height_resize;
         pointContainer.style.position = 'absolute';
         pointContainer.style.width = `${imgW}px`;
         pointContainer.style.height = `${imgH}px`;
-
+        pointContainer.style.overflow = 'hidden';
         points.forEach((point) => {
             const [index, x, y] = point;
             const pointDiv = document.createElement('div');

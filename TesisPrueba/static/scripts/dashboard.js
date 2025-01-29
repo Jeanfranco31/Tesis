@@ -35,13 +35,52 @@ document.addEventListener("DOMContentLoaded", async function () {
 });
 
 async function saveFirstTutorial(){
+    const form = new FormData();
+    const regexRutaWindows = /^[a-zA-Z]:\\(?:[^\\/:*?"<>|\r\n]+\\)*[^\\/:*?"<>|\r\n]*$/;
+    const rutaIngresada = txtPath.value;
+    const valid = true;
+    console.log(rutaIngresada);
 
-    if(txtPath.value != null && txtPath.value != "" && txtFPS.value != null && txtFPS.value != ""){
-
-        const form = new FormData();
+    if(rutaIngresada != null && rutaIngresada != "" && rutaIngresada != null && rutaIngresada != ""){
         form.append('id_user',localStorage.getItem('id'));
-        form.append('main_path',txtPath.value);
-        form.append('fps_value',txtFPS.value);
+        form.append('main_path',rutaIngresada);
+        if(txtFPS.value != '' || txtFPS.value != null){
+            form.append('fps_value',txtFPS.value);
+        }
+
+        if(!regexRutaWindows.test(rutaIngresada)){
+            valid = false;
+        } else if(rutaIngresada == ''){
+            valid = false;
+        } else {
+            form.append('path',rutaIngresada);
+        }
+    
+        if (!valid) {
+            const messageDiv = document.createElement('div');
+            messageDiv.textContent = 'El formulario de ruta contiene errores y no se enviará';
+            messageDiv.style.position = 'fixed';
+            messageDiv.style.bottom = '20px';
+            messageDiv.style.right = '20px';
+            messageDiv.style.backgroundColor = 'rgb(239, 79, 61)';
+            messageDiv.style.color = '#fff';
+            messageDiv.style.padding = '10px 20px';
+            messageDiv.style.borderRadius = '8px';
+            messageDiv.style.boxShadow = '0 2px 6px rgba(0, 0, 0, 0.2)';
+            messageDiv.style.fontSize = '16px';
+            messageDiv.style.zIndex = '1000';
+            messageDiv.style.transition = 'opacity 0.5s';
+    
+            document.body.appendChild(messageDiv);
+    
+            setTimeout(() => {
+                messageDiv.style.opacity = '0';
+                setTimeout(() => {
+                    messageDiv.remove();
+                }, 500);
+            }, 3000);
+            return;
+        }
 
         const request = await fetch('/saveFirstTutorialInfo',{
              method: 'POST',
@@ -49,12 +88,37 @@ async function saveFirstTutorial(){
         });
 
         const response = await request.json();
+
+        const messageDiv = document.createElement('div');
+        messageDiv.textContent = 'Configuración inicial guardada correctamente';
+        messageDiv.style.position = 'fixed';
+        messageDiv.style.bottom = '20px';
+        messageDiv.style.right = '20px';
+        messageDiv.style.backgroundColor = 'rgb(91, 239, 61)';
+        messageDiv.style.color = '#fff';
+        messageDiv.style.padding = '10px 20px';
+        messageDiv.style.borderRadius = '8px';
+        messageDiv.style.boxShadow = '0 2px 6px rgba(0, 0, 0, 0.2)';
+        messageDiv.style.fontSize = '16px';
+        messageDiv.style.zIndex = '1000';
+        messageDiv.style.transition = 'opacity 0.5s';
+
+        document.body.appendChild(messageDiv);
+
+        setTimeout(() => {
+            messageDiv.style.opacity = '0';
+            setTimeout(() => {
+                messageDiv.remove();
+            }, 500);
+        }, 3000);
+
         modal_first_session.style.display = 'none';
         localStorage.setItem('frames',txtFPS.value);
 
     }else{
         console.log('Verifica que ambos campos contengan datos')
     }
+    
 }
 
 async function validateHasTutorial(token){

@@ -1,5 +1,6 @@
 const main_content_view = document.getElementById('main_container_routes');
 const folderPath = document.getElementById('folderInput');
+const container_button_save = document.getElementById('container_button_save');
 const buttonSave = document.getElementById('button_save');
 const closeModalButton = document.getElementById('save');
 const modalCreateFolder = document.getElementById('modal_create_folder');
@@ -44,13 +45,13 @@ async function HasPath(){
             method: 'POST',
             body: form
         });
-        const data = await response.json()
-
+        const data = await response.json();
         if(data.ruta){
-
             folderPath.placeholder = '';
             folderPath.disabled = true;
             buttonSave.style.display = "none";
+            buttonSave.disabled = true
+            container_button_save.style.display = "none"; 
             folderPath.value = data.ruta;
             main_path = data.ruta;
         }else {
@@ -63,9 +64,25 @@ async function HasPath(){
 }
 
 async function saveMainPath(){
-    const form = new FormData()
-    form.append('path',folderPath.value)
-    form.append('id', localStorage.getItem('id'))
+    const form = new FormData();
+    let valid = true;
+    const regexRutaWindows = /^[a-zA-Z]:\\(?:[^\\/:*?"<>|\r\n]+\\)*[^\\/:*?"<>|\r\n]*$/;
+    const rutaIngresada = folderPath.value;
+    console.log(rutaIngresada);
+    form.append('id', localStorage.getItem('id'));
+
+    if(!regexRutaWindows.test(rutaIngresada)){
+        valid = false;
+    } else if(rutaIngresada == ''){
+        valid = false;
+    } else {
+        form.append('path',rutaIngresada);
+    }
+
+    if (!valid) {
+        console.error('El formulario de ruta contiene errores y no se enviará.');
+        return;
+    }
 
     try{
         const request = await fetch('/parametrizador-ruta-principal',{

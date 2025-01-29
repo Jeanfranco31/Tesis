@@ -29,7 +29,7 @@
                             <label>Ruta Principal:</label>
                             <input type="text" id="folderInput" placeholder="Pega aqui la ruta que tendra tu proyecto completo">
                         </div>
-                        <div class="button_save" onclick="saveMainPath()">
+                        <div id="container_button_save" class="button_save" onclick="saveMainPath()">
                             <button id="button_save">Guardar configuración</button>
                         </div>
                     </div>
@@ -55,7 +55,7 @@
         <section class="content_table">
             <h2>Rutas Parametrizadas Actualmente</h2>
             <div class="add_route_button">
-                <button onclick="openModalCreatePath()">Agregar Nueva Ruta</button>
+                <button onclick="openModalCreatePath()">Agregar Nueva Carpeta</button>
             </div>
             <table>
             <thead>

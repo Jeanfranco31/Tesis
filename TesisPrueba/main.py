@@ -766,7 +766,7 @@ def generate_images_from_videos():
     try:
         frames = []
         with VideoFileClip(video_path) as clip:
-            max_duration = 10
+            max_duration = 30
             fps = fps_value
             frame_times = [i / fps for i in range(int(min(clip.duration, max_duration) * fps))]
 
