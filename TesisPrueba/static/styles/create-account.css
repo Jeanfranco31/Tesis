@@ -154,14 +154,18 @@ button:hover {
 
 .content_pass{
     position:relative;
+    display: flex;
+    align-items: center;
     border-radius:4px;
     width:100%;
 }
 .bi-eye{
     color:#fff;
+    position: absolute;
+    right: 10px;
 }
 #inputPass{
-    width: 80%;
+    width: 100%;
     padding: 0.75rem 1rem;
     border-radius: 0.375rem;
     border: 1px solid rgba(55, 65, 81, 1);
@@ -171,7 +175,7 @@ button:hover {
 }
 
 #inputVerifyPass{
-    width: 80%;
+    width: 100%;
     padding: 0.75rem 1rem;
     border-radius: 0.375rem;
     border: 1px solid rgba(55, 65, 81, 1);

@@ -958,7 +958,7 @@ def save_frames_for_video():
 
                     return jsonify({
                         'result': True,
-                        'message': 'Parametrizacion de FPS actualizado'
+                        'message': 'Parametrización de FPS actualizado'
                     })
         except pyodbc.Error as e:
             return jsonify({'result': False, 'message': 'Error interno del servidor'}), 500

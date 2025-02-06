@@ -179,20 +179,17 @@ async function saveNewFolder(){
 
 function generateMessageSuccesfull(message){
     const messageDiv = document.createElement('div');
-    messageDiv.style.position = 'absolute';
+    messageDiv.textContent = message;
+    messageDiv.style.position = 'fixed';
     messageDiv.style.bottom = '4%';
     messageDiv.style.right = '4%';
     messageDiv.style.backgroundColor = 'rgba(103, 220, 17 ,0.8)';
-    messageDiv.style.border = '1px solid #ccc';
-    messageDiv.style.borderRadius = '5px';
-    messageDiv.style.width = '220px';
-    messageDiv.style.height = '60px';
-
-    const messageText = document.createElement('p');
-    messageText.textContent = message;
-    messageText.style.textAlign  = 'center';
-    messageText.style.lineHeight = '60px';
-    messageDiv.appendChild(messageText);
+    messageDiv.style.padding = '10px 20px';
+    messageDiv.style.borderRadius = '8px';
+    messageDiv.style.boxShadow = '0 2px 6px rgba(0, 0, 0, 0.2)';
+    messageDiv.style.fontSize = '16px';
+    messageDiv.style.zIndex = '1000';
+    messageDiv.style.transition = 'opacity 0.5s';
 
     document.body.appendChild(messageDiv);
 
@@ -203,21 +200,17 @@ function generateMessageSuccesfull(message){
 
 function generateMessageError(message){
     const messageDiv = document.createElement('div');
+    messageDiv.textContent = message;
     messageDiv.style.position = 'fixed';
     messageDiv.style.bottom = '4%';
     messageDiv.style.right = '4%';
     messageDiv.style.backgroundColor = '#da0b0b';
-    messageDiv.style.border = '1px solid #ccc';
-    messageDiv.style.borderRadius = '5px';
-    messageDiv.style.width = '220px';
-    messageDiv.style.height = '60px';
-
-    const messageText = document.createElement('p');
-    messageText.textContent = message;
-    messageText.style.textAlign  = 'center';
-    messageText.style.lineHeight = '60px';
-    messageText.style.color = '#ffffff';
-    messageDiv.appendChild(messageText);
+    messageDiv.style.padding = '10px 20px';
+    messageDiv.style.borderRadius = '8px';
+    messageDiv.style.boxShadow = '0 2px 6px rgba(0, 0, 0, 0.2)';
+    messageDiv.style.fontSize = '16px';
+    messageDiv.style.zIndex = '1000';
+    messageDiv.style.transition = 'opacity 0.5s';
 
     document.body.appendChild(messageDiv);
 
