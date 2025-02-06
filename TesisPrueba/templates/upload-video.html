@@ -46,7 +46,7 @@
                                         X
                                         <strong><span id="val_height"></span></strong>
                                     </p>
-                                    <select id="select-option" class="selected-options">
+                                    <select id="select-option-vertical" class="selected-options">
                                         <optgroup label="Elije una dimension en PX"></optgroup>
                                         <option value="option1">175 X 260</option>
                                         <option value="option2">225 X 334</option>
@@ -57,6 +57,12 @@
                                         <option value="option1">250 X 167</option>
                                         <option value="option2">300 X 200</option>
                                         <option value="option3" selected>350 X 233</option>
+                                    </select>
+                                    <select id="select-option-cuadrada" class="selected-options">
+                                        <optgroup label="Elije una dimension en PX"></optgroup>
+                                        <option value="option1">250 X 250</option>
+                                        <option value="option2">300 X 300</option>
+                                        <option value="option3" selected>350 X 350</option>
                                     </select>
                                 </div>
                             </div>
@@ -97,8 +103,11 @@
                             <div id="point-container"></div>
                         </div>
                         <div class="resize_content">
-                            <div>
-                                <h2>Dimension de la imagen actual 300 x 445</h2>
+                            <div class="resize_subcontent">
+                                <h2>Dimensión de la imagen actual</h2>
+                                <strong><span id="val_width_modal"></span></strong>
+                                X
+                                <strong><span id="val_height_modal"></span></strong>
                             </div>
 
                             <div class="content_mini_cards" id="content_mini_cards">

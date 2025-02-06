@@ -117,8 +117,10 @@ def upload_image():
             original_width, original_height = image.size
             if original_width > original_height:
                 image_position = 'horizontal'
-            else:
+            elif original_width < original_height:
                 image_position = 'vertical'
+            else:
+                image_position = 'cuadrada'
 
         # Procesar la imagen y detectar la pose
         img = cv.imread(filepath)
@@ -792,12 +794,16 @@ def upload_image_from_video():
             return jsonify({'message': 'No se envió ninguna imagen.'}), 400
 
         image_file = request.files['image']
-        width = int(request.form.get('width'))
-        height = int(request.form.get('height'))
         filename = image_file.filename
 
         if filename == '':
             return jsonify({'message': 'El nombre del archivo está vacío.'}), 400
+
+        try:
+            width = int(request.form.get('width', 0))
+            height = int(request.form.get('height', 0))
+        except ValueError:
+            return jsonify({'message': 'Los valores de width y height deben ser números enteros.'}), 400
 
         filepath = os.path.join(UPLOAD_FOLDER, filename)
         image_file.save(filepath)
@@ -807,16 +813,14 @@ def upload_image_from_video():
                 original_width, original_height = image.size
 
                 if original_width > original_height:
-                    resized_img = image.resize((width, height))
-                    final_width = width
-                    final_height = height
+                    final_width, final_height = width, height
+                elif original_height > original_width:
+                    final_width, final_height = width, height
                 else:
-                    resized_img = image.resize((width, height))
-                    final_width = width
-                    final_height = height
-
+                    final_width = final_height = min(width, height) if width and height else 300  # Valor por defecto
 
                 #resized_img = image.resize((300, 445))
+                resized_img = image.resize((final_width, final_height))
                 resized_image_name = 'resized_' + filename
                 output_path_file = os.path.join(UPLOAD_FOLDER, resized_image_name)
                 resized_img.save(output_path_file)
@@ -836,7 +840,12 @@ def upload_image_from_video():
         output_path = os.path.join(UPLOAD_FOLDER, 'points_' + filename)
         cv.imwrite(output_path, img_with_pose)
 
-        image_position = 'horizontal' if original_width > original_height else 'vertical'
+        if original_width > original_height:
+            image_position = 'horizontal'
+        elif original_height > original_width:
+            image_position = 'vertical'
+        else:
+            image_position = 'cuadrada'
 
         return jsonify({
             'message': 'Imagen procesada exitosamente.',
