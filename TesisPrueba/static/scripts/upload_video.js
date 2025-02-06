@@ -4,8 +4,9 @@ const buttonGenerateImagesFromVideo = document.getElementById('button');
 const modelImages = document.getElementById('imageModal');
 const loader = document.getElementById('loader_container');
 const saveButton = document.getElementById('saveButton');
-const option = document.getElementById('select-option');
+const optionVerticalImage = document.getElementById('select-option-vertical');
 const optionHorizontalImage = document.getElementById('select-option-horizontal');
+const optionCuadradaImage = document.getElementById('select-option-cuadrada');
 const close_icon = document.getElementById('closeIcon');
 const selectFrames = document.getElementById('frames');
 const modalImage = document.getElementById('modal-img');
@@ -13,6 +14,8 @@ const txtNumberFPS = document.getElementById('txtNumberFPS');
 const omitirImagen = document.getElementById('btn_omitir_imagen');
 const contentOptions = document.getElementById('content-options-elements');
 const selectOptions = document.getElementById('selectOptions');
+const val_width_modal = document.getElementById('val_width_modal');
+const val_height_modal = document.getElementById('val_height_modal');
 
 const val_width = document.getElementById('val_width');
 const val_height = document.getElementById('val_height');
@@ -80,7 +83,7 @@ var divToPoints = [
 
     });
 
-    option.addEventListener('change', (event) => {
+    optionVerticalImage.addEventListener('change', (event) => {
         selectedOption = event.target.value;
 
         if (selectedOption === 'option1') {
@@ -100,9 +103,7 @@ var divToPoints = [
             height_resize = 445;
             val_width.textContent = '300'
             val_height.textContent = '445'
-
         }
-
     });
 
     optionHorizontalImage.addEventListener('change', (event) => {
@@ -125,12 +126,31 @@ var divToPoints = [
             height_resize = 233;
             val_width.textContent = '350'
             val_height.textContent = '233'
-
         }
-
     });
 
+    optionCuadradaImage.addEventListener('change', (event) => {
+        selectedOption = event.target.value;
 
+        if (selectedOption === 'option1') {
+            width_resize = 250;
+            height_resize = 250;
+            val_width.textContent = '250'
+            val_height.textContent = '250'
+
+        } else if (selectedOption === 'option2') {
+            width_resize = 300;
+            height_resize = 300;
+            val_width.textContent = '300'
+            val_height.textContent = '300'
+
+        } else if (selectedOption === 'option3') {
+            width_resize = 350;
+            height_resize = 350;
+            val_width.textContent = '350'
+            val_height.textContent = '350'
+        }
+    });
 
 // Permite arrastrar el archivo sobre la zona de drop
     dropZone.addEventListener('dragover', (e) => {
@@ -192,8 +212,9 @@ var divToPoints = [
 
             if (videoWidth > videoHeight) {
                 contentOptions.style.display = 'block';
-                option.style.display = 'none';
+                optionVerticalImage.style.display = 'none';
                 optionHorizontalImage.style.display = 'block';
+                optionCuadradaImage.style.display = 'none';
                 width_resize = 350;
                 height_resize = 233;
                 val_width.textContent = '350';
@@ -201,11 +222,21 @@ var divToPoints = [
             } else if (videoWidth < videoHeight) {
                 contentOptions.style.display = 'block';
                 optionHorizontalImage.style.display = 'none';
-                option.style.display = 'block';
+                optionVerticalImage.style.display = 'block';
+                optionCuadradaImage.style.display = 'none';
                 width_resize = 300;
                 height_resize = 445;
                 val_width.textContent = '300';
                 val_height.textContent = '445';
+            } else if (videoWidth == videoHeight) {
+                contentOptions.style.display = 'block';
+                optionVerticalImage.style.display = 'none';
+                optionHorizontalImage.style.display = 'none';
+                optionCuadradaImage.style.display = 'block';
+                width_resize = 350;
+                height_resize = 350;
+                val_width.textContent = '350';
+                val_height.textContent = '350';
             }
         });
     }
@@ -346,6 +377,8 @@ var divToPoints = [
             points = result.position;
             width_resize  = result.width;
             height_resize = result.height;
+            val_width_modal.textContent = result.width;
+            val_height_modal.textContent = result.height;
             fileName = result.filename;
             console.log('result',result)
             if (result.path) {

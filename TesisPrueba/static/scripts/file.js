@@ -5,9 +5,10 @@ const previewImg = document.getElementById('preview-img');
 const button = document.getElementById('button');
 const modalImgPreview = document.getElementById('modal-imgPreview');
 const modalImg = document.getElementById('modal-img');
-const option = document.getElementById('select-option');
 const selectOptions = document.getElementById('selectOptions');
+const optionVerticalImage = document.getElementById('select-option-vertical');
 const optionHorizontalImage = document.getElementById('select-option-horizontal');
+const optionCuadradaImage = document.getElementById('select-option-cuadrada');
 const modalEdit = document.getElementById('imageModal');
 const containerMiniCards = document.getElementById('content_mini_cards');
 const contentOptions = document.getElementById('content-options');
@@ -72,7 +73,7 @@ var height_resize;
 
     });
 
-    option.addEventListener('change', (event) => {
+    optionVerticalImage.addEventListener('change', (event) => {
         selectedOption = event.target.value;
 
         if (selectedOption === 'option1') {
@@ -122,6 +123,29 @@ var height_resize;
 
     });
 
+    optionCuadradaImage.addEventListener('change', (event) => {
+        selectedOption = event.target.value;
+
+        if (selectedOption === 'option1') {
+            width_resize = 250;
+            height_resize = 250;
+            val_width.textContent = '250'
+            val_height.textContent = '250'
+
+        } else if (selectedOption === 'option2') {
+            width_resize = 300;
+            height_resize = 300;
+            val_width.textContent = '300'
+            val_height.textContent = '300'
+
+        } else if (selectedOption === 'option3') {
+            width_resize = 350;
+            height_resize = 350;
+            val_width.textContent = '350'
+            val_height.textContent = '350'
+
+        }
+    });
 
     dropZone.addEventListener('dragover', (e) => {
         e.preventDefault();
@@ -177,8 +201,9 @@ var height_resize;
 
                 if(img.width > img.height){
                     contentOptions.style.display = 'block';
-                    option.style.display = 'none';
+                    optionVerticalImage.style.display = 'none';
                     optionHorizontalImage.style.display = 'block';
+                    optionCuadradaImage.style.display = 'none';
                     width_resize = 350;
                     height_resize = 233;
                     val_width.textContent = '350'
@@ -187,11 +212,21 @@ var height_resize;
                 }else if(img.width < img.height ){
                     contentOptions.style.display = 'block';
                     optionHorizontalImage.style.display = 'none';
-                    option.style.display = 'block';
+                    optionVerticalImage.style.display = 'block';
+                    optionCuadradaImage.style.display = 'none';
                     width_resize = 300;
                     height_resize = 445;
                     val_width.textContent = '300'
                     val_height.textContent = '445'
+                }else if(img.width == img.height){
+                    contentOptions.style.display = 'block';
+                    optionVerticalImage.style.display = 'none';
+                    optionHorizontalImage.style.display = 'none';
+                    optionCuadradaImage.style.display = 'block';
+                    width_resize = 350;
+                    height_resize = 350;
+                    val_width.textContent = '350'
+                    val_height.textContent = '350'
                 }
             };
             img.src = event.target.result;
@@ -216,8 +251,8 @@ var height_resize;
         formData.append('image', cachedFile);
         formData.append('width',width_resize);
         formData.append('height',height_resize);
-        console.log(width_resize)
-                console.log(height_resize)
+        console.log(width_resize);
+        console.log(height_resize);
 
         try{
             const response = await fetch('/resize_image', {
@@ -234,8 +269,8 @@ var height_resize;
                 data = await response.json();
                 this.response = data;
                 this.filePathName = data.path;
-                this.width_resize = data.ancho
-                this.height_resize = data.alto
+                this.width_resize = data.ancho;
+                this.height_resize = data.alto;
                 val_width_modal.textContent = data.ancho;
                 val_height_modal.textContent = data.alto;
 
@@ -567,7 +602,12 @@ var height_resize;
         this.optionHorizontalImage = event.target.value;
     });
 
-
+    optionCuadradaImage.addEventListener('click', (event) => {
+        event.stopPropagation();
+    });
+    optionCuadradaImage.addEventListener('change', (event) => {
+        this.optionCuadradaImage = event.target.value;
+    });
 
 
 
@@ -576,21 +616,21 @@ var height_resize;
         let new_image;
         let width, height;
 
-        if(this.optionHorizontalImage != null){
-            if (this.optionHorizontalImage === 'option1') {
-                width = 250;
-                height = 167;
-            } else if (this.optionHorizontalImage === 'option2') {
-                width = 300;
-                height = 200;
-            } else if (this.optionHorizontalImage === 'option3') {
-                width = 350;
-                height = 233;
-            } else {
-                console.error('Opción no válida');
-                return;
-            }
-        }
+        // if(this.optionHorizontalImage != null){
+        //     if (this.optionHorizontalImage === 'option1') {
+        //         width = 250;
+        //         height = 167;
+        //     } else if (this.optionHorizontalImage === 'option2') {
+        //         width = 300;
+        //         height = 200;
+        //     } else if (this.optionHorizontalImage === 'option3') {
+        //         width = 350;
+        //         height = 233;
+        //     } else {
+        //         console.error('Opción no válida');
+        //         return;
+        //     }
+        // }
 
         this.new_image = '';
         const formData = new FormData();
