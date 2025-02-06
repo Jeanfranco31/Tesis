@@ -110,7 +110,7 @@ async function cargarRutas() {
             body: data
         });
         const datos = await response.json();
-
+        console.log(datos)
         const tablaCuerpo = document.getElementById('tabla-cuerpo');
         tablaCuerpo.style.position = 'relative';
 
@@ -304,27 +304,56 @@ async function openModalOptions(rowData){
          form.append('frame_value',txtNumberFPS.value)
          form.append('id_user', localStorage.getItem('id'));
 
-         try {
-            const response = await fetch('/saveNewFrame', {
-                method: 'POST',
-                body: form
-            });
+         if(txtNumberFPS.value >= 1 && txtNumberFPS.value <= 24)
+         {
+             try {
+                 const response = await fetch('/saveNewFrame', {
+                    method: 'POST',
+                    body: form
+                 });
 
-            if (!response.ok) {
-              throw new Error(`Error saving frame: ${response.statusText}`);
-            }
+                 if (!response.ok) {
+                    throw new Error(`Error saving frame: ${response.statusText}`);
+                 }
 
-            const data = await response.json();
-            localStorage.setItem('frames', txtNumberFPS.value);
-            generateMessageSuccesfull(data.message);
-            txtNumberFPS.disabled = true;
-            iconSaveNewFrame.style.display = 'none';
-            iconEditFrame.style.display = 'block';
-            iconCancelFrame.style.display = 'none';
+                 const data = await response.json();
+                 localStorage.setItem('frames', txtNumberFPS.value);
+                 generateMessageSuccesfull(data.message);
+                 txtNumberFPS.disabled = true;
+                 iconSaveNewFrame.style.display = 'none';
+                 iconEditFrame.style.display = 'block';
+                 iconCancelFrame.style.display = 'none';
 
-         } catch (error) {
-            console.error('Error saving frame:', error);
+             } catch (error) {
+                 console.error('Error saving frame:', error);
+             }
+         }else{
+            const messageDiv = document.createElement('div');
+            messageDiv.textContent = 'No puedes ingresar un valor fuera del rango 1 - 24';
+            messageDiv.style.position = 'fixed';
+            messageDiv.style.bottom = '20px';
+            messageDiv.style.right = '20px';
+            messageDiv.style.backgroundColor = 'rgb(241, 2, 2)';
+            messageDiv.style.color = '#fff';
+            messageDiv.style.padding = '10px 20px';
+            messageDiv.style.borderRadius = '8px';
+            messageDiv.style.boxShadow = '0 2px 6px rgba(0, 0, 0, 0.2)';
+            messageDiv.style.fontSize = '16px';
+            messageDiv.style.zIndex = '1000';
+            messageDiv.style.transition = 'opacity 0.5s';
+
+            document.body.appendChild(messageDiv);
+
+            setTimeout(() => {
+                messageDiv.style.opacity = '0';
+                setTimeout(() => {
+                    messageDiv.remove();
+                }, 500);
+            }, 3000);
          }
+
+
+
     }
 
 

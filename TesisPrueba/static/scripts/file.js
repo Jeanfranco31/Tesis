@@ -184,7 +184,7 @@ var height_resize;
                     val_width.textContent = '350'
                     val_height.textContent = '233'
 
-                }else if(img.width < img.height){
+                }else if(img.width < img.height ){
                     contentOptions.style.display = 'block';
                     optionHorizontalImage.style.display = 'none';
                     option.style.display = 'block';
@@ -272,7 +272,6 @@ var height_resize;
         pointContainer.style.position = 'absolute';
         pointContainer.style.width = `${imgW}px`;
         pointContainer.style.height = `${imgH}px`;
-        pointContainer.style.overflow = 'hidden';
         points.forEach((point) => {
             const [index, x, y] = point;
             const pointDiv = document.createElement('div');
@@ -440,7 +439,7 @@ var height_resize;
             }
 
             const data = await response.json();
-
+            console.log(data)
             this.response = data;
 
             if (Array.isArray(this.response.position)) {
@@ -452,7 +451,7 @@ var height_resize;
                     buttonSaveImage.style.backgroundColor = '#0067e5';
                     buttonSaveImage.style.opacity = '0.5';
 
-                    let timeLeft = 5;
+                    let timeLeft = 10;
                     const contador = document.getElementById('cont');
                     const countdown = setInterval(() => {
                         timeLeft--;

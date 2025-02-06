@@ -38,7 +38,7 @@
             <section class="parametrizar_video">
                 <h5>Parametrización de FPS</h5>
                 <div class="content-select-fps">
-                    <input type="number" class="select-option_" id="txtNumberFPS" placeholder="No tienes parametrizado un valor" min="1" max="24">
+                    <input type="number" class="select-option_" id="txtNumberFPS" placeholder="No tienes parametrizado un valor" oninput="if(this.value.length > 2) this.value = this.value.slice(0,2)" min="1" max="24">
                     <p> FPS</p>
                     <div class="icon_edit_button">
                         <i id="icon_edit_button" class="bi bi-pencil-square" onclick="enabledSelectFrame()"></i>
