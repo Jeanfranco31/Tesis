@@ -14,8 +14,6 @@ const txtNumberFPS = document.getElementById('txtNumberFPS');
 const omitirImagen = document.getElementById('btn_omitir_imagen');
 const contentOptions = document.getElementById('content-options-elements');
 const selectOptions = document.getElementById('selectOptions');
-const val_width_modal = document.getElementById('val_width_modal');
-const val_height_modal = document.getElementById('val_height_modal');
 
 const val_width = document.getElementById('val_width');
 const val_height = document.getElementById('val_height');
@@ -377,8 +375,8 @@ var divToPoints = [
             points = result.position;
             width_resize  = result.width;
             height_resize = result.height;
-            val_width_modal.textContent = result.width;
-            val_height_modal.textContent = result.height;
+            val_width.textContent = result.width;
+            val_height.textContent = result.height;
             fileName = result.filename;
             console.log('result',result)
             if (result.path) {
