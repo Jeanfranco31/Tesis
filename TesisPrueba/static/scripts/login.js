@@ -10,6 +10,19 @@ iconViewPassword.addEventListener('click', ()=>{
     inputPassword.type = isPassword ? 'text' : 'password';
 });
 
+window.onload = function() {
+    const message = sessionStorage.getItem('successMessage');
+    if (message) {
+        messageInformation(message); // Muestra el mensaje
+        sessionStorage.removeItem('successMessage'); // Borra el mensaje tras mostrarlo
+
+        // Oculta el mensaje tras unos segundos
+        setTimeout(() => {
+            messageInformation('');
+        }, 4000);
+    }
+};
+
     async function getLogin() {
         const form = new FormData();
         let ruta;
@@ -160,3 +173,28 @@ iconViewPassword.addEventListener('click', ()=>{
             document.getElementById('login-button').click(); // Simular el clic en el botón
         }
     });
+
+    function messageInformation(message) {
+        const messageDiv = document.createElement('div');
+        messageDiv.textContent = message;
+        messageDiv.style.position = 'fixed';
+        messageDiv.style.bottom = '20px';
+        messageDiv.style.right = '20px';
+        messageDiv.style.backgroundColor = 'rgb(102, 199, 11)';
+        messageDiv.style.color = '#fff';
+        messageDiv.style.padding = '10px 20px';
+        messageDiv.style.borderRadius = '8px';
+        messageDiv.style.boxShadow = '0 2px 6px rgba(250, 250, 250, 0.2)';
+        messageDiv.style.fontSize = '16px';
+        messageDiv.style.zIndex = '1000';
+        messageDiv.style.transition = 'opacity 0.5s';
+    
+        document.body.appendChild(messageDiv);
+        
+        setTimeout(() => {
+            messageDiv.style.opacity = '0';
+            setTimeout(() => {
+                messageDiv.remove();
+            }, 500);
+        }, 3000);        
+    }

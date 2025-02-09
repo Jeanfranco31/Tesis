@@ -4,6 +4,8 @@ const inputCedula = document.getElementById('inputIdentification');
 const inputMail = document.getElementById('inputMail');
 const inputPass = document.getElementById('inputPass');
 const inputVerifyPass = document.getElementById('inputVerifyPass');
+const nameMessage= document.getElementById('nameMessage');
+const lastNameMessage= document.getElementById('lastNameMessage');
 const cedulaMessage = document.getElementById('cedulaMessage');
 const passMessage = document.getElementById('passMessage');
 const emailMessage = document.getElementById('emailMessage');
@@ -12,10 +14,6 @@ const checkIdentification = document.getElementById('rb_identification');
 const checkPassport = document.getElementById('rb_passport');
 const iconViewPassword = document.getElementById('iconPassword');
 const iconViewPasswordVerify = document.getElementById('iconPasswordVerify');
-
-
-
-
 
 
 iconViewPassword.addEventListener('click', ()=>{
@@ -35,10 +33,17 @@ async function createAccount() {
     //Validar Nombre y Apellido
     const nombre = inputName.value.trim();
     const apellido = inputApellido.value.trim();
-    if (nombre.length >= 3 && apellido.length >= 3) {
+    if (nombre.length >= 3) {
         form.append('name', nombre);
+    } else {
+        nameMessage.textContent = 'Este campo es obligatorio';
+        valid = false;
+    }
+
+    if (apellido.length >= 3) {
         form.append('lastName', apellido);
     } else {
+        lastNameMessage.textContent = 'Este campo es obligatorio';
         valid = false;
     }
 
@@ -144,7 +149,9 @@ async function createAccount() {
         
         const data = await response.json();
         if (data.created) {
+            sessionStorage.setItem('successMessage', 'Su usuario fue registrado con éxito');
             window.location.href = data.redirect_url;
+            messageInformation('Su usuario fue registrado con éxito');
         } else {
             document.getElementById('message_content').innerHTML =
             `
@@ -190,4 +197,3 @@ function validarCedula(cedula) {
 
     return digitoVerificador === digitos[9];
 }
-
